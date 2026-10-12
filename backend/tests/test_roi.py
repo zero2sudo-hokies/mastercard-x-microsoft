@@ -43,3 +43,22 @@ def test_overrides_and_curve():
 def test_request_validation(bad):
     with pytest.raises(ValueError):
         RoiRequest(fips="48215", **bad)
+
+
+def test_audience_bases_from_p3_fdic_inputs():
+    from fastapi.testclient import TestClient
+    from app.main import app
+    c = TestClient(app)
+    if not store.state_audience:
+        pytest.skip("data/p3/roi-inputs.json not present")
+    fips = next(a.fips for a in store.by_level["county"] if a.state_abbr == "NY")
+    ctx = c.get(f"/api/roi/context/{fips}").json()
+    assert ctx["state"]["state_abbr"] == "NY" and ctx["state"]["small_sample"] is True
+    under, unb, inter = (ctx["area_audience"][k] for k in ("underserved", "unbanked", "interested_unbanked"))
+    assert under > unb > inter > 0  # interest applies to unbanked only, never underbanked
+    r = c.post("/api/roi", json={"fips": fips, "audience_basis": "interested_unbanked", "adoption_rate": 0.1}).json()
+    assert r["audience"]["area_households"] == inter and r["program"]["accounts"] == round(inter * 0.1)
+    assert [s["level"] for s in r["scale"]] == ["County", "State", "United States"]  # no global "interested" base
+    assert r["scale"][1]["base"] == ctx["state"]["interested_unbanked_households"]
+    default = c.post("/api/roi", json={"fips": fips}).json()
+    assert default["inputs"]["audience_basis"] == "underserved" and default["audience"]["area_households"] == under

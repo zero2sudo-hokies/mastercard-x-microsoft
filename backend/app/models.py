@@ -7,6 +7,7 @@ Topic = Literal["fees", "fraud_scams", "transfers", "account_closed", "customer_
 TOPICS: tuple[str, ...] = ("fees", "fraud_scams", "transfers", "account_closed", "customer_service", "distrust")
 Level = Literal["state", "county"]
 IssuerType = Literal["community", "large_bank"]
+AudienceBasis = Literal["underserved", "unbanked", "interested_unbanked"]
 FrustrationStatus = Literal["ok", "low_data", "no_data"]
 TopicMap = dict[str, float]
 
@@ -140,6 +141,8 @@ class RoiRequest(BaseModel):
     cac: Optional[float] = Field(None, ge=0)
     fixed_program_cost: Optional[float] = Field(None, ge=0)
     network_yield: Optional[float] = Field(None, ge=0)
+    # who adoption applies to; data/p3: the interest share applies to unbanked households only
+    audience_basis: AudienceBasis = "underserved"
 
 
 class RoiArea(BaseModel):
@@ -156,6 +159,13 @@ class RoiInputs(BaseModel):
     cac: float
     fixed_program_cost: float
     network_yield: float
+    audience_basis: AudienceBasis = "underserved"
+
+
+class RoiAudience(BaseModel):
+    basis: AudienceBasis
+    area_households: int
+    label: str
 
 
 class RoiUnit(BaseModel):
@@ -197,6 +207,42 @@ class RoiResult(BaseModel):
     program: RoiProgram
     ltv_curve: list[LtvPoint]
     scale: list[ScaleRow]
+    labels: list[str]
+    audience: Optional[RoiAudience] = None
+
+
+class StateAudience(BaseModel):
+    state_abbr: str
+    survey_year: int
+    households: int
+    unbanked_households: int
+    unbanked_rate: float
+    underbanked_households: int
+    underbanked_rate: float
+    interested_share_of_unbanked: Optional[float] = None
+    interested_unbanked_households: Optional[int] = None
+    very_interested_households: Optional[int] = None
+    interested_and_once_banked_households: Optional[int] = None
+    n_unbanked_surveyed: int
+    small_sample: bool
+
+
+class BankBenchmark(BaseModel):
+    id: str
+    label: str
+    banks: int
+    net_interest_income_per_1000_deposits: float
+    deposit_account_fees_per_1000_deposits: float
+    all_operating_costs_per_1000_deposits: float
+    median_efficiency_ratio_pct: Optional[float] = None
+
+
+class RoiContext(BaseModel):
+    fips: str
+    state: Optional[StateAudience] = None
+    area_audience: dict[str, int]  # basis -> households for this area (county values are modeled)
+    banks: list[BankBenchmark]
+    bank_quarter: Optional[str] = None
     labels: list[str]
 
 

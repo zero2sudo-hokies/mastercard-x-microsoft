@@ -10,6 +10,7 @@ from app.models import Area, FrustrationArea
 
 log = logging.getLogger("navigator")
 APP = Path(__file__).parent
+ROI_INPUTS = APP.parent.parent / "data" / "p3" / "roi-inputs.json"  # P3's verified FDIC audience + bank benchmarks
 
 
 def _load(name):
@@ -44,6 +45,15 @@ class Store:
             for group in ("states", "counties")
             for fips, f in frustration_raw.get(group, {}).items()
         }
+
+        # optional: the ROI still works on benchmarks.json alone if this file is missing
+        self.roi_inputs = None
+        if ROI_INPUTS.exists():
+            try:
+                self.roi_inputs = json.loads(ROI_INPUTS.read_text(encoding="utf-8"))
+            except (OSError, ValueError):
+                log.warning("could not read %s", ROI_INPUTS)
+        self.state_audience = {r["state"]: r for r in (self.roi_inputs or {}).get("state_opportunities", [])}
 
     def state_households(self, state_fips: str) -> int:
         """Underserved households for a state: the state Area if present, else the sum of its counties."""

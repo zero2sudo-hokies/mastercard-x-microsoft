@@ -33,6 +33,8 @@ def build_facts(profile: dict, roi: dict, partner_name: str, notes: str) -> dict
         "deposit_earnings_per_account": u["deposit_earnings"], "fraud_loss_per_account": u["fraud_loss"],
         "servicing_cost_per_account": u["servicing"], "annual_margin_per_account": u["annual_margin"],
         "lifetime_value_per_account": u["ltv"], "net_per_account": u["net_per_account"], "breakeven_churn": u["breakeven_churn"],
+        "pilot_audience": (roi.get("audience") or {}).get("label"),
+        "pilot_audience_households": (roi.get("audience") or {}).get("area_households"),
         "pilot_accounts_modeled": p["accounts"], "issuer_net_lifetime_modeled": p["issuer_net_lifetime"],
         "network_volume_year1_modeled": p["network_volume_y1"], "network_revenue_year1_placeholder": p["network_revenue_y1_est"],
         "state_scale_accounts": state_scale and state_scale["accounts"], "us_scale_accounts": us_scale and us_scale["accounts"],

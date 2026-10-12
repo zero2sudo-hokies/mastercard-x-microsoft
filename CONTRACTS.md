@@ -212,6 +212,11 @@ Math (round money to whole dollars only at output, keep full precision inside):
 - `ltv_curve`: churn 0.10 to 0.45 step 0.01.
 - Scale: County = area, State = sum of `est_underserved_hh` of that state's counties (or the state Area), US = `us_underserved_hh`, Global = `global_unbanked_adults`. Same adoption_rate.
 
+### ROI audience (added after data/p3 FDIC inputs, additive)
+- `RoiRequest.audience_basis`: `"underserved"` (default, unchanged math) | `"unbanked"` | `"interested_unbanked"`. Accounts = audience households x adoption. State and US bases come from FDIC 2023 rows in `data/p3/roi-inputs.json`; county unbanked = households x state unbanked rate, county interested = that x state interest share (modeled). The interested basis has no Global scale row.
+- `RoiResult.audience`: `{ "basis", "area_households", "label" }`; `RoiResult.inputs.audience_basis` echoes the request.
+- `GET /api/roi/context/{fips}` -> `RoiContext`: `{ fips, state: StateAudience | null, area_audience: {basis: households}, banks: BankBenchmark[], bank_quarter, labels }`. Read-only context: bank ratios are whole-bank averages and never feed the ROI math.
+
 ### `POST /api/chat` (P3)
 Request:
 ```json
