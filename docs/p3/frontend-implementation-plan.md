@@ -6,6 +6,8 @@ Build a county dashboard that helps a Mastercard team shortlist pilot areas by m
 
 Use `ny_county_pilot_data.json` as the initial application data source and `ny_county_pilot_data.csv` for analyst review. The JSON has `metadata`, `counties` and `persona_profiles`. County records use five-character string `fips` identifiers. Rates are decimals 0–1; unavailable values are JSON `null` and blank CSV fields. Modeled counts, unknown source years and mapping limitations are explicit in metadata.
 
+Add `roi-inputs.json` for the issuer scenario panel. It supplies 2023 state/metro survey opportunity, including stated interest among unbanked households, and independently verified Q2 2026 whole-bank reference ratios. Required account-level financial assumptions and ROI results remain null until entered. The reference ratios must not automatically populate incremental account margins, servicing costs or interchange rates.
+
 Place the JSON at `frontend/public/data/ny_county_pilot_data.json` for the first local prototype. Fetch it once through a typed loader and index records by FIPS. No model credentials or individual complaint narratives belong in the frontend. This snapshot is a new, versioned frontend input; do not pretend it is the existing v2 `areas.json` or `frustration.json`. In particular, `exclusion_index`, validated topic scores, complaint population rates, ROI and look-alikes are not provided by this dataset.
 
 ```ts
@@ -79,6 +81,19 @@ On selection, display:
 
 Keep `Build pilot plan` disabled or clearly marked unavailable until validated complaint topics/severity and the P1 ROI/profile APIs exist. A later P3-generated plan must cite the facts and preserve modeled/unknown labels, with human review before approval.
 
+## Issuer ROI scenario panel
+
+The financial scenario panel can operate independently of complaint classification. Use `roi-inputs.json` as sourced audience context and whole-bank benchmark reference, not as an already calculated ROI result.
+
+1. Show a New York state context card: 417,844 estimated unbanked households, 139,497 estimated very/somewhat interested households, and 1,253,882 estimated underbanked households. Display 2023 and the relevant sample counts; the interested estimate is backed by 18 respondents among 52 unbanked respondents. Interest is not an actual conversion rate.
+2. Offer explicit audience choices: all unbanked, interested unbanked, or underbanked product adoption. Do not add overlapping interested/previously-banked/very-interested subsets. A county estimate of interest using a state share requires a separately labeled modeling assumption. Do not assign metro totals to a county or count multi-state metros as NY-only.
+3. Display whole-bank benchmark references for `Banks below $10B assets` and `Banks at/above $10B assets`, with Q2 2026 and annual-flow labels. Explain that these are portfolio ratios, not new-account profitability. Interchange assumptions require verified issuer status and partner economics, not automatic inference from the asset bucket.
+4. Collect partner/product, audience basis, reachable share, conversion, activation, accounts per household, active account-year exposure, average balance, incremental deposit margin, transaction behavior, net issuer transaction revenue, product fees, servicing, fraud, benefits, inactive-account costs, acquisition costs and fixed program cost. For multi-year calculations, also require horizon, churn and discount rate. Mark unsupported values as editable assumptions; start them blank instead of inventing defaults. For a no-fee product, the relevant account-fee revenue is zero.
+5. Only calculate results once inputs are valid. Show acquired/active accounts, annual contribution, net pilot value, period cash flows, NPV/payback and a clearly defined return denominator. Include conservative/base/optimistic assumption sets without implying that stated interest determines conversion.
+6. Show Mastercard network volume separately. An estimated Mastercard revenue line requires a distinct, explicit net-yield assumption; spend is not revenue.
+
+Add `components/roi/IssuerScenarioPanel.tsx`, `OpportunityContext.tsx`, `BankBenchmarkReference.tsx`, `ScenarioInputs.tsx` and `ScenarioResults.tsx`, with `lib/roi-inputs.ts` and typed schemas. P1 owns the pure financial calculator/API; P4 owns controls and presentation; P3 consumes computed facts for explanations. The packet is not a drop-in replacement for the old `benchmarks.json`; agree on an adapter rather than changing the v2 contracts silently.
+
 ## Shortlist and ranking
 
 Start with two transparent sort choices: `Highest underserved share` and `Most estimated households`. Selecting a row selects and zooms/highlights its county. Include both metrics in every shortlist row so concentration and potential reach are visible together. Optional filters: minimum estimated household count, county search, and baseline narrative coverage.
@@ -114,7 +129,8 @@ Derive color scales once per dataset/layer, not once per county render. Memoize 
 2. Build the opportunity map, legend, NYC inset, hover/focus tooltip and selected-county panel. Enable concentration and household-reach layers.
 3. Add the county shortlist, search/sort controls and persona mix. Preserve manual shortlist selection across layer changes.
 4. Add baseline complaint tone with data hatching, count thresholds and source-period badges. Use the actual coverage statuses instead of assuming every county has sentiment.
-5. Replace or expand the snapshot with full-window, validated data and an agreed API adapter. Then connect P3 explanations and P5 pilot review through existing contracts.
+5. Add the sourced opportunity/whole-bank context and issuer scenario panel. Validate inputs and implement the agreed pure financial calculator; keep missing financial results visibly unavailable. This does not depend on completing sentiment classification.
+6. Replace or expand the complaint snapshot with full-window, validated data and an agreed API adapter. Then connect P3 explanations and P5 pilot review through existing contracts.
 
 ## Acceptance checks
 
@@ -125,5 +141,7 @@ Derive color scales once per dataset/layer, not once per county render. Memoize 
 - No mapped complaints is distinct from no narrative, low sample and zero measured negative share.
 - The UI never calls VADER polarity a 1–5 severity score, a representative underserved sentiment rate or a validated pilot recommendation.
 - Partner availability, adoption, ROI, severity and priority are not fabricated from this snapshot.
+- Survey interest is distinct from product conversion; normalized household counts multiply `_thousands` by 1,000 once. Bank annual metrics are not annualized again or used as marginal account economics.
+- ROI stays unavailable when required scenario inputs are absent; valid zero inputs such as no-fee revenue remain zero. Multi-state metro figures and state interest are not presented as observed county results.
 - Source years that are unknown remain unknown. Mapping limitations and July-only complaint coverage are available to reviewers.
 - The app has accessible keyboard/list selection, visible legends and usable mobile layout; run the project's build and the relevant data-loader/map checks before handoff.
