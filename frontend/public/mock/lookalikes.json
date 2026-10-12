@@ -1,0 +1,52 @@
+[
+ {
+  "fips": "48479",
+  "name": "Webb County",
+  "state_abbr": "TX",
+  "distance_km": 190,
+  "similarity": 0.398,
+  "exclusion_index": 86.3,
+  "frustration_score": 56.8,
+  "top_topic": "transfers"
+ },
+ {
+  "fips": "48245",
+  "name": "Jefferson County",
+  "state_abbr": "TX",
+  "distance_km": 551,
+  "similarity": 0.339,
+  "exclusion_index": 82.9,
+  "frustration_score": 0.0,
+  "top_topic": "transfers"
+ },
+ {
+  "fips": "48375",
+  "name": "Potter County",
+  "state_abbr": "TX",
+  "distance_km": 1062,
+  "similarity": 0.293,
+  "exclusion_index": 88.2,
+  "frustration_score": 59.5,
+  "top_topic": "transfers"
+ },
+ {
+  "fips": "48291",
+  "name": "Liberty County",
+  "state_abbr": "TX",
+  "distance_km": 531,
+  "similarity": 0.222,
+  "exclusion_index": 78.6,
+  "frustration_score": 91.9,
+  "top_topic": "customer_service"
+ },
+ {
+  "fips": "48135",
+  "name": "Ector County",
+  "state_abbr": "TX",
+  "distance_km": 741,
+  "similarity": 0.204,
+  "exclusion_index": 73.2,
+  "frustration_score": 48.6,
+  "top_topic": "customer_service"
+ }
+]

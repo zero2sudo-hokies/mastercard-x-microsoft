@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-navy: #0b1f3a;
+  --color-navy-soft: #1d3557;
+  --color-accent: #f79e1b;
+  --color-paper: #f7f6f2;
+  --color-line: #e4e2dc;
+  --color-muted: #5b6577;
+  --font-sans: var(--font-inter);
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-navy);
+}
+
+/* map paths: crisp borders, no focus outline flash on click */
+.map-path { vector-effect: non-scaling-stroke; outline: none; }

@@ -1,0 +1,192 @@
+[
+ {
+  "rank": 1,
+  "fips": "48061",
+  "name": "Cameron County",
+  "state_abbr": "TX",
+  "level": "county",
+  "priority_score": 96.5,
+  "exclusion_index": 93.0,
+  "frustration_score": 100.0,
+  "top_topic": "distrust",
+  "benefit_id": "trusted_partner_onboarding",
+  "clear_lead": true,
+  "est_underserved_hh": 62316,
+  "reasons": [
+   "Exclusion index 93 (top 7% of US counties)",
+   "Distrust pain 1.16x national",
+   "338 complaints in 24 months"
+  ]
+ },
+ {
+  "rank": 2,
+  "fips": "48469",
+  "name": "Victoria County",
+  "state_abbr": "TX",
+  "level": "county",
+  "priority_score": 85.9,
+  "exclusion_index": 74.5,
+  "frustration_score": 97.3,
+  "top_topic": "fees",
+  "benefit_id": "no_fee_account",
+  "clear_lead": true,
+  "est_underserved_hh": 10267,
+  "reasons": [
+   "Exclusion index 74 (top 26% of US counties)",
+   "Fees pain 1.09x national",
+   "71 complaints in 24 months"
+  ]
+ },
+ {
+  "rank": 3,
+  "fips": "48291",
+  "name": "Liberty County",
+  "state_abbr": "TX",
+  "level": "county",
+  "priority_score": 85.2,
+  "exclusion_index": 78.6,
+  "frustration_score": 91.9,
+  "top_topic": "customer_service",
+  "benefit_id": "partner_support_line",
+  "clear_lead": true,
+  "est_underserved_hh": 10548,
+  "reasons": [
+   "Exclusion index 79 (top 21% of US counties)",
+   "Customer service pain 1.04x national",
+   "77 complaints in 24 months"
+  ]
+ },
+ {
+  "rank": 4,
+  "fips": "48183",
+  "name": "Gregg County",
+  "state_abbr": "TX",
+  "level": "county",
+  "priority_score": 74.9,
+  "exclusion_index": 68.7,
+  "frustration_score": 81.1,
+  "top_topic": "transfers",
+  "benefit_id": "low_cost_transfers",
+  "clear_lead": true,
+  "est_underserved_hh": 14097,
+  "reasons": [
+   "Exclusion index 69 (top 31% of US counties)",
+   "Transfers pain 1.08x national",
+   "86 complaints in 24 months"
+  ]
+ },
+ {
+  "rank": 5,
+  "fips": "48375",
+  "name": "Potter County",
+  "state_abbr": "TX",
+  "level": "county",
+  "priority_score": 73.8,
+  "exclusion_index": 88.2,
+  "frustration_score": 59.5,
+  "top_topic": "transfers",
+  "benefit_id": "low_cost_transfers",
+  "clear_lead": true,
+  "est_underserved_hh": 16080,
+  "reasons": [
+   "Exclusion index 88 (top 12% of US counties)",
+   "Transfers pain 1.29x national",
+   "70 complaints in 24 months"
+  ]
+ },
+ {
+  "rank": 6,
+  "fips": "48113",
+  "name": "Dallas County",
+  "state_abbr": "TX",
+  "level": "county",
+  "priority_score": 71.7,
+  "exclusion_index": 56.9,
+  "frustration_score": 86.5,
+  "top_topic": "fees",
+  "benefit_id": "no_fee_account",
+  "clear_lead": true,
+  "est_underserved_hh": 248012,
+  "reasons": [
+   "Exclusion index 57 (top 43% of US counties)",
+   "Fees pain 1.43x national",
+   "1,841 complaints in 24 months"
+  ]
+ },
+ {
+  "rank": 7,
+  "fips": "48479",
+  "name": "Webb County",
+  "state_abbr": "TX",
+  "level": "county",
+  "priority_score": 71.5,
+  "exclusion_index": 86.3,
+  "frustration_score": 56.8,
+  "top_topic": "transfers",
+  "benefit_id": "low_cost_transfers",
+  "clear_lead": true,
+  "est_underserved_hh": 31438,
+  "reasons": [
+   "Exclusion index 86 (top 14% of US counties)",
+   "Transfers pain 1.35x national",
+   "175 complaints in 24 months"
+  ]
+ },
+ {
+  "rank": 8,
+  "fips": "48309",
+  "name": "McLennan County",
+  "state_abbr": "TX",
+  "level": "county",
+  "priority_score": 71.1,
+  "exclusion_index": 71.9,
+  "frustration_score": 70.3,
+  "top_topic": "fraud_scams",
+  "benefit_id": "fraud_protection",
+  "clear_lead": true,
+  "est_underserved_hh": 29266,
+  "reasons": [
+   "Exclusion index 72 (top 28% of US counties)",
+   "Fraud and scams pain 1.37x national",
+   "161 complaints in 24 months"
+  ]
+ },
+ {
+  "rank": 9,
+  "fips": "48451",
+  "name": "Tom Green County",
+  "state_abbr": "TX",
+  "level": "county",
+  "priority_score": 69.8,
+  "exclusion_index": 64.0,
+  "frustration_score": 75.7,
+  "top_topic": "fees",
+  "benefit_id": "no_fee_account",
+  "clear_lead": true,
+  "est_underserved_hh": 9421,
+  "reasons": [
+   "Exclusion index 64 (top 36% of US counties)",
+   "Fees pain 1.11x national",
+   "78 complaints in 24 months"
+  ]
+ },
+ {
+  "rank": 10,
+  "fips": "48215",
+  "name": "Hidalgo County",
+  "state_abbr": "TX",
+  "level": "county",
+  "priority_score": 65.0,
+  "exclusion_index": 92.3,
+  "frustration_score": 37.8,
+  "top_topic": "transfers",
+  "benefit_id": "low_cost_transfers",
+  "clear_lead": true,
+  "est_underserved_hh": 130647,
+  "reasons": [
+   "Exclusion index 92 (top 8% of US counties)",
+   "Transfers pain 1.31x national",
+   "413 complaints in 24 months"
+  ]
+ }
+]
