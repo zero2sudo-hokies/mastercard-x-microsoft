@@ -1,0 +1,807 @@
+{
+ "generated_at": "2026-10-12T15:00:00Z",
+ "is_demo_data": true,
+ "window": {
+  "from": "2024-10-01",
+  "to": "2026-09-30"
+ },
+ "products": [
+  "Checking or savings account",
+  "Prepaid card",
+  "Money transfer, virtual currency, or money service"
+ ],
+ "classification": {
+  "model": "gpt-5-mini",
+  "narratives_classified": 1400,
+  "topic_agreement": 0.81
+ },
+ "national": {
+  "complaints": 210000,
+  "topic_shares": {
+   "fees": 0.18,
+   "fraud_scams": 0.27,
+   "transfers": 0.12,
+   "account_closed": 0.21,
+   "customer_service": 0.15,
+   "distrust": 0.07
+  },
+  "mean_intensity": 3.4,
+  "topic_intensity": {
+   "fees": 3.1,
+   "fraud_scams": 3.9,
+   "transfers": 3.2,
+   "account_closed": 3.8,
+   "customer_service": 2.9,
+   "distrust": 3.5
+  }
+ },
+ "states": {
+  "48": {
+   "fips": "48",
+   "level": "state",
+   "complaints": 9800,
+   "complaints_per_100k": 32.5,
+   "narratives_classified": 882,
+   "mean_intensity": 3.44,
+   "intensity_source": "area",
+   "topic_counts": {
+    "fees": 1200,
+    "fraud_scams": 4791,
+    "transfers": 683,
+    "account_closed": 1788,
+    "customer_service": 787,
+    "distrust": 551
+   },
+   "topic_shares": {
+    "fees": 0.1226,
+    "fraud_scams": 0.4882,
+    "transfers": 0.0698,
+    "account_closed": 0.1825,
+    "customer_service": 0.0805,
+    "distrust": 0.0563
+   },
+   "pain_scores": {
+    "fees": 0.417,
+    "fraud_scams": 1.316,
+    "transfers": 0.379,
+    "account_closed": 0.614,
+    "customer_service": 0.311,
+    "distrust": 0.523
+   },
+   "top_topic": "fraud_scams",
+   "second_topic": "account_closed",
+   "top_topic_lead": 2.143,
+   "clear_lead": true,
+   "frustration_score": 0.0,
+   "status": "ok",
+   "excerpts": [
+    {
+     "topic": "fraud_scams",
+     "intensity": 4,
+     "text": "Someone took money from my account through a fake payment request and the bank took weeks to respond."
+    },
+    {
+     "topic": "account_closed",
+     "intensity": 3,
+     "text": "The bank closed my account without warning and kept my deposit for over a month."
+    }
+   ]
+  },
+  "35": {
+   "fips": "35",
+   "level": "state",
+   "complaints": 900,
+   "complaints_per_100k": 42.4,
+   "narratives_classified": 81,
+   "mean_intensity": 3.69,
+   "intensity_source": "area",
+   "topic_counts": {
+    "fees": 96,
+    "fraud_scams": 194,
+    "transfers": 114,
+    "account_closed": 371,
+    "customer_service": 83,
+    "distrust": 42
+   },
+   "topic_shares": {
+    "fees": 0.109,
+    "fraud_scams": 0.2173,
+    "transfers": 0.1265,
+    "account_closed": 0.4057,
+    "customer_service": 0.0941,
+    "distrust": 0.0474
+   },
+   "pain_scores": {
+    "fees": 0.392,
+    "fraud_scams": 0.686,
+    "transfers": 0.696,
+    "account_closed": 1.461,
+    "customer_service": 0.412,
+    "distrust": 0.437
+   },
+   "top_topic": "account_closed",
+   "second_topic": "transfers",
+   "top_topic_lead": 2.099,
+   "clear_lead": true,
+   "frustration_score": 50.0,
+   "status": "ok",
+   "excerpts": [
+    {
+     "topic": "account_closed",
+     "intensity": 4,
+     "text": "The bank closed my account without warning and kept my deposit for over a month."
+    },
+    {
+     "topic": "transfers",
+     "intensity": 3,
+     "text": "My transfer was held for days with no explanation and the fee was higher than what I was quoted."
+    }
+   ]
+  },
+  "06": {
+   "fips": "06",
+   "level": "state",
+   "complaints": 30999,
+   "complaints_per_100k": 78.9,
+   "narratives_classified": 2790,
+   "mean_intensity": 3.58,
+   "intensity_source": "area",
+   "topic_counts": {
+    "fees": 5524,
+    "fraud_scams": 15178,
+    "transfers": 2461,
+    "account_closed": 3761,
+    "customer_service": 2616,
+    "distrust": 1459
+   },
+   "topic_shares": {
+    "fees": 0.1782,
+    "fraud_scams": 0.4894,
+    "transfers": 0.0794,
+    "account_closed": 0.1214,
+    "customer_service": 0.0845,
+    "distrust": 0.0471
+   },
+   "pain_scores": {
+    "fees": 0.667,
+    "fraud_scams": 1.352,
+    "transfers": 0.438,
+    "account_closed": 0.457,
+    "customer_service": 0.322,
+    "distrust": 0.482
+   },
+   "top_topic": "fraud_scams",
+   "second_topic": "fees",
+   "top_topic_lead": 2.027,
+   "clear_lead": true,
+   "frustration_score": 100.0,
+   "status": "ok",
+   "excerpts": [
+    {
+     "topic": "fraud_scams",
+     "intensity": 4,
+     "text": "Someone took money from my account through a fake payment request and the bank took weeks to respond."
+    },
+    {
+     "topic": "fees",
+     "intensity": 3,
+     "text": "I was charged overdraft fees three times in one week on a balance that was only short by a few dollars."
+    }
+   ]
+  }
+ },
+ "counties": {
+  "48215": {
+   "fips": "48215",
+   "level": "county",
+   "complaints": 411,
+   "complaints_per_100k": 46.1,
+   "narratives_classified": 37,
+   "mean_intensity": 3.45,
+   "intensity_source": "area",
+   "topic_counts": {
+    "fees": 51,
+    "fraud_scams": 76,
+    "transfers": 116,
+    "account_closed": 69,
+    "customer_service": 71,
+    "distrust": 28
+   },
+   "topic_shares": {
+    "fees": 0.1279,
+    "fraud_scams": 0.1907,
+    "transfers": 0.2712,
+    "account_closed": 0.1707,
+    "customer_service": 0.1712,
+    "distrust": 0.0683
+   },
+   "pain_scores": {
+    "fees": 0.429,
+    "fraud_scams": 0.566,
+    "transfers": 1.455,
+    "account_closed": 0.603,
+    "customer_service": 0.721,
+    "distrust": 0.72
+   },
+   "top_topic": "transfers",
+   "second_topic": "customer_service",
+   "top_topic_lead": 2.018,
+   "clear_lead": true,
+   "frustration_score": 11.1,
+   "status": "ok",
+   "excerpts": [
+    {
+     "topic": "transfers",
+     "intensity": 4,
+     "text": "My transfer was held for days with no explanation and the fee was higher than what I was quoted."
+    },
+    {
+     "topic": "customer_service",
+     "intensity": 3,
+     "text": "I called five times and every agent told me something different about my dispute."
+    }
+   ]
+  },
+  "48061": {
+   "fips": "48061",
+   "level": "county",
+   "complaints": 261,
+   "complaints_per_100k": 61.3,
+   "narratives_classified": 23,
+   "mean_intensity": 3.42,
+   "intensity_source": "area",
+   "topic_counts": {
+    "fees": 87,
+    "fraud_scams": 46,
+    "transfers": 26,
+    "account_closed": 45,
+    "customer_service": 40,
+    "distrust": 17
+   },
+   "topic_shares": {
+    "fees": 0.3175,
+    "fraud_scams": 0.1859,
+    "transfers": 0.1017,
+    "account_closed": 0.1763,
+    "customer_service": 0.1529,
+    "distrust": 0.0656
+   },
+   "pain_scores": {
+    "fees": 1.058,
+    "fraud_scams": 0.591,
+    "transfers": 0.505,
+    "account_closed": 0.636,
+    "customer_service": 0.638,
+    "distrust": 0.62
+   },
+   "top_topic": "fees",
+   "second_topic": "customer_service",
+   "top_topic_lead": 1.658,
+   "clear_lead": true,
+   "frustration_score": 55.6,
+   "status": "ok",
+   "excerpts": [
+    {
+     "topic": "fees",
+     "intensity": 4,
+     "text": "I was charged overdraft fees three times in one week on a balance that was only short by a few dollars."
+    },
+    {
+     "topic": "customer_service",
+     "intensity": 3,
+     "text": "I called five times and every agent told me something different about my dispute."
+    }
+   ]
+  },
+  "48479": {
+   "fips": "48479",
+   "level": "county",
+   "complaints": 18,
+   "complaints_per_100k": 6.7,
+   "narratives_classified": 2,
+   "mean_intensity": 3.56,
+   "intensity_source": "state",
+   "topic_counts": {
+    "fees": 3,
+    "fraud_scams": 3,
+    "transfers": 4,
+    "account_closed": 4,
+    "customer_service": 3,
+    "distrust": 1
+   },
+   "topic_shares": {
+    "fees": 0.175,
+    "fraud_scams": 0.2313,
+    "transfers": 0.1583,
+    "account_closed": 0.2146,
+    "customer_service": 0.1562,
+    "distrust": 0.0646
+   },
+   "pain_scores": {
+    "fees": 0.663,
+    "fraud_scams": 0.654,
+    "transfers": 0.894,
+    "account_closed": 0.801,
+    "customer_service": 0.627,
+    "distrust": 0.65
+   },
+   "top_topic": "transfers",
+   "second_topic": "account_closed",
+   "top_topic_lead": 1.116,
+   "clear_lead": false,
+   "frustration_score": null,
+   "status": "low_data",
+   "excerpts": [
+    {
+     "topic": "transfers",
+     "intensity": 4,
+     "text": "My transfer was held for days with no explanation and the fee was higher than what I was quoted."
+    },
+    {
+     "topic": "account_closed",
+     "intensity": 3,
+     "text": "The bank closed my account without warning and kept my deposit for over a month."
+    }
+   ]
+  },
+  "48141": {
+   "fips": "48141",
+   "level": "county",
+   "complaints": 520,
+   "complaints_per_100k": 59.7,
+   "narratives_classified": 47,
+   "mean_intensity": 3.73,
+   "intensity_source": "area",
+   "topic_counts": {
+    "fees": 83,
+    "fraud_scams": 133,
+    "transfers": 44,
+    "account_closed": 180,
+    "customer_service": 62,
+    "distrust": 18
+   },
+   "topic_shares": {
+    "fees": 0.1607,
+    "fraud_scams": 0.2565,
+    "transfers": 0.0865,
+    "account_closed": 0.3387,
+    "customer_service": 0.1209,
+    "distrust": 0.0365
+   },
+   "pain_scores": {
+    "fees": 0.587,
+    "fraud_scams": 0.769,
+    "transfers": 0.519,
+    "account_closed": 1.316,
+    "customer_service": 0.451,
+    "distrust": 0.362
+   },
+   "top_topic": "account_closed",
+   "second_topic": "fraud_scams",
+   "top_topic_lead": 1.711,
+   "clear_lead": true,
+   "frustration_score": 77.8,
+   "status": "ok",
+   "excerpts": [
+    {
+     "topic": "account_closed",
+     "intensity": 4,
+     "text": "The bank closed my account without warning and kept my deposit for over a month."
+    },
+    {
+     "topic": "fraud_scams",
+     "intensity": 3,
+     "text": "Someone took money from my account through a fake payment request and the bank took weeks to respond."
+    }
+   ]
+  },
+  "48201": {
+   "fips": "48201",
+   "level": "county",
+   "complaints": 3899,
+   "complaints_per_100k": 80.6,
+   "narratives_classified": 351,
+   "mean_intensity": 3.66,
+   "intensity_source": "area",
+   "topic_counts": {
+    "fees": 620,
+    "fraud_scams": 1915,
+    "transfers": 238,
+    "account_closed": 625,
+    "customer_service": 347,
+    "distrust": 154
+   },
+   "topic_shares": {
+    "fees": 0.1592,
+    "fraud_scams": 0.4895,
+    "transfers": 0.0615,
+    "account_closed": 0.1607,
+    "customer_service": 0.0895,
+    "distrust": 0.0397
+   },
+   "pain_scores": {
+    "fees": 0.502,
+    "fraud_scams": 1.501,
+    "transfers": 0.306,
+    "account_closed": 0.562,
+    "customer_service": 0.342,
+    "distrust": 0.432
+   },
+   "top_topic": "fraud_scams",
+   "second_topic": "account_closed",
+   "top_topic_lead": 2.671,
+   "clear_lead": true,
+   "frustration_score": 88.9,
+   "status": "ok",
+   "excerpts": [
+    {
+     "topic": "fraud_scams",
+     "intensity": 4,
+     "text": "Someone took money from my account through a fake payment request and the bank took weeks to respond."
+    },
+    {
+     "topic": "account_closed",
+     "intensity": 3,
+     "text": "The bank closed my account without warning and kept my deposit for over a month."
+    }
+   ]
+  },
+  "35013": {
+   "fips": "35013",
+   "level": "county",
+   "complaints": 139,
+   "complaints_per_100k": 62.0,
+   "narratives_classified": 13,
+   "mean_intensity": 3.52,
+   "intensity_source": "area",
+   "topic_counts": {
+    "fees": 48,
+    "fraud_scams": 21,
+    "transfers": 13,
+    "account_closed": 25,
+    "customer_service": 22,
+    "distrust": 10
+   },
+   "topic_shares": {
+    "fees": 0.316,
+    "fraud_scams": 0.1722,
+    "transfers": 0.0982,
+    "account_closed": 0.1852,
+    "customer_service": 0.1568,
+    "distrust": 0.0716
+   },
+   "pain_scores": {
+    "fees": 1.194,
+    "fraud_scams": 0.483,
+    "transfers": 0.522,
+    "account_closed": 0.661,
+    "customer_service": 0.673,
+    "distrust": 0.792
+   },
+   "top_topic": "fees",
+   "second_topic": "distrust",
+   "top_topic_lead": 1.508,
+   "clear_lead": true,
+   "frustration_score": 66.7,
+   "status": "ok",
+   "excerpts": [
+    {
+     "topic": "fees",
+     "intensity": 4,
+     "text": "I was charged overdraft fees three times in one week on a balance that was only short by a few dollars."
+    },
+    {
+     "topic": "distrust",
+     "intensity": 3,
+     "text": "After what happened I do not trust banks to hold my money so I keep cash at home now."
+    }
+   ]
+  },
+  "35001": {
+   "fips": "35001",
+   "level": "county",
+   "complaints": 381,
+   "complaints_per_100k": 56.5,
+   "narratives_classified": 34,
+   "mean_intensity": 3.54,
+   "intensity_source": "area",
+   "topic_counts": {
+    "fees": 42,
+    "fraud_scams": 197,
+    "transfers": 29,
+    "account_closed": 53,
+    "customer_service": 38,
+    "distrust": 22
+   },
+   "topic_shares": {
+    "fees": 0.1153,
+    "fraud_scams": 0.499,
+    "transfers": 0.0793,
+    "account_closed": 0.1443,
+    "customer_service": 0.1034,
+    "distrust": 0.0586
+   },
+   "pain_scores": {
+    "fees": 0.411,
+    "fraud_scams": 1.397,
+    "transfers": 0.383,
+    "account_closed": 0.521,
+    "customer_service": 0.394,
+    "distrust": 0.603
+   },
+   "top_topic": "fraud_scams",
+   "second_topic": "distrust",
+   "top_topic_lead": 2.317,
+   "clear_lead": true,
+   "frustration_score": 44.4,
+   "status": "ok",
+   "excerpts": [
+    {
+     "topic": "fraud_scams",
+     "intensity": 4,
+     "text": "Someone took money from my account through a fake payment request and the bank took weeks to respond."
+    },
+    {
+     "topic": "distrust",
+     "intensity": 3,
+     "text": "After what happened I do not trust banks to hold my money so I keep cash at home now."
+    }
+   ]
+  },
+  "35031": {
+   "fips": "35031",
+   "level": "county",
+   "complaints": 12,
+   "complaints_per_100k": 17.0,
+   "narratives_classified": 1,
+   "mean_intensity": 3.64,
+   "intensity_source": "state",
+   "topic_counts": {
+    "fees": 2,
+    "fraud_scams": 3,
+    "transfers": 1,
+    "account_closed": 2,
+    "customer_service": 2,
+    "distrust": 2
+   },
+   "topic_shares": {
+    "fees": 0.1762,
+    "fraud_scams": 0.2643,
+    "transfers": 0.1095,
+    "account_closed": 0.1976,
+    "customer_service": 0.1548,
+    "distrust": 0.0976
+   },
+   "pain_scores": {
+    "fees": 0.556,
+    "fraud_scams": 0.828,
+    "transfers": 0.63,
+    "account_closed": 0.773,
+    "customer_service": 0.652,
+    "distrust": 0.968
+   },
+   "top_topic": "distrust",
+   "second_topic": "fraud_scams",
+   "top_topic_lead": 1.169,
+   "clear_lead": true,
+   "frustration_score": null,
+   "status": "low_data",
+   "excerpts": [
+    {
+     "topic": "distrust",
+     "intensity": 4,
+     "text": "After what happened I do not trust banks to hold my money so I keep cash at home now."
+    },
+    {
+     "topic": "fraud_scams",
+     "intensity": 3,
+     "text": "Someone took money from my account through a fake payment request and the bank took weeks to respond."
+    }
+   ]
+  },
+  "06025": {
+   "fips": "06025",
+   "level": "county",
+   "complaints": 96,
+   "complaints_per_100k": 53.3,
+   "narratives_classified": 9,
+   "mean_intensity": 3.26,
+   "intensity_source": "state",
+   "topic_counts": {
+    "fees": 16,
+    "fraud_scams": 18,
+    "transfers": 26,
+    "account_closed": 22,
+    "customer_service": 10,
+    "distrust": 4
+   },
+   "topic_shares": {
+    "fees": 0.1698,
+    "fraud_scams": 0.2071,
+    "transfers": 0.2349,
+    "account_closed": 0.2246,
+    "customer_service": 0.1151,
+    "distrust": 0.0484
+   },
+   "pain_scores": {
+    "fees": 0.557,
+    "fraud_scams": 0.569,
+    "transfers": 1.229,
+    "account_closed": 0.757,
+    "customer_service": 0.399,
+    "distrust": 0.458
+   },
+   "top_topic": "transfers",
+   "second_topic": "account_closed",
+   "top_topic_lead": 1.624,
+   "clear_lead": true,
+   "frustration_score": 22.2,
+   "status": "ok",
+   "excerpts": [
+    {
+     "topic": "transfers",
+     "intensity": 4,
+     "text": "My transfer was held for days with no explanation and the fee was higher than what I was quoted."
+    },
+    {
+     "topic": "account_closed",
+     "intensity": 3,
+     "text": "The bank closed my account without warning and kept my deposit for over a month."
+    }
+   ]
+  },
+  "06029": {
+   "fips": "06029",
+   "level": "county",
+   "complaints": 411,
+   "complaints_per_100k": 44.9,
+   "narratives_classified": 37,
+   "mean_intensity": 3.21,
+   "intensity_source": "area",
+   "topic_counts": {
+    "fees": 153,
+    "fraud_scams": 70,
+    "transfers": 40,
+    "account_closed": 50,
+    "customer_service": 70,
+    "distrust": 28
+   },
+   "topic_shares": {
+    "fees": 0.3592,
+    "fraud_scams": 0.1771,
+    "transfers": 0.0989,
+    "account_closed": 0.1277,
+    "customer_service": 0.1689,
+    "distrust": 0.0683
+   },
+   "pain_scores": {
+    "fees": 1.157,
+    "fraud_scams": 0.496,
+    "transfers": 0.518,
+    "account_closed": 0.456,
+    "customer_service": 0.606,
+    "distrust": 0.74
+   },
+   "top_topic": "fees",
+   "second_topic": "distrust",
+   "top_topic_lead": 1.564,
+   "clear_lead": true,
+   "frustration_score": 0.0,
+   "status": "ok",
+   "excerpts": [
+    {
+     "topic": "fees",
+     "intensity": 4,
+     "text": "I was charged overdraft fees three times in one week on a balance that was only short by a few dollars."
+    },
+    {
+     "topic": "distrust",
+     "intensity": 3,
+     "text": "After what happened I do not trust banks to hold my money so I keep cash at home now."
+    }
+   ]
+  },
+  "06019": {
+   "fips": "06019",
+   "level": "county",
+   "complaints": 521,
+   "complaints_per_100k": 51.2,
+   "narratives_classified": 47,
+   "mean_intensity": 3.45,
+   "intensity_source": "area",
+   "topic_counts": {
+    "fees": 101,
+    "fraud_scams": 108,
+    "transfers": 49,
+    "account_closed": 200,
+    "customer_service": 43,
+    "distrust": 20
+   },
+   "topic_shares": {
+    "fees": 0.1931,
+    "fraud_scams": 0.2107,
+    "transfers": 0.0955,
+    "account_closed": 0.3744,
+    "customer_service": 0.0862,
+    "distrust": 0.0401
+   },
+   "pain_scores": {
+    "fees": 0.652,
+    "fraud_scams": 0.592,
+    "transfers": 0.554,
+    "account_closed": 1.287,
+    "customer_service": 0.301,
+    "distrust": 0.443
+   },
+   "top_topic": "account_closed",
+   "second_topic": "fees",
+   "top_topic_lead": 1.974,
+   "clear_lead": true,
+   "frustration_score": 33.3,
+   "status": "ok",
+   "excerpts": [
+    {
+     "topic": "account_closed",
+     "intensity": 4,
+     "text": "The bank closed my account without warning and kept my deposit for over a month."
+    },
+    {
+     "topic": "fees",
+     "intensity": 3,
+     "text": "I was charged overdraft fees three times in one week on a balance that was only short by a few dollars."
+    }
+   ]
+  },
+  "06037": {
+   "fips": "06037",
+   "level": "county",
+   "complaints": 8800,
+   "complaints_per_100k": 89.7,
+   "narratives_classified": 792,
+   "mean_intensity": 3.8,
+   "intensity_source": "area",
+   "topic_counts": {
+    "fees": 1260,
+    "fraud_scams": 4287,
+    "transfers": 608,
+    "account_closed": 1485,
+    "customer_service": 670,
+    "distrust": 490
+   },
+   "topic_shares": {
+    "fees": 0.1433,
+    "fraud_scams": 0.4864,
+    "transfers": 0.0693,
+    "account_closed": 0.1689,
+    "customer_service": 0.0764,
+    "distrust": 0.0557
+   },
+   "pain_scores": {
+    "fees": 0.554,
+    "fraud_scams": 1.513,
+    "transfers": 0.392,
+    "account_closed": 0.592,
+    "customer_service": 0.291,
+    "distrust": 0.528
+   },
+   "top_topic": "fraud_scams",
+   "second_topic": "account_closed",
+   "top_topic_lead": 2.556,
+   "clear_lead": true,
+   "frustration_score": 100.0,
+   "status": "ok",
+   "excerpts": [
+    {
+     "topic": "fraud_scams",
+     "intensity": 4,
+     "text": "Someone took money from my account through a fake payment request and the bank took weeks to respond."
+    },
+    {
+     "topic": "account_closed",
+     "intensity": 3,
+     "text": "The bank closed my account without warning and kept my deposit for over a month."
+    }
+   ]
+  }
+ }
+}

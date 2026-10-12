@@ -1,0 +1,25 @@
+"""Fixed 6-benefit catalog from CONTRACTS.md, one per complaint topic."""
+from app.models import Benefit
+
+BENEFITS = [
+    Benefit(id="no_fee_account", topic="fees", title="No-fee account (no overdraft, no minimum balance)",
+            description="A basic account with no overdraft fees, no monthly fee and no minimum balance.",
+            pain_measure="Fee complaints per 100k residents"),
+    Benefit(id="fraud_protection", topic="fraud_scams", title="Fraud protection (alerts, scam warnings, fast reimbursement)",
+            description="Real-time transaction alerts, scam warnings before risky payments and fast reimbursement of fraud losses.",
+            pain_measure="Fraud and scam complaints per 100k residents"),
+    Benefit(id="low_cost_transfers", topic="transfers", title="Low-cost card-funded transfers",
+            description="Low, upfront-priced transfers funded from a card or account. Since Jan 1, 2026 a 1% federal excise tax "
+                        "applies to cash-funded remittances; card- and account-funded transfers are exempt.",
+            pain_measure="Transfer complaints per 100k residents"),
+    Benefit(id="second_chance_account", topic="account_closed", title="Second-chance account",
+            description="An account for people previously closed out of banking, with clear rules and a path to a standard account.",
+            pain_measure="Account closure complaints per 100k residents"),
+    Benefit(id="partner_support_line", topic="customer_service", title="Human support line run with the local partner",
+            description="A local, human-staffed support line run with the community partner, with tracked resolution times.",
+            pain_measure="Customer service complaints per 100k residents"),
+    Benefit(id="trusted_partner_onboarding", topic="distrust", title="Onboarding through a trusted local partner",
+            description="Account opening and education delivered through a trusted local organization instead of a branch.",
+            pain_measure="Distrust-related complaints per 100k residents"),
+]
+BY_TOPIC = {b.topic: b for b in BENEFITS}

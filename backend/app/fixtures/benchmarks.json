@@ -1,0 +1,38 @@
+{
+  "transactions_per_month": 33.4,
+  "avg_ticket": 37,
+  "interchange_per_tx": {
+    "community": 0.52,
+    "large_bank": 0.23
+  },
+  "avg_balance": 1273,
+  "deposit_margin": 0.0332,
+  "fraud_rate": 0.00176,
+  "issuer_fraud_share": 0.26,
+  "servicing": {
+    "community": 175,
+    "large_bank": 400
+  },
+  "cac": {
+    "community": 428,
+    "large_bank": 561
+  },
+  "churn_observed": {
+    "community": 0.4,
+    "large_bank": 0.24
+  },
+  "network_yield_placeholder": 0.0029,
+  "us_underserved_hh": 24600000,
+  "global_unbanked_adults": 1300000000,
+  "roi_defaults": {
+    "issuer_type": "community",
+    "adoption_rate": 0.03,
+    "fixed_program_cost": 75000
+  },
+  "notes": {
+    "network_yield_placeholder": "Approximate: Mastercard net revenue / gross dollar volume. Verify before quoting.",
+    "adoption_rate": "Placeholder; the pilot replaces it.",
+    "fixed_program_cost": "Placeholder; the pilot replaces it.",
+    "servicing": "Older benchmark; rerun with partner issuer costs."
+  }
+}

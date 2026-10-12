@@ -1,0 +1,26 @@
+"""Settings from backend/.env. Never log these values."""
+import os
+from dataclasses import dataclass
+from pathlib import Path
+
+from dotenv import load_dotenv
+
+load_dotenv(Path(__file__).parent.parent / ".env")
+
+
+@dataclass(frozen=True)
+class Settings:
+    azure_openai_endpoint: str = os.getenv("AZURE_OPENAI_ENDPOINT", "")
+    azure_openai_api_key: str = os.getenv("AZURE_OPENAI_API_KEY", "")
+    azure_openai_deployment: str = os.getenv("AZURE_OPENAI_DEPLOYMENT", "gpt-5-mini")
+    api_base: str = os.getenv("API_BASE", "http://localhost:8000")
+
+    @property
+    def ai_configured(self) -> bool:
+        return bool(self.azure_openai_endpoint and self.azure_openai_api_key and "<your-resource>" not in self.azure_openai_endpoint)
+
+    def __repr__(self):  # keep the key out of logs and tracebacks
+        return f"Settings(deployment={self.azure_openai_deployment!r}, ai_configured={self.ai_configured})"
+
+
+settings = Settings()

@@ -1,0 +1,265 @@
+"""Pydantic models for every type in CONTRACTS.md. P3 imports these; keep names stable."""
+from typing import Literal, Optional
+
+from pydantic import BaseModel, Field
+
+Topic = Literal["fees", "fraud_scams", "transfers", "account_closed", "customer_service", "distrust"]
+TOPICS: tuple[str, ...] = ("fees", "fraud_scams", "transfers", "account_closed", "customer_service", "distrust")
+Level = Literal["state", "county"]
+IssuerType = Literal["community", "large_bank"]
+FrustrationStatus = Literal["ok", "low_data", "no_data"]
+TopicMap = dict[str, float]
+
+
+# ---- data layer ----
+class Area(BaseModel):
+    fips: str
+    name: str
+    level: Level
+    state_fips: str
+    state_abbr: str
+    population: int
+    households: int
+    median_income: Optional[int] = None
+    poverty_rate: Optional[float] = None
+    no_internet_rate: Optional[float] = None
+    branches: Optional[int] = None
+    branches_per_10k_hh: Optional[float] = None
+    unbanked_rate: Optional[float] = None
+    underbanked_rate: Optional[float] = None
+    underserved_rate: Optional[float] = None
+    est_underserved_hh: int
+    exclusion_index: float
+    exclusion_rank: int
+    centroid: Optional[list[float]] = None
+
+
+class Excerpt(BaseModel):
+    topic: Topic
+    intensity: int
+    text: str
+
+
+class FrustrationArea(BaseModel):
+    fips: str
+    level: Level
+    complaints: int
+    complaints_per_100k: Optional[float] = None
+    narratives_classified: int = 0
+    mean_intensity: Optional[float] = None
+    intensity_source: Optional[Literal["area", "state", "national"]] = None
+    topic_counts: Optional[dict[str, int]] = None
+    topic_shares: Optional[TopicMap] = None
+    pain_scores: Optional[TopicMap] = None
+    top_topic: Optional[Topic] = None
+    second_topic: Optional[Topic] = None
+    top_topic_lead: Optional[float] = None
+    clear_lead: Optional[bool] = None
+    frustration_score: Optional[float] = None
+    status: FrustrationStatus
+    excerpts: list[Excerpt] = []
+
+
+class Benefit(BaseModel):
+    id: str
+    topic: Topic
+    title: str
+    description: str
+    pain_measure: str
+
+
+# ---- API responses ----
+class AreaSummary(BaseModel):
+    fips: str
+    name: str
+    level: Level
+    state_fips: str
+    state_abbr: str
+    exclusion_index: float
+    frustration_score: Optional[float] = None
+    frustration_status: FrustrationStatus
+    top_topic: Optional[Topic] = None
+    top_benefit_id: Optional[str] = None
+    pain_scores: Optional[TopicMap] = None
+    est_underserved_hh: int
+    priority_score: Optional[float] = None
+
+
+class Lookalike(BaseModel):
+    fips: str
+    name: str
+    state_abbr: str
+    distance_km: int
+    similarity: float
+    exclusion_index: float
+    frustration_score: Optional[float] = None
+    top_topic: Optional[Topic] = None
+
+
+class AreaProfile(BaseModel):
+    area: Area
+    frustration: Optional[FrustrationArea] = None
+    benefit: Optional[Benefit] = None
+    lookalikes: list[Lookalike]
+    labels: list[str]
+
+
+class Recommendation(BaseModel):
+    rank: int
+    fips: str
+    name: str
+    state_abbr: str
+    level: Level
+    priority_score: float
+    exclusion_index: float
+    frustration_score: Optional[float] = None
+    top_topic: Optional[Topic] = None
+    benefit_id: Optional[str] = None
+    clear_lead: Optional[bool] = None
+    est_underserved_hh: int
+    reasons: list[str]
+
+
+class DataSource(BaseModel):
+    areas: Literal["pipeline", "fixtures"]
+    frustration: Literal["pipeline", "fixtures"]
+
+
+class Health(BaseModel):
+    status: Literal["ok"] = "ok"
+    data_source: DataSource
+    ai_configured: bool
+
+
+# ---- ROI ----
+class RoiRequest(BaseModel):
+    fips: str
+    issuer_type: IssuerType = "community"
+    adoption_rate: Optional[float] = Field(None, gt=0, le=1)
+    churn: Optional[float] = Field(None, gt=0, le=1)
+    cac: Optional[float] = Field(None, ge=0)
+    fixed_program_cost: Optional[float] = Field(None, ge=0)
+    network_yield: Optional[float] = Field(None, ge=0)
+
+
+class RoiArea(BaseModel):
+    fips: str
+    name: str
+    state_abbr: str
+    est_underserved_hh: int
+
+
+class RoiInputs(BaseModel):
+    issuer_type: IssuerType
+    adoption_rate: float
+    churn: float
+    cac: float
+    fixed_program_cost: float
+    network_yield: float
+
+
+class RoiUnit(BaseModel):
+    annual_spend: int
+    swipe_revenue: int
+    deposit_earnings: int
+    fraud_loss: int
+    servicing: int
+    annual_margin: int
+    ltv: int
+    net_per_account: int
+    breakeven_churn: Optional[float] = None
+
+
+class RoiProgram(BaseModel):
+    accounts: int
+    issuer_net_lifetime: int
+    network_volume_y1: int
+    network_revenue_y1_est: int
+
+
+class LtvPoint(BaseModel):
+    churn: float
+    ltv: int
+
+
+class ScaleRow(BaseModel):
+    level: str
+    base: int
+    unit: Literal["households", "adults"]
+    accounts: int
+    network_volume_y1: int
+
+
+class RoiResult(BaseModel):
+    area: RoiArea
+    inputs: RoiInputs
+    unit: RoiUnit
+    program: RoiProgram
+    ltv_curve: list[LtvPoint]
+    scale: list[ScaleRow]
+    labels: list[str]
+
+
+# ---- chat + plan (P3 implements the routes) ----
+class ChatMessage(BaseModel):
+    role: Literal["user", "assistant"]
+    content: str
+
+
+class ChatContext(BaseModel):
+    layer: Literal["underserved", "frustration"] = "underserved"
+    state_fips: Optional[str] = None
+    selected_fips: Optional[str] = None
+
+
+class ChatRequest(BaseModel):
+    messages: list[ChatMessage]
+    context: ChatContext = ChatContext()
+
+
+class ToolCall(BaseModel):
+    name: str
+    args: dict = {}
+
+
+class ChatResponse(BaseModel):
+    reply: str
+    recommendations: list[Recommendation] = []
+    focus_fips: list[str] = []
+    tool_calls: list[ToolCall] = []
+    mode: Literal["foundry", "rules"]
+    warnings: list[str] = []
+
+
+class PlanRequest(BaseModel):
+    fips: str
+    roi: Optional[RoiRequest] = None
+    partner_name: str = "Community credit union (TBD)"
+    notes: str = ""
+
+
+class PilotPlan(BaseModel):
+    id: str
+    fips: str
+    area_name: str
+    status: Literal["draft", "approved"]
+    markdown: str
+    model: str
+    mode: Literal["foundry", "rules"]
+    generated_at: str
+    warnings: list[str] = []
+    facts_used: dict = {}
+    approved_by: Optional[str] = None
+    approved_at: Optional[str] = None
+
+
+class Checklist(BaseModel):
+    compliance_review: bool = False
+    community_partner: bool = False
+    no_protected_attributes: bool = False
+
+
+class ApproveRequest(BaseModel):
+    reviewer: str
+    markdown: str
+    checklist: Checklist
