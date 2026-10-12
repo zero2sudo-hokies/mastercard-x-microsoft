@@ -1,11 +1,11 @@
-import { Card, Spinner } from "@/components/ui";
+import { Suspense } from "react";
+import { Spinner } from "@/components/ui";
+import Dashboard from "./Dashboard";
 
 export default function Home() {
   return (
-    <div className="p-6">
-      <Card title="Dashboard">
-        <Spinner label="Map coming next" />
-      </Card>
-    </div>
+    <Suspense fallback={<div className="p-6"><Spinner label="Loading dashboard" /></div>}>
+      <Dashboard />
+    </Suspense>
   );
 }

@@ -35,8 +35,8 @@ export function Tag({ tag }: { tag: DataTag }) {
 export function Stat({ label, value, sublabel, tag }: { label: string; value: ReactNode; sublabel?: ReactNode; tag?: DataTag }) {
   return (
     <div className="min-w-0">
-      <div className="flex items-center gap-1.5 text-xs text-muted">
-        <span className="truncate">{label}</span>
+      <div className="flex flex-wrap items-center gap-1.5 text-xs text-muted">
+        <span className="leading-tight">{label}</span>
         {tag && <Tag tag={tag} />}
       </div>
       <div className="mt-0.5 text-lg font-semibold tabular-nums text-navy">{value}</div>
