@@ -3,6 +3,7 @@
 export type TopicId = "fees" | "fraud_scams" | "transfers" | "account_closed" | "customer_service" | "distrust";
 export type Level = "state" | "county";
 export type IssuerType = "community" | "large_bank";
+export type AudienceBasis = "underserved" | "unbanked" | "interested_unbanked";
 export type FrustrationStatus = "ok" | "low_data" | "no_data";
 export type Layer = "underserved" | "frustration";
 export type TopicMap = Record<TopicId, number>;
@@ -153,6 +154,7 @@ export interface RoiRequest {
   cac: number | null;
   fixed_program_cost: number | null;
   network_yield: number | null;
+  audience_basis?: AudienceBasis;
 }
 
 export interface RoiResult {
@@ -164,6 +166,7 @@ export interface RoiResult {
     cac: number;
     fixed_program_cost: number;
     network_yield: number;
+    audience_basis?: AudienceBasis;
   };
   unit: {
     annual_spend: number;
@@ -179,6 +182,42 @@ export interface RoiResult {
   program: { accounts: number; issuer_net_lifetime: number; network_volume_y1: number; network_revenue_y1_est: number };
   ltv_curve: { churn: number; ltv: number }[];
   scale: { level: string; base: number; unit: "households" | "adults"; accounts: number; network_volume_y1: number }[];
+  labels: string[];
+  audience?: { basis: AudienceBasis; area_households: number; label: string } | null;
+}
+
+export interface StateAudience {
+  state_abbr: string;
+  survey_year: number;
+  households: number;
+  unbanked_households: number;
+  unbanked_rate: number;
+  underbanked_households: number;
+  underbanked_rate: number;
+  interested_share_of_unbanked: number | null;
+  interested_unbanked_households: number | null;
+  very_interested_households: number | null;
+  interested_and_once_banked_households: number | null;
+  n_unbanked_surveyed: number;
+  small_sample: boolean;
+}
+
+export interface BankBenchmark {
+  id: string;
+  label: string;
+  banks: number;
+  net_interest_income_per_1000_deposits: number;
+  deposit_account_fees_per_1000_deposits: number;
+  all_operating_costs_per_1000_deposits: number;
+  median_efficiency_ratio_pct: number | null;
+}
+
+export interface RoiContext {
+  fips: string;
+  state: StateAudience | null;
+  area_audience: Partial<Record<AudienceBasis, number>>;
+  banks: BankBenchmark[];
+  bank_quarter: string | null;
   labels: string[];
 }
 

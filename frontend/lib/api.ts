@@ -13,6 +13,7 @@ import type {
   PlanRequest,
   Recommendation,
   RecommendationParams,
+  RoiContext,
   RoiRequest,
   RoiResult,
 } from "./types";
@@ -75,6 +76,7 @@ export function getRecommendations(params: RecommendationParams = {}) {
 export const getBenefits = () => request<Benefit[]>("/api/benefits", "benefits.json");
 export const getAssumptions = () => request<Benchmarks>("/api/assumptions", "assumptions.json");
 export const postRoi = (req: RoiRequest) => request<RoiResult>("/api/roi", "roi.json", post(req));
+export const getRoiContext = (fips: string) => request<RoiContext>(`/api/roi/context/${fips}`, "roi_context.json");
 export const postChat = (req: ChatRequest) => request<ChatResponse>("/api/chat", "chat.json", post(req));
 export const postPlan = (req: PlanRequest) => request<PilotPlan>("/api/plan", "plan.json", post(req));
 export const approvePlan = (id: string, req: ApproveRequest) =>

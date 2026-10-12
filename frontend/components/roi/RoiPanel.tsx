@@ -1,13 +1,26 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
-import { Card, ErrorBox, SourceNote, Spinner, Tag, type DataTag } from "@/components/ui";
-import { getAssumptions, postRoi } from "@/lib/api";
+import { Card, ErrorBox, SourceNote, Spinner, Stat, Tag, type DataTag } from "@/components/ui";
+import { getAssumptions, getRoiContext, postRoi } from "@/lib/api";
 import { fmtInt, fmtPct, fmtUSD } from "@/lib/format";
-import type { Benchmarks, IssuerType, RoiRequest, RoiResult } from "@/lib/types";
+import type { AudienceBasis, Benchmarks, IssuerType, RoiContext, RoiRequest, RoiResult } from "@/lib/types";
 import LtvChart from "./LtvChart";
 
-type Inputs = Omit<RoiRequest, "fips"> & { adoption_rate: number; churn: number; cac: number; fixed_program_cost: number; network_yield: number };
+type Inputs = Omit<RoiRequest, "fips"> & {
+  adoption_rate: number;
+  churn: number;
+  cac: number;
+  fixed_program_cost: number;
+  network_yield: number;
+  audience_basis: AudienceBasis;
+};
+
+const BASIS_LABEL: Record<AudienceBasis, string> = {
+  underserved: "Unbanked + underbanked",
+  unbanked: "Unbanked only",
+  interested_unbanked: "Unbanked & interested",
+};
 
 function defaultsFor(b: Benchmarks, issuer: IssuerType, prev?: Inputs): Inputs {
   return {
@@ -17,6 +30,7 @@ function defaultsFor(b: Benchmarks, issuer: IssuerType, prev?: Inputs): Inputs {
     cac: b.cac[issuer],
     fixed_program_cost: prev?.fixed_program_cost ?? b.roi_defaults.fixed_program_cost,
     network_yield: prev?.network_yield ?? b.network_yield_placeholder,
+    audience_basis: prev?.audience_basis ?? "underserved",
   };
 }
 
@@ -26,6 +40,18 @@ export default function RoiPanel({ fips, onChange }: { fips: string; onChange?: 
   const [benchError, setBenchError] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
   const [result, setResult] = useState<{ key: string; data?: RoiResult; error?: string } | null>(null);
+  const [context, setContext] = useState<{ fips: string; data: RoiContext | null } | null>(null);
+
+  // sourced audience context (data/p3 FDIC inputs); optional, so a failure just hides the card
+  useEffect(() => {
+    let alive = true;
+    getRoiContext(fips)
+      .then((data) => alive && setContext({ fips, data }))
+      .catch(() => alive && setContext({ fips, data: null }));
+    return () => {
+      alive = false;
+    };
+  }, [fips]);
 
   useEffect(() => {
     let alive = true;
@@ -67,6 +93,7 @@ export default function RoiPanel({ fips, onChange }: { fips: string; onChange?: 
   if (!bench || !inputs) return <Spinner label="Loading ROI assumptions" />;
 
   const set = (patch: Partial<Inputs>) => setInputs({ ...inputs, ...patch });
+  const ctx = context?.fips === fips ? context.data : null;
   const data = result?.data;
   const stale = result?.key !== key;
   const error = !stale ? result?.error : null;
@@ -87,6 +114,30 @@ export default function RoiPanel({ fips, onChange }: { fips: string; onChange?: 
                 {t === "community" ? "Community issuer" : "Large bank"}
               </button>
             ))}
+          </div>
+
+          <div>
+            <div className="mb-1 text-xs text-muted">Audience the adoption rate applies to</div>
+            <div role="radiogroup" aria-label="Audience" className="grid grid-cols-3 gap-1 rounded-lg bg-paper p-1">
+              {(Object.keys(BASIS_LABEL) as AudienceBasis[]).map((basis) => {
+                const n = ctx?.area_audience[basis];
+                const available = basis === "underserved" || n != null;
+                const on = inputs.audience_basis === basis;
+                return (
+                  <button
+                    key={basis}
+                    role="radio"
+                    aria-checked={on}
+                    disabled={!available}
+                    onClick={() => set({ audience_basis: basis })}
+                    className={`rounded-md px-2 py-1.5 text-left text-xs disabled:cursor-not-allowed disabled:opacity-40 ${on ? "bg-navy text-white" : "text-navy hover:bg-white"}`}
+                  >
+                    <span className="block font-medium">{BASIS_LABEL[basis]}</span>
+                    <span className={on ? "text-white/80" : "text-muted"}>{n != null ? `${fmtInt(n)} households` : basis === "underserved" ? "modeled" : "no data"}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           <Slider label="Adoption rate" tag="placeholder" value={inputs.adoption_rate} min={0.005} max={0.15} step={0.005} display={fmtPct(inputs.adoption_rate)} onChange={(v) => set({ adoption_rate: v })} />
@@ -122,6 +173,8 @@ export default function RoiPanel({ fips, onChange }: { fips: string; onChange?: 
         </div>
       </Card>
 
+      {ctx?.state && <AudienceCard ctx={ctx} />}
+
       {error && <ErrorBox message={error} onRetry={() => setAttempt((a) => a + 1)} />}
       {!data && !error && <Spinner label="Computing ROI" />}
 
@@ -149,7 +202,12 @@ export default function RoiPanel({ fips, onChange }: { fips: string; onChange?: 
 
           <Card title={`Program in ${data.area.name}, ${data.area.state_abbr}`}>
             <div className="grid grid-cols-2 gap-3">
-              <Big label="Accounts" value={fmtInt(data.program.accounts)} sub={`${fmtPct(data.inputs.adoption_rate)} of ${fmtInt(data.area.est_underserved_hh)} underserved households`} tag="modeled" />
+              <Big
+                label="Accounts"
+                value={fmtInt(data.program.accounts)}
+                sub={`${fmtPct(data.inputs.adoption_rate)} of ${fmtInt(data.audience?.area_households ?? data.area.est_underserved_hh)} households (${BASIS_LABEL[data.inputs.audience_basis ?? "underserved"].toLowerCase()})`}
+                tag="modeled"
+              />
               <Big
                 label="Issuer net, lifetime"
                 value={<span className={data.program.issuer_net_lifetime >= 0 ? "text-emerald-700" : "text-red-700"}>{fmtUSD(data.program.issuer_net_lifetime)}</span>}
@@ -176,7 +234,7 @@ export default function RoiPanel({ fips, onChange }: { fips: string; onChange?: 
                 </div>
               ))}
             </div>
-            <SourceNote>Same adoption rate at every level. US base: FDIC 2023 unbanked + underbanked households. Global base: unbanked adults.</SourceNote>
+            <SourceNote>Same adoption rate at every level. {data.audience?.label} Global base: unbanked adults.</SourceNote>
           </Card>
 
           {data.labels.map((l) => (
@@ -254,5 +312,63 @@ function Big({ label, value, sub, tag }: { label: string; value: ReactNode; sub:
       <div className="mt-1 text-xl font-semibold tabular-nums">{value}</div>
       <div className="text-[11px] text-muted">{sub}</div>
     </div>
+  );
+}
+
+const BANK_ROWS = [
+  ["Net interest income", "net_interest_income_per_1000_deposits"],
+  ["Deposit account fees", "deposit_account_fees_per_1000_deposits"],
+  ["All operating costs", "all_operating_costs_per_1000_deposits"],
+] as const;
+
+function AudienceCard({ ctx }: { ctx: RoiContext }) {
+  const st = ctx.state!;
+  return (
+    <Card title={`Sourced audience: ${st.state_abbr}, FDIC ${st.survey_year} survey`}>
+      <div className="grid grid-cols-3 gap-3">
+        <Stat label="Unbanked households" value={fmtInt(st.unbanked_households)} sublabel={fmtPct(st.unbanked_rate)} tag="sourced" />
+        <Stat label="Interested in an account" value={fmtPct(st.interested_share_of_unbanked)} sublabel={`${fmtInt(st.interested_unbanked_households)} of the unbanked`} tag="sourced" />
+        <Stat label="Underbanked households" value={fmtInt(st.underbanked_households)} sublabel={fmtPct(st.underbanked_rate)} tag="sourced" />
+      </div>
+      {st.small_sample && (
+        <p className="mt-2 rounded bg-amber-50 px-2 py-1 text-xs text-amber-900">
+          Small sample: {st.n_unbanked_surveyed} unbanked respondents in {st.state_abbr}, no confidence interval published.
+        </p>
+      )}
+      {ctx.banks.length > 0 && (
+        <details className="mt-3 text-xs">
+          <summary className="cursor-pointer font-medium text-navy">Bank reference ratios ({ctx.bank_quarter ?? "latest"}, whole-bank, not per-account)</summary>
+          <table className="mt-2 w-full tabular-nums">
+            <thead>
+              <tr className="text-left text-muted">
+                <th className="py-1 font-normal">Per $1,000 deposits, annual</th>
+                {ctx.banks.map((b) => (
+                  <th key={b.id} className="py-1 text-right font-normal">
+                    {b.label} ({fmtInt(b.banks)})
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="text-navy">
+              {BANK_ROWS.map(([label, key]) => (
+                <tr key={key} className="border-t border-line">
+                  <td className="py-1 text-muted">{label}</td>
+                  {ctx.banks.map((b) => (
+                    <td key={b.id} className="py-1 text-right">
+                      ${b[key].toFixed(2)}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </details>
+      )}
+      {ctx.labels
+        .filter((l) => !l.startsWith("Small sample"))
+        .map((l) => (
+          <SourceNote key={l}>{l}</SourceNote>
+        ))}
+    </Card>
   );
 }
