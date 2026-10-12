@@ -45,6 +45,9 @@ def profile(fips: str) -> AreaProfile:
         labels.append("Unbanked and underbanked rates are FDIC 2023 state estimates.")
     if not fr or fr.status != "ok":
         labels.append("Not enough data: fewer than 30 CFPB complaints, so no frustration score.")
+    if fr and fr.complaints and fr.mean_intensity is None:
+        labels.append("Complaint topics come from CFPB issue categories; intensity is not classified yet, "
+                      "so pain = topic share vs national.")
     if store.areas_meta.get("is_demo_data") or store.frustration_meta.get("is_demo_data"):
         labels.append("Demo data: some values are fixtures, not pipeline output.")
     return AreaProfile(
