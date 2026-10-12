@@ -67,7 +67,10 @@ def unmatched_numbers(text: str, facts) -> list[str]:
         plain = float(raw.replace("$", "").replace(",", ""))
         if (2020 <= plain <= 2030 and not unit and "$" not in raw) or (plain.is_integer() and abs(plain) < 13 and not unit) or plain in ALLOWED:
             continue
-        if not any(abs(v - k) <= max(abs(k) * 0.01, 0.5 if abs(k) >= 50 else 0.005) for k in known):
+        # "$1.7M" is rounded to its last shown digit, so allow half of that place too
+        decimals = len(raw.split(".")[1]) if "." in raw else 0
+        shown = 0.5 * 10 ** -decimals * (abs(v / plain) if plain else 1)
+        if not any(abs(v - k) <= max(abs(k) * 0.01, shown, 0.5 if abs(k) >= 50 else 0.005) for k in known):
             warnings.append(f"Number {raw.strip()}{unit or ''} does not match any provided fact.")
     return list(dict.fromkeys(warnings))[:10]
 
