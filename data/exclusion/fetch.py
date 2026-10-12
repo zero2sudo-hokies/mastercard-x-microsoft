@@ -30,7 +30,7 @@ def get(url):
 def stream_filtered(url, out):
     """Stream a big pipe-delimited file and keep only state and county rows."""
     with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=300) as r, open(out, "w", encoding="utf-8") as f:
-        for line in io.TextIOWrapper(r, encoding="latin-1"):
+        for line in io.TextIOWrapper(r, encoding="utf-8", errors="replace"):
             if line.startswith(KEEP) or "|0400000US" in line or "|0500000US" in line:
                 f.write(line)
 
