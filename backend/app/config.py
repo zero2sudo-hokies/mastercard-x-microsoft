@@ -13,7 +13,8 @@ class Settings:
     azure_openai_endpoint: str = os.getenv("AZURE_OPENAI_ENDPOINT", "")
     azure_openai_api_key: str = os.getenv("AZURE_OPENAI_API_KEY", "")
     azure_openai_deployment: str = os.getenv("AZURE_OPENAI_DEPLOYMENT", "gpt-5-mini")
-    api_base: str = os.getenv("API_BASE", "http://localhost:8000")
+    # 127.0.0.1, not localhost: avoids a slow IPv6 lookup on Windows when the AI tools call the API
+    api_base: str = os.getenv("API_BASE", "http://127.0.0.1:8000")
 
     @property
     def ai_configured(self) -> bool:
