@@ -95,7 +95,10 @@ export default function AreaProfilePanel({ fips, onSelect }: { fips: string | nu
                 );
               })}
             </ul>
-            <p className="mt-1 text-[11px] text-muted">Share of complaints · pain score (1.00 = national level at intensity 5)</p>
+            <p className="mt-1 text-[11px] text-muted">
+              Share of complaints · pain score{" "}
+              {fr.mean_intensity == null ? "(topic share vs national; 1.00 = national)" : "(share vs national, weighted by intensity; 1.00 = national at intensity 5)"}
+            </p>
             <div className="mt-3 grid grid-cols-2 gap-3">
               <Stat label="Mean intensity (1-5)" value={fr.mean_intensity?.toFixed(1) ?? "—"} sublabel={fr.intensity_source ? `From ${fr.intensity_source} narratives` : undefined} tag="modeled" />
               <Stat label="Complaints per 100k" value={fr.complaints_per_100k?.toFixed(1) ?? "—"} sublabel={`${fmtInt(fr.complaints)} total`} tag="sourced" />
@@ -112,7 +115,10 @@ export default function AreaProfilePanel({ fips, onSelect }: { fips: string | nu
                 ))}
               </div>
             )}
-            <SourceNote>CFPB Consumer Complaint Database. Topics and intensity classified by a Foundry model.</SourceNote>
+            <SourceNote>
+              CFPB Consumer Complaint Database.{" "}
+              {fr.mean_intensity == null ? "Topics from CFPB issue categories; intensity not classified yet." : "Topics and intensity classified by a Foundry model."}
+            </SourceNote>
           </>
         )}
       </Card>

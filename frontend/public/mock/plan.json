@@ -1,0 +1,91 @@
+{
+ "id": "p_4de8b1",
+ "fips": "36005",
+ "area_name": "Bronx County, NY",
+ "status": "draft",
+ "markdown": "## 1. Executive summary\nBronx County, NY is a high-exclusion urban county with about 217,454 underserved households (modeled) and a poverty rate of 27.8%. We propose a 12-month pilot with a community issuer to test a Second-chance account offering clear rules and a path to a standard account. The pilot targets measurable reductions in account-closure complaints and improved account usage.\n\n## 2. Why this area\nBronx County has an exclusion index of 92 and an underserved rate of 40.7%. Median household income is $48,676, no-internet rate is 9.6%, and there are 2.36 branches per 10,000 households, indicating limited physical access. State FDIC unbanked and underbanked rates are 5.1% and 15.4% respectively.\n\n## 3. What frustrates people here and the benefit\nTop complaints: account closures (pain 1.256) and customer service (pain 1.074). Matched benefit: Second-chance account — an account for people previously closed out of banking, with clear rules and a path to a standard account. Pilot will track account-closure complaints per 100k residents as the primary pain measure.\n\n## 4. Offer design\n- Product: Second-chance account with staged remediation milestones and explicit criteria to upgrade to a standard account.  \n- Pricing and economics are simple: annual margin per account $69, swipe revenue $208, deposit earnings $42, fraud loss $7, servicing $175.  \n- Targeted scale for Bronx: about 6,524 accounts (modeled) in year one; adoption assumption 3.0% (placeholder).  \n\n## 5. Outreach plan\n- Partners: Community credit union (TBD) and local community organizations only.  \n- Channels: in-person enrollment through partner orgs, outreach materials at partner sites, and partner-led group sessions.  \n- Compliance: issuer partner review of all outreach materials and processes. Outreach only through community organizations; no protected-attribute targeting; eligibility and outreach use economic access only.\n\n## 6. Why Mastercard\nMastercard provides network reach and measurement capability without holding accounts, enabling rapid partnership with a community issuer and community organizations to reach underserved households and measure network spend impact.\n\n## 7. Economics and the two levers\n- Unit economics today: acquisition cost per account $428, lifetime value per account $172, net per account -$256, yearly churn 40.0%, breakeven churn 16.1%. Issuer net lifetime modeled -$1,743,618.  \n- Network-level impact: network volume year 1 modeled $96,748,310 and network revenue year 1 placeholder $280,570; network yield placeholder 0.3%. Fixed program cost placeholder $75,000.  \n- Two levers to move economics: reduce churn toward breakeven (from 40.0% toward 16.1%), and lower acquisition cost via trusted community partners and co-delivery.\n\n## 8. Pilot design and success measures\n- Geography: launch in Bronx County, NY with five look-alike counties for comparison: Broome, Monroe, Erie, Onondaga, Niagara.  \n- Timeline: 12-month baseline, 12-month pilot with a 6-month read; difference-in-differences against look-alikes.  \n- Scale: about 6,524 pilot accounts (modeled).  \n- Primary measures: new accounts per 1,000 adults, 90-day active rate, transactions per account per month, yearly churn versus breakeven (16.1%), and target-topic complaints per 100k residents versus look-alikes.  \n- 2x2 read: usage up + pain down = scale; usage up + pain flat = rework benefit; usage flat + pain down = fix outreach; both flat = drop.\n\n## 9. Risks and safeguards\n- Complaint data skews toward banked customers; complaints count is 2,122 and 151.1 per 100k residents, which may undercount unbanked experiences.  \n- Underserved households are modeled from state FDIC rates and county poverty; about 217,454 underserved households (modeled).  \n- Benchmarks for servicing are older; issuer partner required to operate accounts and bear compliance, fraud, and servicing risk. Safeguards: partner compliance review, limited initial scale, and complaint monitoring.\n\n## 10. Decision needed\nApprove the pilot and commit $75,000 (fixed program cost placeholder) to launch with a community issuer and community organization outreach.\n\n_Draft generated with AI from Navigator data. Modeled and placeholder figures must be validated in the pilot._",
+ "model": "gpt-5-mini",
+ "mode": "foundry",
+ "generated_at": "2026-10-12T17:56:09Z",
+ "warnings": [
+  "Network volume is described near 'revenue'. Volume is spend on the network, not Mastercard revenue."
+ ],
+ "facts_used": {
+  "area_name": "Bronx County, NY",
+  "level": "county",
+  "exclusion_index": 92.0,
+  "exclusion_rank": 254,
+  "households": 534100,
+  "est_underserved_households_modeled": 217454,
+  "underserved_rate_modeled": 0.4071,
+  "poverty_rate": 0.2781,
+  "no_internet_rate": 0.0957,
+  "branches_per_10k_households": 2.36,
+  "median_household_income": 48676,
+  "state_fdic_unbanked_rate": 0.051,
+  "state_fdic_underbanked_rate": 0.154,
+  "complaints": 2122,
+  "complaints_per_100k": 151.1,
+  "frustration_score": 90.0,
+  "top_topic": "account closures",
+  "top_topic_pain": 1.256,
+  "second_topic": "customer service",
+  "second_topic_pain": 1.074,
+  "clear_lead": true,
+  "benefit_title": "Second-chance account",
+  "benefit_description": "An account for people previously closed out of banking, with clear rules and a path to a standard account.",
+  "benefit_pain_measure": "Account closure complaints per 100k residents",
+  "issuer_type": "community",
+  "adoption_rate_placeholder": 0.03,
+  "yearly_churn": 0.4,
+  "acquisition_cost_per_account": 428.0,
+  "fixed_program_cost_placeholder": 75000.0,
+  "network_yield_placeholder": 0.0029,
+  "annual_spend_per_account": 14830,
+  "swipe_revenue_per_account": 208,
+  "deposit_earnings_per_account": 42,
+  "fraud_loss_per_account": 7,
+  "servicing_cost_per_account": 175,
+  "annual_margin_per_account": 69,
+  "lifetime_value_per_account": 172,
+  "net_per_account": -256,
+  "breakeven_churn": 0.161,
+  "pilot_accounts_modeled": 6524,
+  "issuer_net_lifetime_modeled": -1743618,
+  "network_volume_year1_modeled": 96748310,
+  "network_revenue_year1_placeholder": 280570,
+  "state_scale_accounts": 47494,
+  "us_scale_accounts": 738000,
+  "lookalikes": [
+   {
+    "name": "Broome County, NY",
+    "similarity": 0.187
+   },
+   {
+    "name": "Monroe County, NY",
+    "similarity": 0.166
+   },
+   {
+    "name": "Erie County, NY",
+    "similarity": 0.154
+   },
+   {
+    "name": "Onondaga County, NY",
+    "similarity": 0.152
+   },
+   {
+    "name": "Niagara County, NY",
+    "similarity": 0.15
+   }
+  ],
+  "data_labels": [
+   "Unbanked and underbanked rates are state-level FDIC 2023 estimates (FDIC has no county data).",
+   "Underserved households are modeled from state FDIC rates and county poverty.",
+   "Complaint topics come from CFPB issue categories; intensity is not classified yet, so pain = topic share vs national."
+  ],
+  "partner_name": "Community credit union (TBD)",
+  "notes": ""
+ },
+ "approved_by": null,
+ "approved_at": null
+}

@@ -171,7 +171,7 @@ export default function Dashboard() {
               <p className="mt-1 text-[11px] text-muted">
                 {layer === "underserved"
                   ? "Exclusion index: FDIC 2023 unbanked and underbanked, ACS poverty, no internet, income, and bank branch density."
-                  : "Frustration score: CFPB complaints per 100k residents weighted by intensity. Under 30 complaints is not scored."}
+                  : "Frustration score: percentile of CFPB complaints per 100k residents. Under 30 complaints is not scored (hatched)."}
                 {stateFips ? " County unbanked rates are state-level." : " Click a state to see its counties."}
                 {USE_MOCK && " Mock data."}
               </p>

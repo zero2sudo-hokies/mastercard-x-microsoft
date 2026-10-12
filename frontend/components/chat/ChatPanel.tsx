@@ -24,7 +24,9 @@ export default function ChatPanel({ context, onFocus, onSelect }: { context: Cha
   const [error, setError] = useState<{ message: string; retry: string } | null>(null);
   const end = useRef<HTMLDivElement>(null);
 
-  useEffect(() => end.current?.scrollIntoView({ behavior: "smooth", block: "end" }), [turns.length, sending]);
+  useEffect(() => {
+    end.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [turns.length, sending]);
 
   async function send(text: string) {
     const question = text.trim();

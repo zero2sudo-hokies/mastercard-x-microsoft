@@ -1,0 +1,79 @@
+{
+ "reply": "- Niagara County, NY — Strong case: exclusion index 58.7 and frustration score 30.0; estimated underserved households (modeled) 18,200. Top frustration: fees (higher than national). Matched benefit: No-fee account (no overdraft, no minimum balance). Trade-off: complaints (78) are moderate — good signal but pilot should test uptake assumptions.  \n- Broome County, NY — High exclusion: 71.1 but frustration score 0.0; estimated underserved households (modeled) 22,196. Top recorded frustration: scams/fraud (not fees); matched benefit still: No-fee account. Data limit: frustration score and complaint volume (35) are thin — complaints may not reflect fee pain here.  \n- Monroe County, NY — Balanced pick: exclusion index 48.3 and frustration score 35.0; estimated underserved households (modeled) 63,600. Top frustration: customer service; matched benefit: No-fee account. Trade-off: large population gives scale but the primary complaint isn’t fees, so product messaging may need to pair service improvements.\n\nOpen any area’s profile next or I can help build a pilot plan for one county.",
+ "recommendations": [
+  {
+   "rank": 1,
+   "fips": "36063",
+   "name": "Niagara County",
+   "state_abbr": "NY",
+   "level": "county",
+   "priority_score": 79.3,
+   "exclusion_index": 58.7,
+   "frustration_score": 30.0,
+   "top_topic": "fees",
+   "benefit_id": "no_fee_account",
+   "clear_lead": false,
+   "est_underserved_hh": 18200,
+   "reasons": [
+    "Exclusion index 59 (top 41% of US counties)",
+    "Fees pain 1.23x national",
+    "78 complaints in 24 months"
+   ]
+  },
+  {
+   "rank": 2,
+   "fips": "36007",
+   "name": "Broome County",
+   "state_abbr": "NY",
+   "level": "county",
+   "priority_score": 73.0,
+   "exclusion_index": 71.1,
+   "frustration_score": 0.0,
+   "top_topic": "fraud_scams",
+   "benefit_id": "no_fee_account",
+   "clear_lead": true,
+   "est_underserved_hh": 22196,
+   "reasons": [
+    "Exclusion index 71 (top 29% of US counties)",
+    "Fees pain 0.81x national",
+    "35 complaints in 24 months"
+   ]
+  },
+  {
+   "rank": 3,
+   "fips": "36055",
+   "name": "Monroe County",
+   "state_abbr": "NY",
+   "level": "county",
+   "priority_score": 71.7,
+   "exclusion_index": 48.3,
+   "frustration_score": 35.0,
+   "top_topic": "customer_service",
+   "benefit_id": "no_fee_account",
+   "clear_lead": false,
+   "est_underserved_hh": 63600,
+   "reasons": [
+    "Exclusion index 48 (top 52% of US counties)",
+    "Fees pain 0.99x national",
+    "309 complaints in 24 months"
+   ]
+  }
+ ],
+ "focus_fips": [
+  "36063",
+  "36007",
+  "36055"
+ ],
+ "tool_calls": [
+  {
+   "name": "get_recommendations",
+   "args": {
+    "level": "county",
+    "topic": "fees",
+    "limit": 3
+   }
+  }
+ ],
+ "mode": "foundry",
+ "warnings": []
+}
