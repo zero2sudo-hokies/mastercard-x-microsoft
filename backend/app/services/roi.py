@@ -2,7 +2,7 @@
 from app.models import LtvPoint, RoiArea, RoiAudience, RoiInputs, RoiProgram, RoiRequest, RoiResult, RoiUnit, ScaleRow
 
 LABELS = [
-    "Benchmarks from industry and Federal Reserve sources; rerun with the partner issuer's costs.",
+    "Benchmarks are sourced (Federal Reserve, FDIC, PULSE, Moebs, FirstPage Sage, Mastercard 10-K; see Assumptions and sources). Rerun with the partner issuer's costs.",
     "Network volume is spend on Mastercard's network, not Mastercard revenue.",
 ]
 

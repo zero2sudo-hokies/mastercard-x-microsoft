@@ -138,6 +138,7 @@ export interface Benchmarks {
   global_unbanked_adults: number;
   roi_defaults: { issuer_type: IssuerType; adoption_rate: number; fixed_program_cost: number };
   notes: Record<string, string>;
+  sources?: Record<string, string>;
 }
 
 export interface Health {

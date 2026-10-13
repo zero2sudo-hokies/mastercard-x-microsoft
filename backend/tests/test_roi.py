@@ -14,19 +14,20 @@ def roi(**kw):
 def test_worked_example_community():
     r = roi(issuer_type="community")
     assert r.inputs.churn == 0.40 and r.inputs.cac == 428
-    assert r.unit.annual_spend == 14830
-    assert r.unit.annual_margin == 69
-    assert r.unit.ltv == 172
-    assert r.unit.breakeven_churn == 0.161
+    # sourced benchmarks (see benchmarks.json "sources"): 30.7 tx/month, $46.89 ticket, $900 balance
+    assert r.unit.annual_spend == 17274
+    assert r.unit.annual_margin == 38
+    assert r.unit.ltv == 95
+    assert r.unit.breakeven_churn == 0.088
     assert r.program.accounts == 2910
-    assert r.program.issuer_net_lifetime == -819279
-    assert r.program.network_volume_y1 == 43154136
-    assert r.program.network_revenue_y1_est == 125147
+    assert r.program.issuer_net_lifetime == -1045165
+    assert r.program.network_volume_y1 == 50268143
+    assert r.program.network_revenue_y1_est == 155831
 
 
 def test_large_bank_loses_money_and_has_no_breakeven():
     r = roi(issuer_type="large_bank")
-    assert r.unit.annual_margin == -272
+    assert r.unit.annual_margin == -294
     assert r.unit.breakeven_churn is None
 
 

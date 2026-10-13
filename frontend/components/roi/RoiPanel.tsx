@@ -145,7 +145,7 @@ export default function RoiPanel({ fips, onChange }: { fips: string; onChange?: 
           <div>
             <Slider label="Yearly churn" value={inputs.churn} min={0.05} max={0.5} step={0.01} display={fmtPct(inputs.churn, 0)} onChange={(v) => set({ churn: v })} />
             <div className="mt-1.5 flex gap-2">
-              <Chip onClick={() => set({ churn: bench.churn_observed[inputs.issuer_type] })}>Observed {fmtPct(bench.churn_observed[inputs.issuer_type], 0)}</Chip>
+              <Chip onClick={() => set({ churn: bench.churn_observed[inputs.issuer_type] })}>Default {fmtPct(bench.churn_observed[inputs.issuer_type], 0)} (placeholder)</Chip>
               <Chip disabled={data?.unit.breakeven_churn == null} onClick={() => data?.unit.breakeven_churn != null && set({ churn: Math.max(0.05, data.unit.breakeven_churn) })}>
                 Breakeven{data?.unit.breakeven_churn != null ? ` ${fmtPct(data.unit.breakeven_churn)}` : ""}
               </Chip>
@@ -236,6 +236,8 @@ export default function RoiPanel({ fips, onChange }: { fips: string; onChange?: 
             </div>
             <SourceNote>Same adoption rate at every level. {data.audience?.label} Global base: unbanked adults.</SourceNote>
           </Card>
+
+          <AssumptionsTable bench={bench} issuer={data.inputs.issuer_type} />
 
           {data.labels.map((l) => (
             <SourceNote key={l}>{l}</SourceNote>
@@ -370,5 +372,45 @@ function AudienceCard({ ctx }: { ctx: RoiContext }) {
           <SourceNote key={l}>{l}</SourceNote>
         ))}
     </Card>
+  );
+}
+
+/** Every benchmark the ROI uses, its value for this issuer type, and where it comes from. */
+function AssumptionsTable({ bench, issuer }: { bench: Benchmarks; issuer: IssuerType }) {
+  const rows: [string, string, string][] = [
+    ["Point-of-sale transactions per month", String(bench.transactions_per_month), "transactions_per_month"],
+    ["Average ticket", fmtUSD(bench.avg_ticket), "avg_ticket"],
+    ["Interchange per transaction", `$${bench.interchange_per_tx[issuer].toFixed(2)}`, "interchange_per_tx"],
+    ["Average balance", fmtUSD(bench.avg_balance), "avg_balance"],
+    ["Deposit margin", fmtPct(bench.deposit_margin, 2), "deposit_margin"],
+    ["Fraud loss rate", fmtPct(bench.fraud_rate, 3), "fraud_rate"],
+    ["Issuer share of fraud", fmtPct(bench.issuer_fraud_share), "issuer_fraud_share"],
+    ["Servicing cost per year", fmtUSD(bench.servicing[issuer]), "servicing"],
+    ["Acquisition cost", fmtUSD(bench.cac[issuer]), "cac"],
+    ["Default yearly churn", fmtPct(bench.churn_observed[issuer], 0), "churn_observed"],
+    ["Network yield", fmtPct(bench.network_yield_placeholder, 2), "network_yield_placeholder"],
+    ["US unbanked + underbanked households", fmtInt(bench.us_underserved_hh), "us_underserved_hh"],
+    ["Global unbanked adults", fmtInt(bench.global_unbanked_adults), "global_unbanked_adults"],
+  ];
+  return (
+    <details className="rounded-xl border border-line bg-white p-4 text-xs shadow-sm">
+      <summary className="cursor-pointer text-sm font-semibold text-navy">Assumptions and sources ({rows.length})</summary>
+      <table className="mt-3 w-full">
+        <tbody>
+          {rows.map(([label, value, key]) => {
+            const placeholder = key === "churn_observed" || key === "network_yield_placeholder";
+            return (
+              <tr key={key} className="border-t border-line align-top">
+                <td className="py-1.5 pr-2 text-muted">{label}</td>
+                <td className="py-1.5 pr-2 text-right font-medium tabular-nums text-navy">{value}</td>
+                <td className="py-1.5 text-muted">
+                  {placeholder && <Tag tag="placeholder" />} {bench.sources?.[key] ?? "Source not recorded"}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </details>
   );
 }

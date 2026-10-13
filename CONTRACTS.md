@@ -38,17 +38,18 @@ Topics (fixed ids, in this order): `fees`, `fraud_scams`, `transfers`, `account_
 - `exclusion_index` 0-100 = percentile of the mean z-score of the measures listed in the plan (states: FDIC unbanked, FDIC underbanked, poverty, no-internet, inverse income, inverse branches per 10k HH; counties: poverty, no-internet, inverse income, inverse branches per 10k HH, state FDIC underserved rate). Nulls get z = 0. `exclusion_rank` 1 = most excluded within its level.
 - FORBIDDEN inputs anywhere: foreign-born, nativity, citizenship, language spoken, limited-English, race, ethnicity, religion.
 
-### `benchmarks.json` (P1) — ROI inputs (Sahaj's input table)
+### `benchmarks.json` (P1) — ROI inputs
+Every value is sourced in a `sources` map inside the file (Federal Reserve Reg II 2023, PULSE 2024, FDIC QBP Q2 2026, SCF 2022, Moebs, FirstPage Sage, Mastercard FY2025 10-K, FDIC 2023 survey, Global Findex 2025). Churn is a labeled placeholder within the published 20-45% first-year attrition range. Values updated 2026-10-13 from the original input table where a source differed.
 ```json
 {
-  "transactions_per_month": 33.4, "avg_ticket": 37,
+  "transactions_per_month": 30.7, "avg_ticket": 46.89,
   "interchange_per_tx": { "community": 0.52, "large_bank": 0.23 },
-  "avg_balance": 1273, "deposit_margin": 0.0332,
-  "fraud_rate": 0.00176, "issuer_fraud_share": 0.26,
+  "avg_balance": 900, "deposit_margin": 0.0332,
+  "fraud_rate": 0.00176, "issuer_fraud_share": 0.283,
   "servicing": { "community": 175, "large_bank": 400 },
   "cac": { "community": 428, "large_bank": 561 },
   "churn_observed": { "community": 0.40, "large_bank": 0.24 },
-  "network_yield_placeholder": 0.0029,
+  "network_yield_placeholder": 0.0031,
   "us_underserved_hh": 24600000, "global_unbanked_adults": 1300000000,
   "roi_defaults": { "issuer_type": "community", "adoption_rate": 0.03, "fixed_program_cost": 75000 },
   "notes": {
@@ -180,7 +181,7 @@ Request:
 ```
 `null` -> default from `benchmarks.json` for that issuer type.
 
-Response `RoiResult`:
+Response `RoiResult` (example shows the shape; numbers are from the original input table. The current worked example on sourced benchmarks: Hidalgo at 97,000 households, community: annual_spend 17,274, annual_margin 38, ltv 95, breakeven_churn 0.088, accounts 2,910, issuer_net_lifetime -1,045,165, network_volume_y1 50,268,143; see `backend/tests/test_roi.py`):
 ```json
 {
   "area": { "fips": "48215", "name": "Hidalgo County", "state_abbr": "TX", "est_underserved_hh": 97000 },

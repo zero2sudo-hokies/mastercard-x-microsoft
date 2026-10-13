@@ -11,169 +11,170 @@
   "churn": 0.4,
   "cac": 428.0,
   "fixed_program_cost": 75000.0,
-  "network_yield": 0.0029
+  "network_yield": 0.0031,
+  "audience_basis": "underserved"
  },
  "unit": {
-  "annual_spend": 14830,
-  "swipe_revenue": 208,
-  "deposit_earnings": 42,
-  "fraud_loss": 7,
+  "annual_spend": 17274,
+  "swipe_revenue": 192,
+  "deposit_earnings": 30,
+  "fraud_loss": 9,
   "servicing": 175,
-  "annual_margin": 69,
-  "ltv": 172,
-  "net_per_account": -256,
-  "breakeven_churn": 0.161
+  "annual_margin": 38,
+  "ltv": 95,
+  "net_per_account": -333,
+  "breakeven_churn": 0.088
  },
  "program": {
   "accounts": 3919,
-  "issuer_net_lifetime": -1077347,
-  "network_volume_y1": 58117202,
-  "network_revenue_y1_est": 168540
+  "issuer_net_lifetime": -1381555,
+  "network_volume_y1": 67697888,
+  "network_revenue_y1_est": 209863
  },
  "ltv_curve": [
   {
    "churn": 0.1,
-   "ltv": 689
+   "ltv": 378
   },
   {
    "churn": 0.11,
-   "ltv": 626
-  },
-  {
-   "churn": 0.12,
-   "ltv": 574
-  },
-  {
-   "churn": 0.13,
-   "ltv": 530
-  },
-  {
-   "churn": 0.14,
-   "ltv": 492
-  },
-  {
-   "churn": 0.15,
-   "ltv": 459
-  },
-  {
-   "churn": 0.16,
-   "ltv": 431
-  },
-  {
-   "churn": 0.17,
-   "ltv": 405
-  },
-  {
-   "churn": 0.18,
-   "ltv": 383
-  },
-  {
-   "churn": 0.19,
-   "ltv": 363
-  },
-  {
-   "churn": 0.2,
    "ltv": 344
   },
   {
+   "churn": 0.12,
+   "ltv": 315
+  },
+  {
+   "churn": 0.13,
+   "ltv": 291
+  },
+  {
+   "churn": 0.14,
+   "ltv": 270
+  },
+  {
+   "churn": 0.15,
+   "ltv": 252
+  },
+  {
+   "churn": 0.16,
+   "ltv": 237
+  },
+  {
+   "churn": 0.17,
+   "ltv": 223
+  },
+  {
+   "churn": 0.18,
+   "ltv": 210
+  },
+  {
+   "churn": 0.19,
+   "ltv": 199
+  },
+  {
+   "churn": 0.2,
+   "ltv": 189
+  },
+  {
    "churn": 0.21,
-   "ltv": 328
+   "ltv": 180
   },
   {
    "churn": 0.22,
-   "ltv": 313
-  },
-  {
-   "churn": 0.23,
-   "ltv": 300
-  },
-  {
-   "churn": 0.24,
-   "ltv": 287
-  },
-  {
-   "churn": 0.25,
-   "ltv": 276
-  },
-  {
-   "churn": 0.26,
-   "ltv": 265
-  },
-  {
-   "churn": 0.27,
-   "ltv": 255
-  },
-  {
-   "churn": 0.28,
-   "ltv": 246
-  },
-  {
-   "churn": 0.29,
-   "ltv": 238
-  },
-  {
-   "churn": 0.3,
-   "ltv": 230
-  },
-  {
-   "churn": 0.31,
-   "ltv": 222
-  },
-  {
-   "churn": 0.32,
-   "ltv": 215
-  },
-  {
-   "churn": 0.33,
-   "ltv": 209
-  },
-  {
-   "churn": 0.34,
-   "ltv": 203
-  },
-  {
-   "churn": 0.35,
-   "ltv": 197
-  },
-  {
-   "churn": 0.36,
-   "ltv": 191
-  },
-  {
-   "churn": 0.37,
-   "ltv": 186
-  },
-  {
-   "churn": 0.38,
-   "ltv": 181
-  },
-  {
-   "churn": 0.39,
-   "ltv": 177
-  },
-  {
-   "churn": 0.4,
    "ltv": 172
   },
   {
+   "churn": 0.23,
+   "ltv": 165
+  },
+  {
+   "churn": 0.24,
+   "ltv": 158
+  },
+  {
+   "churn": 0.25,
+   "ltv": 151
+  },
+  {
+   "churn": 0.26,
+   "ltv": 146
+  },
+  {
+   "churn": 0.27,
+   "ltv": 140
+  },
+  {
+   "churn": 0.28,
+   "ltv": 135
+  },
+  {
+   "churn": 0.29,
+   "ltv": 130
+  },
+  {
+   "churn": 0.3,
+   "ltv": 126
+  },
+  {
+   "churn": 0.31,
+   "ltv": 122
+  },
+  {
+   "churn": 0.32,
+   "ltv": 118
+  },
+  {
+   "churn": 0.33,
+   "ltv": 115
+  },
+  {
+   "churn": 0.34,
+   "ltv": 111
+  },
+  {
+   "churn": 0.35,
+   "ltv": 108
+  },
+  {
+   "churn": 0.36,
+   "ltv": 105
+  },
+  {
+   "churn": 0.37,
+   "ltv": 102
+  },
+  {
+   "churn": 0.38,
+   "ltv": 100
+  },
+  {
+   "churn": 0.39,
+   "ltv": 97
+  },
+  {
+   "churn": 0.4,
+   "ltv": 95
+  },
+  {
    "churn": 0.41,
-   "ltv": 168
+   "ltv": 92
   },
   {
    "churn": 0.42,
-   "ltv": 164
+   "ltv": 90
   },
   {
    "churn": 0.43,
-   "ltv": 160
+   "ltv": 88
   },
   {
    "churn": 0.44,
-   "ltv": 157
+   "ltv": 86
   },
   {
    "churn": 0.45,
-   "ltv": 153
+   "ltv": 84
   }
  ],
  "scale": [
@@ -182,32 +183,37 @@
    "base": 130647,
    "unit": "households",
    "accounts": 3919,
-   "network_volume_y1": 58117202
+   "network_volume_y1": 67697888
   },
   {
    "level": "State",
    "base": 2748204,
    "unit": "households",
    "accounts": 82446,
-   "network_volume_y1": 1222641202
+   "network_volume_y1": 1424194959
   },
   {
    "level": "United States",
    "base": 24600000,
    "unit": "households",
    "accounts": 738000,
-   "network_volume_y1": 10944244800
+   "network_volume_y1": 12748415688
   },
   {
    "level": "Global",
    "base": 1300000000,
    "unit": "adults",
    "accounts": 39000000,
-   "network_volume_y1": 578354400000
+   "network_volume_y1": 673696764000
   }
  ],
  "labels": [
-  "Benchmarks from industry and Federal Reserve sources; rerun with the partner issuer's costs.",
+  "Benchmarks are sourced (Federal Reserve, FDIC, PULSE, Moebs, FirstPage Sage, Mastercard 10-K; see Assumptions and sources). Rerun with the partner issuer's costs.",
   "Network volume is spend on Mastercard's network, not Mastercard revenue."
- ]
+ ],
+ "audience": {
+  "basis": "underserved",
+  "area_households": 130647,
+  "label": "Unbanked + underbanked households (modeled for counties from state FDIC rates and poverty)."
+ }
 }
