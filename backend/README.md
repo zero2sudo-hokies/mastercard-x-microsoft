@@ -6,7 +6,7 @@ FastAPI on :8000. Serves the exclusion layer, merges P2's frustration layer, and
 cd backend
 pip install -r requirements.txt
 cp ../.env.example .env      # only needed for P3's AI routes
-uvicorn app.main:app --reload --port 8000
+uvicorn app.main:app --reload --host localhost --port 8000   # localhost binds IPv4 and IPv6
 pytest -q
 ```
 Open http://localhost:8000/docs.

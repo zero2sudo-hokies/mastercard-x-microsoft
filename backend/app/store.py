@@ -4,13 +4,15 @@ Each file falls back to app/fixtures/ on its own, so the API runs before the pip
 """
 import json
 import logging
+import os
 from pathlib import Path
 
 from app.models import Area, FrustrationArea
 
 log = logging.getLogger("navigator")
 APP = Path(__file__).parent
-ROI_INPUTS = APP.parent.parent / "data" / "p3" / "roi-inputs.json"  # P3's verified FDIC audience + bank benchmarks
+# P3's verified FDIC audience + bank benchmarks (the Docker image copies it to the same relative path)
+ROI_INPUTS = Path(os.getenv("ROI_INPUTS_PATH", str(APP.parent.parent / "data" / "p3" / "roi-inputs.json")))
 
 
 def _load(name):

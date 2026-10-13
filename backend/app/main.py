@@ -1,11 +1,13 @@
 import logging
 import time
+from collections import defaultdict, deque
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from app.config import settings
 from app.routers import areas, meta, recommend, roi
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -27,8 +29,27 @@ async def log_and_guard(request: Request, call_next):
     return response
 
 
-# added after the guard so CORS headers are on every response, 500s included
-app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000"], allow_methods=["*"], allow_headers=["*"])
+AI_PATHS = ("/api/chat", "/api/plan")
+_ai_calls: dict[str, deque] = defaultdict(deque)
+
+
+@app.middleware("http")
+async def limit_ai_calls(request: Request, call_next):
+    """Per-IP hourly cap on the Foundry-backed routes. In memory: resets on restart, per instance."""
+    if request.method == "POST" and request.url.path.startswith(AI_PATHS):
+        # behind a host proxy (Azure, Render) the client is the first X-Forwarded-For entry
+        ip = (request.headers.get("x-forwarded-for") or "").split(",")[0].strip() or (request.client.host if request.client else "?")
+        now, calls = time.time(), _ai_calls[ip]
+        while calls and now - calls[0] > 3600:
+            calls.popleft()
+        if len(calls) >= settings.ai_requests_per_hour:
+            return JSONResponse({"detail": "Too many AI requests from this address. Try again in a little while."}, status_code=429)
+        calls.append(now)
+    return await call_next(request)
+
+
+# added last so CORS is outermost: its headers land on every response, 429s and 500s included
+app.add_middleware(CORSMiddleware, allow_origins=list(settings.allowed_origins), allow_methods=["GET", "POST"], allow_headers=["*"])
 
 
 @app.exception_handler(RequestValidationError)

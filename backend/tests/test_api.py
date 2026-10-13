@@ -57,3 +57,17 @@ def test_no_protected_words_in_responses():
     text = " ".join(client.get(u).text.lower() for u in
                     [f"/api/areas/{FIPS}", "/api/recommendations?limit=50", "/api/benefits"])
     assert not [w for w in banned if w in text]
+
+
+def test_ai_routes_are_rate_limited(monkeypatch):
+    from app import main
+    from app.config import settings
+    monkeypatch.setattr(type(settings), "ai_requests_per_hour", property(lambda self: 2))
+    monkeypatch.setattr(type(settings), "ai_configured", property(lambda self: False))
+    main._ai_calls.clear()
+    body = {"messages": [{"role": "user", "content": "where to pilot?"}]}
+    headers = {"x-forwarded-for": "203.0.113.9"}
+    codes = [client.post("/api/chat", json=body, headers=headers).status_code for _ in range(3)]
+    assert codes[:2] != [429, 429] and codes[2] == 429
+    assert client.get("/api/health", headers=headers).status_code == 200  # reads are never limited
+    main._ai_calls.clear()
