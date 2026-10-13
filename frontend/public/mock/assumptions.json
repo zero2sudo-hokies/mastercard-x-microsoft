@@ -1,56 +1,56 @@
 {
-  "transactions_per_month": 30.7,
-  "avg_ticket": 46.89,
-  "interchange_per_tx": {
-    "community": 0.52,
-    "large_bank": 0.23
-  },
-  "avg_balance": 900,
-  "deposit_margin": 0.0332,
-  "fraud_rate": 0.00176,
-  "issuer_fraud_share": 0.283,
-  "servicing": {
-    "community": 175,
-    "large_bank": 400
-  },
-  "cac": {
-    "community": 428,
-    "large_bank": 561
-  },
-  "churn_observed": {
-    "community": 0.4,
-    "large_bank": 0.24
-  },
-  "network_yield_placeholder": 0.0031,
-  "us_underserved_hh": 24600000,
-  "global_unbanked_adults": 1300000000,
-  "roi_defaults": {
-    "issuer_type": "community",
-    "adoption_rate": 0.03,
-    "fixed_program_cost": 75000
-  },
-  "sources": {
-    "transactions_per_month": "PULSE 2024 Debit Issuer Study (2023 data): 30.7 point-of-sale transactions per active debit card per month. ATM and account-to-account transfers excluded because they earn no interchange.",
-    "avg_ticket": "PULSE 2024 Debit Issuer Study: average debit ticket $46.89 in 2023. Cross-check: Federal Reserve Regulation II 2023 data, $4.7T over 100.7B transactions = $46.7.",
-    "interchange_per_tx": "Federal Reserve Regulation II 2023 interchange report: exempt issuers (under $10B, used for community) averaged $0.52; covered issuers $0.22 (dual-message) to $0.24 (single-message), used as $0.23.",
-    "avg_balance": "Federal Reserve Survey of Consumer Finances 2022: median transaction-account balance of about $900 for the lowest income group (as reported by Bankrate).",
-    "deposit_margin": "FDIC Quarterly Banking Profile Q2 2026: industry net interest margin 3.32%. Whole-bank proxy; it likely overstates the margin on small deposit balances.",
-    "fraud_rate": "Federal Reserve Regulation II 2023: fraud losses to all parties were 17.6 basis points of transaction value (covered issuers).",
-    "issuer_fraud_share": "Federal Reserve Regulation II 2023: issuers absorbed 28.3% of fraud losses (merchants 49.9%, cardholders 21.8%).",
-    "servicing": "Moebs Services cost study (via Banking Exchange): $175 per checking account per year at efficient institutions; about $400 at banks over $50B in assets.",
-    "cac": "FirstPage Sage banking customer acquisition cost benchmarks (2018-2024 data): credit union $428 (used for community issuer), retail consumer bank $561.",
-    "churn_observed": "Placeholder, not observed: industry first-year checking attrition runs 20-45% (Raddon 20-25%, Bain 32%, Harland Clarke 35-45%). The pilot measures the real rate.",
-    "network_yield_placeholder": "Mastercard FY2025 Form 10-K: net revenue $32.79B over about $10.63T gross dollar volume = 0.31%. Approximate; not Mastercard revenue from this program.",
-    "us_underserved_hh": "FDIC 2023 National Survey of Unbanked and Underbanked Households: 5.6M unbanked + 19.0M underbanked households.",
-    "global_unbanked_adults": "World Bank Global Findex 2025: about 1.3 billion adults without an account (adults, not households).",
-    "roi_defaults": "Placeholders: adoption rate and fixed program cost are set by the pilot."
-  },
-  "notes": {
-    "network_yield_placeholder": "Approximate: Mastercard net revenue / gross dollar volume. Verify before quoting.",
-    "adoption_rate": "Placeholder; the pilot replaces it.",
-    "fixed_program_cost": "Placeholder; the pilot replaces it.",
-    "servicing": "Older benchmark; rerun with partner issuer costs.",
-    "churn_observed": "Placeholder within the published first-year attrition range; the pilot measures it.",
-    "deposit_margin": "Industry NIM used as a proxy; rerun with the partner's deposit economics."
-  }
+ "transactions_per_month": 30.7,
+ "avg_ticket": 46.89,
+ "interchange_per_tx": {
+  "community": 0.52,
+  "large_bank": 0.23
+ },
+ "avg_balance": 900,
+ "deposit_margin": 0.0332,
+ "fraud_rate": 0.00176,
+ "issuer_fraud_share": 0.283,
+ "servicing": {
+  "community": 175,
+  "large_bank": 400
+ },
+ "cac": {
+  "community": 428,
+  "large_bank": 561
+ },
+ "churn_observed": {
+  "community": 0.4,
+  "large_bank": 0.24
+ },
+ "network_yield_placeholder": 0.0031,
+ "us_underserved_hh": 24600000,
+ "global_unbanked_adults": 1300000000,
+ "roi_defaults": {
+  "issuer_type": "community",
+  "adoption_rate": 0.03,
+  "fixed_program_cost": 75000
+ },
+ "sources": {
+  "transactions_per_month": "PULSE 2024 Debit Issuer Study (2023 data): 30.7 point-of-sale transactions per active debit card per month. ATM and account-to-account transfers excluded because they earn no interchange.",
+  "avg_ticket": "PULSE 2024 Debit Issuer Study: average debit ticket $46.89 in 2023. Cross-check: Federal Reserve Regulation II 2023 data, $4.7T over 100.7B transactions = $46.7.",
+  "interchange_per_tx": "Federal Reserve Regulation II 2023 interchange report: exempt issuers (under $10B, used for community) averaged $0.52; covered issuers $0.22 (dual-message) to $0.24 (single-message), used as $0.23.",
+  "avg_balance": "Federal Reserve Survey of Consumer Finances 2022: median transaction-account balance of about $900 for the lowest income group (as reported by Bankrate).",
+  "deposit_margin": "FDIC Quarterly Banking Profile Q2 2026: industry net interest margin 3.32%. Whole-bank proxy; it likely overstates the margin on small deposit balances.",
+  "fraud_rate": "Federal Reserve Regulation II 2023: fraud losses to all parties were 17.6 basis points of transaction value (covered issuers).",
+  "issuer_fraud_share": "Federal Reserve Regulation II 2023: issuers absorbed 28.3% of fraud losses (merchants 49.9%, cardholders 21.8%).",
+  "servicing": "Moebs Services cost study (via Banking Exchange): $175 per checking account per year at efficient institutions; about $400 at banks over $50B in assets.",
+  "cac": "FirstPage Sage banking customer acquisition cost benchmarks (2018-2024 data): credit union $428 (used for community issuer), retail consumer bank $561.",
+  "churn_observed": "Placeholder, not observed: industry first-year checking attrition runs 20-45% (Raddon 20-25%, Bain 32%, Harland Clarke 35-45%). The pilot measures the real rate.",
+  "network_yield_placeholder": "Mastercard FY2025 Form 10-K: net revenue $32.79B over about $10.63T gross dollar volume = 0.31%. Approximate; not Mastercard revenue from this program.",
+  "us_underserved_hh": "FDIC 2023 National Survey of Unbanked and Underbanked Households: 5.6M unbanked + 19.0M underbanked households.",
+  "global_unbanked_adults": "World Bank Global Findex 2025: about 1.3 billion adults without an account (adults, not households).",
+  "roi_defaults": "Placeholders: adoption rate and fixed program cost are set by the pilot."
+ },
+ "notes": {
+  "network_yield_placeholder": "Approximate: Mastercard net revenue / gross dollar volume. Verify before quoting.",
+  "adoption_rate": "Placeholder; the pilot replaces it.",
+  "fixed_program_cost": "Placeholder; the pilot replaces it.",
+  "servicing": "Older benchmark; rerun with partner issuer costs.",
+  "churn_observed": "Placeholder within the published first-year attrition range; the pilot measures it.",
+  "deposit_margin": "Industry NIM used as a proxy; rerun with the partner's deposit economics."
+ }
 }

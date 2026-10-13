@@ -1,9 +1,9 @@
 {
  "area": {
-  "fips": "48215",
-  "name": "Hidalgo County",
-  "state_abbr": "TX",
-  "est_underserved_hh": 130647
+  "fips": "36005",
+  "name": "Bronx County",
+  "state_abbr": "NY",
+  "est_underserved_hh": 217454
  },
  "inputs": {
   "issuer_type": "community",
@@ -26,10 +26,10 @@
   "breakeven_churn": 0.088
  },
  "program": {
-  "accounts": 3919,
-  "issuer_net_lifetime": -1381555,
-  "network_volume_y1": 67697888,
-  "network_revenue_y1_est": 209863
+  "accounts": 6524,
+  "issuer_net_lifetime": -2250036,
+  "network_volume_y1": 112697377,
+  "network_revenue_y1_est": 349362
  },
  "ltv_curve": [
   {
@@ -180,17 +180,17 @@
  "scale": [
   {
    "level": "County",
-   "base": 130647,
+   "base": 217454,
    "unit": "households",
-   "accounts": 3919,
-   "network_volume_y1": 67697888
+   "accounts": 6524,
+   "network_volume_y1": 112697377
   },
   {
    "level": "State",
-   "base": 2748204,
+   "base": 1583142,
    "unit": "households",
-   "accounts": 82446,
-   "network_volume_y1": 1424194959
+   "accounts": 47494,
+   "network_volume_y1": 820424464
   },
   {
    "level": "United States",
@@ -213,7 +213,7 @@
  ],
  "audience": {
   "basis": "underserved",
-  "area_households": 130647,
+  "area_households": 217454,
   "label": "Unbanked + underbanked households (modeled for counties from state FDIC rates and poverty)."
  }
 }

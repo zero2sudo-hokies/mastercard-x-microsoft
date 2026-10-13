@@ -1,1 +1,8 @@
-{"status":"ok","data_source":{"areas":"pipeline","frustration":"fixtures"},"ai_configured":false}
+{
+ "status": "ok",
+ "data_source": {
+  "areas": "pipeline",
+  "frustration": "pipeline"
+ },
+ "ai_configured": false
+}

@@ -31,7 +31,8 @@ export class ApiError extends Error {
 }
 
 async function request<T>(path: string, mock: string, init?: RequestInit): Promise<T> {
-  const url = USE_MOCK ? `/mock/${mock}` : `${API_BASE}${path}`;
+  // mock files are served under the site base path (the repo sub-path on GitHub Pages)
+  const url = USE_MOCK ? `${process.env.NEXT_PUBLIC_BASE_PATH || ""}/mock/${mock}` : `${API_BASE}${path}`;
   let res: Response;
   try {
     // mock files are static, so always GET them

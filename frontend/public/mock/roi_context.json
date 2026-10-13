@@ -1,24 +1,24 @@
 {
- "fips": "48215",
+ "fips": "36005",
  "state": {
-  "state_abbr": "TX",
+  "state_abbr": "NY",
   "survey_year": 2023,
-  "households": 11225670,
-  "unbanked_households": 731519,
-  "unbanked_rate": 0.06516481701430471,
-  "underbanked_households": 2074963,
-  "underbanked_rate": 0.18484091002016728,
-  "interested_share_of_unbanked": 0.2742051927803915,
-  "interested_unbanked_households": 200586,
-  "very_interested_households": 98010,
-  "interested_and_once_banked_households": 96541,
-  "n_unbanked_surveyed": 95,
+  "households": 8162957,
+  "unbanked_households": 417844,
+  "unbanked_rate": 0.05118786647288063,
+  "underbanked_households": 1253882,
+  "underbanked_rate": 0.15360631260220484,
+  "interested_share_of_unbanked": 0.3338483682259732,
+  "interested_unbanked_households": 139497,
+  "very_interested_households": 83508,
+  "interested_and_once_banked_households": 84069,
+  "n_unbanked_surveyed": 52,
   "small_sample": true
  },
  "area_audience": {
-  "underserved": 130647,
-  "unbanked": 17564,
-  "interested_unbanked": 4816
+  "underserved": 217454,
+  "unbanked": 27239,
+  "interested_unbanked": 9094
  },
  "banks": [
   {
@@ -42,7 +42,7 @@
  ],
  "bank_quarter": "2026-06-30",
  "labels": [
-  "Small sample: 95 unbanked respondents in TX; no confidence interval published.",
+  "Small sample: 52 unbanked respondents in NY; no confidence interval published.",
   "Stated interest in a bank account is not an adoption or card conversion rate.",
   "County unbanked and interested counts are modeled from state FDIC rates.",
   "Bank ratios are whole-bank portfolio averages by asset size, not per-account economics or FDIC community-bank classes."
