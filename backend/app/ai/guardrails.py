@@ -7,7 +7,7 @@ BANNED = ["immigra", "undocumented", "illegal alien", "citizen", "itin", "ssn", 
 _BANNED_RE = [(t, re.compile(rf"\b{re.escape(t)}" + (r"\b" if t in ("race", "itin", "ssn") else ""), re.I)) for t in BANNED]
 
 # design constants and small integers the plan may use without a matching fact
-ALLOWED = {33.4, 12, 6, 90, 30, 1000, 10000, 150, 1.15, 100, 100000, 5, 10, 2}
+ALLOWED = {12, 6, 90, 30, 1000, 10000, 150, 1.15, 100, 100000, 5, 10, 2}
 _NUM_RE = re.compile(r"(?<![\w.])(-?\$?\d[\d,]*(?:\.\d+)?)\s*(%|[kKmMbB](?:n|illion)?\b)?")
 
 
@@ -58,13 +58,15 @@ def fact_numbers(facts) -> list[float]:
 
 
 def unmatched_numbers(text: str, facts) -> list[str]:
-    known = fact_numbers(facts)
+    known = [abs(k) for k in fact_numbers(facts)]
+    text = text.replace("\u2212", "-").replace("\u2013", "-")  # unicode minus / en dash
     warnings = []
     for raw, unit in _NUM_RE.findall(text):
         v = _parse(raw, unit)
         if v is None:
             continue
-        plain = float(raw.replace("$", "").replace(",", ""))
+        v = abs(v)
+        plain = abs(float(raw.replace("$", "").replace(",", "")))
         if (2020 <= plain <= 2030 and not unit and "$" not in raw) or (plain.is_integer() and abs(plain) < 13 and not unit) or plain in ALLOWED:
             continue
         # "$1.7M" is rounded to its last shown digit, so allow half of that place too
@@ -76,12 +78,17 @@ def unmatched_numbers(text: str, facts) -> list[str]:
 
 
 def revenue_wording(text: str) -> list[str]:
-    """Warn when 'revenue' sits within 10 words of a network volume mention."""
-    words = re.findall(r"\S+", text.lower())
-    vol = [i for i in range(len(words) - 1) if words[i].startswith("network") and words[i + 1].startswith("volume")]
-    rev = [i for i, w in enumerate(words) if w.startswith("revenue")]
-    if any(abs(r - v) <= 10 for r in rev for v in vol) and "not mastercard revenue" not in text.lower():
-        return ["Network volume is described near 'revenue'. Volume is spend on the network, not Mastercard revenue."]
+    """Warn when a sentence presents network volume as revenue. Fine: 'network revenue ... (placeholder)' stated
+    separately, or 'not Mastercard revenue'. Flagged: 'network volume of $27.7M is new revenue'."""
+    for sentence in re.split(r"(?<=[.!?;])\s+|\n", text):
+        low = sentence.lower()
+        if "network volume" not in low or "revenue" not in low:
+            continue
+        for m in re.finditer(r"revenue", low):
+            before, after = low[max(0, m.start() - 40):m.start()], low[m.end():m.end() + 30]
+            if re.search(r"\b(not|never|isn't)\b", before) or before.rstrip().endswith("network") or "placeholder" in after:
+                continue
+            return ["Network volume is described as revenue. Volume is spend on the network, not Mastercard revenue."]
     return []
 
 

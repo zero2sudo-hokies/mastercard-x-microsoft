@@ -73,6 +73,8 @@ def test_guardrails():
     assert guardrails.unmatched_numbers("138,433 households, 24.8% poverty, in 2026", facts) == []
     assert guardrails.unmatched_numbers("about 999,999 people", facts) == ["Number 999,999 does not match any provided fact."]
     assert guardrails.revenue_wording("network volume of $27.7M is new revenue for us")
+    assert guardrails.revenue_wording("Network volume year 1 $112.7M (modeled) with network revenue $349,362 (placeholder).") == []
+    assert guardrails.revenue_wording("Network volume is spend on the network, not Mastercard revenue.") == []
 
 
 def test_plan_template_mode_and_approval(monkeypatch):
@@ -101,3 +103,18 @@ def test_plan_errors(monkeypatch):
     body = {"reviewer": "A", "markdown": "x", "checklist": {"compliance_review": True, "community_partner": True, "no_protected_attributes": True}}
     assert client.post("/api/plan/p_nope/approve", json=body).status_code == 404
     plans.PLANS.clear()
+
+
+def test_plan_uses_roi_panel_inputs_and_fdic_context(monkeypatch):
+    ai_off(monkeypatch)
+    fips = next((f for f, fr in store.frustration.items() if len(f) == 5 and fr.status == "ok" and f.startswith("36")), None)
+    if not fips or not store.state_audience:
+        pytest.skip("needs NY frustration data and data/p3 roi-inputs")
+    roi = {"fips": fips, "issuer_type": "community", "adoption_rate": 0.05, "churn": 0.16, "cac": 300,
+           "fixed_program_cost": 50000, "network_yield": None, "audience_basis": "interested_unbanked"}
+    plan = client.post("/api/plan", json={"fips": fips, "roi": roi, "partner_name": "Test CU"}).json()
+    f = plan["facts_used"]
+    assert f["yearly_churn"] == 0.16 and f["acquisition_cost_per_account"] == 300 and f["adoption_rate_placeholder"] == 0.05
+    assert f["pilot_audience_basis"] == "interested_unbanked" and f["state_fdic_unbanked_households"] > 0
+    assert "Audience:" in plan["markdown"] and "State FDIC survey" in plan["markdown"]
+    assert not [w for w in plan["warnings"] if w.startswith("Number")], plan["warnings"]

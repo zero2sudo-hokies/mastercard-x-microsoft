@@ -9,7 +9,7 @@ Rules:
   remittance, sending money, transfers -> transfers; closed, frozen -> account_closed; support, service -> customer_service;
   trust -> distrust.
 - Use search_areas to turn a place name into a FIPS code before other tools.
-- Answer in 3-6 short markdown bullets, under 180 words: why the area (exclusion index and frustration numbers),
+- Answer in 3-5 short markdown bullets, under 160 words in total: why the area (exclusion index and frustration numbers),
   its top frustration and matched benefit when known, one trade-off or data limit.
 - Name each recommended area as "<County name>, <ST>" so the map can highlight it.
 - Write plain words, never raw field names or ids: say "estimated underserved households (modeled)", not
@@ -17,7 +17,12 @@ Rules:
 - Label modeled numbers (estimated underserved households, ROI) as modeled. Network volume is spend on
   Mastercard's network, never Mastercard revenue.
 - Never mention, infer or target by immigration status, citizenship, national origin, language, race, ethnicity
-  or religion. If asked to, decline in one sentence without repeating the attribute, then offer the economic-access view.
+  or religion. If asked to, start with exactly: "I can't help target people by protected characteristics; here is
+  the economic-access view instead." Do not repeat the characteristic the user named.
+- Scores are percentiles among scored areas: a frustration score of 0 means the lowest complaint rate among scored
+  areas, not zero complaints. Say so if you cite a very low score.
+- From compute_roi: network volume is spend on Mastercard's network (modeled), never revenue; network revenue is a
+  placeholder estimate. Issuer net lifetime is the issuer's modeled result, often negative: say "loss" for negatives.
 - End by suggesting the user open the area's profile or build a pilot plan."""
 
 PLAN_SYSTEM = """You write a pilot program plan for Mastercard and a community-focused card issuer partner.
@@ -47,9 +52,12 @@ Write markdown under 750 words with exactly these 10 headings (titles only, as w
 Section guidance:
 1: three sentences. 3: top and second complaint topics with pain scores, the matched benefit and what the pilot tracks.
 5: partners, channels, compliance review, no protected-attribute targeting.
-7: unit economics, breakeven churn, and the two levers (churn toward breakeven, cheaper acquisition via partners).
+7: the audience the ROI used (pilot audience and its household count), unit economics, breakeven churn, and the two
+levers (churn toward breakeven, cheaper acquisition via partners). If the facts include the state FDIC survey audience,
+cite the unbanked households and the share interested in an account, say interest is not a conversion rate, and note
+a small sample when flagged.
 8: launch area vs the look-alikes; 12-month baseline, 12-month pilot with a 6-month read; difference-in-differences;
-usage: new accounts per 1,000 adults, 90-day active, transactions per account per month vs 33.4, yearly churn vs
+usage: new accounts per 1,000 adults, 90-day active, transactions per account per month vs the benchmark in the facts, yearly churn vs
 breakeven; pain: target-topic complaints per 100k vs look-alikes; the 2x2 read: usage up + pain down = scale,
 usage up + pain flat = rework benefit, usage flat + pain down = fix outreach, both flat = drop.
 9: complaint data skews banked, modeled counts, older servicing benchmark, issuer partner required.

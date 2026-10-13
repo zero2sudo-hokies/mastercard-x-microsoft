@@ -9,6 +9,7 @@ def build_facts(profile: dict, roi: dict, partner_name: str, notes: str) -> dict
     top, second = fr.get("top_topic"), fr.get("second_topic")
     u, p, i = roi["unit"], roi["program"], roi["inputs"]
     state_scale = next((s for s in roi.get("scale", []) if s["level"] == "State"), None)
+    st = (roi.get("context") or {}).get("state") or {}
     us_scale = next((s for s in roi.get("scale", []) if s["level"] == "United States"), None)
     facts = {
         "area_name": f"{a['name']}, {a['state_abbr']}" if a["level"] == "county" else a["name"],
@@ -29,11 +30,19 @@ def build_facts(profile: dict, roi: dict, partner_name: str, notes: str) -> dict
         "issuer_type": i["issuer_type"], "adoption_rate_placeholder": i["adoption_rate"], "yearly_churn": i["churn"],
         "acquisition_cost_per_account": i["cac"], "fixed_program_cost_placeholder": i["fixed_program_cost"],
         "network_yield_placeholder": i["network_yield"],
+        "benchmark_transactions_per_month": roi.get("benchmarks", {}).get("transactions_per_month"),
+        "benchmark_avg_ticket": roi.get("benchmarks", {}).get("avg_ticket"),
         "annual_spend_per_account": u["annual_spend"], "swipe_revenue_per_account": u["swipe_revenue"],
         "deposit_earnings_per_account": u["deposit_earnings"], "fraud_loss_per_account": u["fraud_loss"],
         "servicing_cost_per_account": u["servicing"], "annual_margin_per_account": u["annual_margin"],
         "lifetime_value_per_account": u["ltv"], "net_per_account": u["net_per_account"], "breakeven_churn": u["breakeven_churn"],
+        "pilot_audience_basis": i.get("audience_basis"),
         "pilot_audience": (roi.get("audience") or {}).get("label"),
+        "state_fdic_unbanked_households": st.get("unbanked_households"),
+        "state_fdic_share_of_unbanked_interested_in_account": st.get("interested_share_of_unbanked"),
+        "state_fdic_interested_unbanked_households": st.get("interested_unbanked_households"),
+        "state_fdic_unbanked_respondents": st.get("n_unbanked_surveyed") if st else None,
+        "state_fdic_small_sample": st.get("small_sample") if st else None,
         "pilot_audience_households": (roi.get("audience") or {}).get("area_households"),
         "pilot_accounts_modeled": p["accounts"], "issuer_net_lifetime_modeled": p["issuer_net_lifetime"],
         "network_volume_year1_modeled": p["network_volume_y1"], "network_revenue_year1_placeholder": p["network_revenue_y1_est"],

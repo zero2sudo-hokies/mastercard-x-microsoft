@@ -77,14 +77,14 @@ def _foundry(req: ChatRequest) -> ChatResponse:
     return _assemble(reply, calls, results, "foundry")
 
 
-def _areas_in(results) -> dict[str, str]:
-    """fips -> short name for every area that appeared in a tool result."""
+def _areas_in(results) -> dict[str, tuple[str, str]]:
+    """fips -> (name, state_abbr) for every area that appeared in a tool result."""
     found = {}
 
     def walk(x):
         if isinstance(x, dict):
             if isinstance(x.get("fips"), str) and isinstance(x.get("name"), str):
-                found.setdefault(x["fips"], x["name"])
+                found.setdefault(x["fips"], (x["name"], x.get("state_abbr") or ""))
             for v in x.values():
                 walk(v)
         elif isinstance(x, list):
@@ -103,10 +103,15 @@ def _plain(s: str) -> str:
 def _assemble(reply, calls, results, mode) -> ChatResponse:
     recs = next((r for name, r in reversed(results) if name == "get_recommendations" and isinstance(r, list)), [])
     low = _plain(reply)
+    areas = _areas_in(results)
+    shorts = [_plain(n.removesuffix(" County").removesuffix(" Parish")) for n, _ in areas.values()]
     positions = {}
-    for fips, name in _areas_in(results).items():
+    for fips, (name, st) in areas.items():
         short = _plain(name.removesuffix(" County").removesuffix(" Parish"))
-        hits = [i for i in (low.find(short), low.find(fips)) if i >= 0]
+        full = f"{_plain(name)}, {st.lower()}" if st and len(fips) == 5 else None
+        hits = [i for i in ((low.find(full) if full else -1), low.find(fips)) if i >= 0]
+        if not hits and shorts.count(short) == 1:  # bare name only when no other result shares it
+            hits = [i for i in (low.find(short),) if i >= 0]
         if hits:
             positions[fips] = min(hits)
     focus = sorted(positions, key=positions.get)[:10]

@@ -14,6 +14,18 @@ def _usd(x):
     return f"{sign}${x / 1e6:.1f}M" if x >= 1e6 else f"{sign}${x:,.0f}"
 
 
+def _fdic_line(f: dict) -> str:
+    if not f.get("state_fdic_unbanked_households"):
+        return ""
+    share = f.get("state_fdic_share_of_unbanked_interested_in_account")
+    line = f"State FDIC survey: {f['state_fdic_unbanked_households']:,} unbanked households"
+    if share is not None:
+        line += f", {_pct(share)} of them interested in an account (stated interest, not a conversion rate)"
+    if f.get("state_fdic_small_sample"):
+        line += f"; small sample ({f.get('state_fdic_unbanked_respondents')} respondents)"
+    return line + "."
+
+
 def render(f: dict) -> str:
     name = f["area_name"]
     top = f.get("top_topic") or "not yet classified"
@@ -45,11 +57,13 @@ Network reach, fraud tools and partner programs let a community issuer offer the
 
 ## 7. Economics and the two levers
 {f['issuer_type'].replace('_', ' ')} issuer, adoption {_pct(f['adoption_rate_placeholder'])} (placeholder): {f['pilot_accounts_modeled']:,} accounts (modeled). Annual margin {_usd(f['annual_margin_per_account'])} per account, lifetime value {_usd(f['lifetime_value_per_account'])} at {_pct(f['yearly_churn'], 0)} churn, acquisition cost {_usd(f['acquisition_cost_per_account'])}. Breakeven churn: {breakeven}. Issuer net lifetime {_usd(f['issuer_net_lifetime_modeled'])} (modeled). Year 1 network volume {_usd(f['network_volume_year1_modeled'])} (modeled).
+Audience: {f.get('pilot_audience', 'underserved households (modeled)')} ({f.get('pilot_audience_households', 0):,} households).
+{_fdic_line(f)}
 Levers: bring churn toward breakeven, and cut acquisition cost through partner-led onboarding.
 
 ## 8. Pilot design and success measures
 Launch in {name}; compare with {looks}. 12-month baseline, 12-month pilot with a 6-month read, difference-in-differences.
-Usage: new accounts per 1,000 adults, 90-day active, transactions per account per month vs 33.4, yearly churn vs breakeven. Pain: target-topic complaints per 100k vs look-alikes.
+Usage: new accounts per 1,000 adults, 90-day active, transactions per account per month vs {f.get('benchmark_transactions_per_month', 'the benchmark')} (benchmark), yearly churn vs breakeven. Pain: target-topic complaints per 100k vs look-alikes.
 Read: usage up + pain down = scale; usage up + pain flat = rework benefit; usage flat + pain down = fix outreach; both flat = drop.
 
 ## 9. Risks and safeguards

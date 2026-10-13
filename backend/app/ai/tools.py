@@ -87,7 +87,12 @@ def compute_roi(fips, issuer_type="community", adoption_rate=None, churn=None, c
                                        "churn": churn, "cac": cac})
     if "error" in r:
         return r
-    return {"area": r["area"], "inputs": r["inputs"], "unit": r["unit"], "program": r["program"]}
+    p = r["program"]
+    return {"area": r["area"], "inputs": r["inputs"], "unit_per_account_per_year": r["unit"],
+            "program": {"accounts_modeled": p["accounts"], "issuer_net_lifetime_modeled": p["issuer_net_lifetime"],
+                        "network_volume_year1_modeled_spend_not_revenue": p["network_volume_y1"],
+                        "network_revenue_year1_placeholder_estimate": p["network_revenue_y1_est"]},
+            "audience": r.get("audience")}
 
 
 def list_benefits():
