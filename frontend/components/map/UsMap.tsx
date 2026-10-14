@@ -7,7 +7,7 @@ import { feature, mesh } from "topojson-client";
 import type { GeometryCollection, Topology } from "topojson-specification";
 import us from "us-atlas/counties-albers-10m.json";
 import BankLogo from "@/components/ui/BankLogo";
-import { crowdedMarkers, zoomAround } from "@/lib/marker-layout";
+import { bankDotColor, crowdedMarkers, zoomAround } from "@/lib/marker-layout";
 import { fmtInt, fmtScore } from "@/lib/format";
 import { TOPIC_ICON, TOPIC_LABEL } from "@/lib/topics";
 import type { AreaSummary, BranchPin, Layer, TopicId } from "@/lib/types";
@@ -362,7 +362,7 @@ export default function UsMap({ states, counties, stateFips, layer, topic, selec
                   const { p, x, y } = m;
                   const lit = highlightCert ? p.cert === highlightCert : true;
                   if (!logoMarkers.has(m)) return (
-                    <circle key={m.id} className="pin branch-dot" cx={x} cy={y} r={3 * units} fill="#0b1f3a" stroke="white" strokeWidth={units} opacity={lit ? 0.85 : 0.12}>
+                    <circle key={m.id} className="pin branch-dot" cx={x} cy={y} r={3 * units} fill={bankDotColor(p.rank)} stroke="white" strokeWidth={units} opacity={lit ? 0.85 : 0.12}>
                       <title>{`${p.bank ?? "Other bank"} · ${p.branch} — zoom in to see logos`}</title>
                     </circle>
                   );

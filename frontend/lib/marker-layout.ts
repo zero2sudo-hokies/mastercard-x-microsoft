@@ -1,5 +1,8 @@
 type View = [number, number, number, number];
 
+export const bankDotColor = (rank: number | null) =>
+  rank === 1 ? "#1d4ed8" : rank === 2 ? "#7c3aed" : rank === 3 ? "#0f766e" : "#64748b";
+
 /** Preserve the map point under a pinch or cursor while changing zoom. */
 export function zoomAround(base: View, view: View, zoom: number, fx: number, fy: number, anchor?: { x: number; y: number }) {
   zoom = Math.max(1, Math.min(16, zoom));
