@@ -3,6 +3,7 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import AreaProfilePanel from "@/components/area/AreaProfilePanel";
+import TopBanksStrip from "@/components/banks/TopBanksStrip";
 import ChatPanel from "@/components/chat/ChatPanel";
 import UsMap from "@/components/map/UsMap";
 import { ErrorBox, Spinner, Tabs } from "@/components/ui";
@@ -167,7 +168,10 @@ export default function Dashboard() {
                 focusFips={focusFips}
                 onStateClick={(f) => setQuery({ state: f, fips: null })}
                 onCountyClick={select}
+                focusSelected={layer === "frustration"}
+                onClearFocus={() => setQuery({ fips: null })}
               />
+              {fips?.length === 5 && <TopBanksStrip fips={fips} name={selectedName ? `${selectedName}` : "this county"} />}
               <p className="mt-1 text-[11px] text-muted">
                 {layer === "underserved"
                   ? "Exclusion index: FDIC 2023 unbanked and underbanked, ACS poverty, no internet, income, and bank branch density."

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
 import { EmptyState, ErrorBox, SourceNote, Spinner, Tag } from "@/components/ui";
 import { compareBanks } from "@/lib/api";
@@ -9,7 +10,7 @@ import type { AudienceBasis, BankCompare as Compare } from "@/lib/types";
 type Shared = { adoption_rate?: number | null; fixed_program_cost?: number | null; audience_basis?: AudienceBasis };
 
 /** Side-by-side ROI and footprint for 2-5 banks. Churn and acquisition cost follow each bank's own tier. */
-export default function BankCompare({ fips, certs, shared, target, onTarget }: { fips: string; certs: string[]; shared: Shared; target: string | null; onTarget: (cert: string) => void }) {
+export default function BankCompare({ fips, certs, shared = {}, planHref }: { fips: string; certs: string[]; shared?: Shared; planHref?: (cert: string) => string }) {
   const [result, setResult] = useState<{ key: string; data?: Compare; error?: string } | null>(null);
   const [attempt, setAttempt] = useState(0);
   const key = JSON.stringify([fips, certs, shared, attempt]);
@@ -73,17 +74,18 @@ export default function BankCompare({ fips, certs, shared, target, onTarget }: {
                 ))}
               </tr>
             ))}
-            <tr className="border-t border-line">
-              <td className="py-2 pr-2 text-muted">Target for the pilot plan</td>
-              {data.rows.map((r) => (
-                <td key={r.bank.cert} className="py-2 pr-2">
-                  <label className="inline-flex cursor-pointer items-center gap-1.5 font-medium text-navy">
-                    <input type="radio" name="target-bank" checked={target === r.bank.cert} onChange={() => onTarget(r.bank.cert)} className="accent-navy" />
-                    Pitch this bank
-                  </label>
-                </td>
-              ))}
-            </tr>
+            {planHref && (
+              <tr className="border-t border-line">
+                <td className="py-2 pr-2 text-muted">Pilot plan</td>
+                {data.rows.map((r) => (
+                  <td key={r.bank.cert} className="py-2 pr-2">
+                    <Link href={planHref(r.bank.cert)} className="inline-flex rounded-lg bg-navy px-2.5 py-1.5 font-medium text-white hover:bg-navy-soft">
+                      Build pilot plan for this bank →
+                    </Link>
+                  </td>
+                ))}
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

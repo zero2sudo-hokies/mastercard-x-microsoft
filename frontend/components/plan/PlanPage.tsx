@@ -4,8 +4,6 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
-import BankCompare from "@/components/banks/BankCompare";
-import BankLeaderboard, { MAX_COMPARE } from "@/components/banks/BankLeaderboard";
 import RoiPanel from "@/components/roi/RoiPanel";
 import { Badge, Button, Card, DataStatusBadge, EmptyState, ErrorBox, Spinner, TopicIcon } from "@/components/ui";
 import { approvePlan, getBanks, getProfile, postPlan } from "@/lib/api";
@@ -24,19 +22,12 @@ export default function PlanPage() {
   const fips = params.get("fips");
   const [profile, setProfile] = useState<{ fips: string; data?: AreaProfile; error?: string } | null>(null);
   const roiReq = useRef<RoiRequest | null>(null);
-  const urlTarget = params.get("bank");
-  const [certs, setCerts] = useState<string[]>(() =>
-    [...new Set([...(params.get("banks") || "").split(","), urlTarget || ""].filter(Boolean))].slice(0, MAX_COMPARE),
-  );
-  const [target, setTarget] = useState<string | null>(urlTarget);
-  const [shared, setShared] = useState<{ adoption_rate: number | null; fixed_program_cost: number | null; audience_basis: RoiRequest["audience_basis"] }>({
-    adoption_rate: null, fixed_program_cost: null, audience_basis: "underserved",
-  });
+  const target = params.get("bank");
   const [bankInfo, setBankInfo] = useState<Record<string, BankEntry>>({});
 
-  // names and tiers for the selected banks (target pitch + ROI tier)
+  // name and tier for the target bank (pitch + ROI tier)
   useEffect(() => {
-    if (!fips) return;
+    if (!fips || !target) return;
     let alive = true;
     getBanks(fips, 10)
       .then((b) => alive && setBankInfo(Object.fromEntries(b.banks.map((x) => [x.cert, x]))))
@@ -44,18 +35,11 @@ export default function PlanPage() {
     return () => {
       alive = false;
     };
-  }, [fips]);
+  }, [fips, target]);
 
-  const toggleBank = (cert: string) => {
-    const next = certs.includes(cert) ? certs.filter((c) => c !== cert) : [...certs, cert];
-    setCerts(next);
-    if (target && !next.includes(target)) setTarget(null);
-  };
   const targetBank = target ? bankInfo[target] : undefined;
   const onRoi = (req: RoiRequest) => {
     roiReq.current = req;
-    const next = { adoption_rate: req.adoption_rate, fixed_program_cost: req.fixed_program_cost, audience_basis: req.audience_basis };
-    if (JSON.stringify(next) !== JSON.stringify(shared)) setShared(next);
   };
 
   useEffect(() => {
@@ -115,26 +99,26 @@ export default function PlanPage() {
         </div>
       </header>
 
-      <section aria-label="Bank partners">
-        <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted">1. Bank partners (optional)</h2>
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,4fr)_minmax(0,7fr)]">
-          <Card title="Top banks by local deposits">
-            <BankLeaderboard fips={fips} selected={certs} onToggle={toggleBank} showNotes={false} />
-          </Card>
-          <Card title="Compare banks" action={targetBank ? <Badge tone="accent">Pitching {targetBank.name}</Badge> : undefined}>
-            <BankCompare fips={fips} certs={certs} shared={shared} target={target} onTarget={setTarget} />
-            {target && (
-              <button onClick={() => setTarget(null)} className="mt-2 text-xs text-muted underline">
-                Clear target bank
-              </button>
-            )}
-          </Card>
+      {target && (
+        <div className="flex flex-wrap items-center gap-2 rounded-lg border border-accent/40 bg-accent/10 px-3 py-2 text-sm text-navy">
+          <strong>Pitch for {targetBank?.name ?? "the selected bank"}</strong>
+          {targetBank && (
+            <span className="text-muted">
+              #{targetBank.rank} by local deposits · {targetBank.issuer_type === "community" ? "exempt (under $10B)" : "covered ($10B+)"} pricing tier
+            </span>
+          )}
+          <Link href={`/banks?fips=${fips}&banks=${target}`} className="ml-auto text-xs underline">
+            Change bank
+          </Link>
+          <Link href={`/plan?fips=${fips}`} className="text-xs underline">
+            General plan
+          </Link>
         </div>
-      </section>
+      )}
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
         <section aria-label="Economics">
-          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted">2. Economics</h2>
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted">1. Economics</h2>
           {targetBank && (
             <p className="mb-2 text-xs text-muted">
               Using {targetBank.name}&apos;s {targetBank.issuer_type === "community" ? "exempt (under $10B)" : "covered ($10B+)"} debit pricing tier.
@@ -143,13 +127,13 @@ export default function PlanPage() {
           <RoiPanel key={targetBank?.issuer_type ?? "default"} fips={fips} onChange={onRoi} defaultIssuer={targetBank?.issuer_type} />
         </section>
         <section aria-label="Pilot plan">
-          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted">3. Pilot plan</h2>
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted">2. Pilot plan</h2>
           {p && fr?.status !== "ok" ? (
             <EmptyState title="Not enough complaint data to plan a pilot here">
               A plan needs at least 30 CFPB complaints to ground the frustration and benefit. Try a look-alike area.
             </EmptyState>
           ) : (
-            <PlanDraft key={target ?? "none"} fips={fips} getRoi={() => roiReq.current} bank={targetBank} />
+            <PlanDraft key={targetBank?.cert ?? "none"} fips={fips} getRoi={() => roiReq.current} bank={targetBank} />
           )}
         </section>
       </div>

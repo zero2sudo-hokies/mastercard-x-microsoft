@@ -20,9 +20,11 @@ export const HEAT_RAMP = ["#fdebd0", "#fbc580", "#f79e1b", "#dd5a26", "#a8231c"]
 
 // ---- geometry, computed once per page load ----
 type Shape = { id: string; d: string; centroid: [number, number] };
+type Box = [[number, number], [number, number]];
 type Geo = {
   states: Shape[];
   stateBounds: Record<string, ViewBox>;
+  countyBoxes: Record<string, Box>;
   countiesByState: Record<string, Shape[]>;
   stateBorders: string;
   nation: string;
@@ -38,6 +40,13 @@ function fit([[x0, y0], [x1, y1]]: [[number, number], [number, number]]): ViewBo
   return [(x0 + x1) / 2 - w / 2, (y0 + y1) / 2 - h / 2, w, h];
 }
 
+/** A view where the county fills about half the frame, leaving room for the lift and the blurred context. */
+function fitFocus([[x0, y0], [x1, y1]]: Box): ViewBox {
+  // pad relative to the county so small and large counties both fill about 45% of the frame
+  const pad = Math.max(x1 - x0, y1 - y0) * 0.6;
+  return fit([[x0 - pad + 24, y0 - pad + 24], [x1 + pad - 24, y1 + pad - 24]]);
+}
+
 function geo(): Geo {
   if (GEO) return GEO;
   const topo = us as unknown as Topology<{ states: GeometryCollection; counties: GeometryCollection; nation: GeometryCollection }>;
@@ -46,14 +55,17 @@ function geo(): Geo {
   const stateFeatures = (feature(topo, topo.objects.states) as unknown as { features: Feature<Geometry>[] }).features;
   const countyFeatures = (feature(topo, topo.objects.counties) as unknown as { features: Feature<Geometry>[] }).features;
   const countiesByState: Record<string, Shape[]> = {};
+  const countyBoxes: Record<string, Box> = {};
   for (const f of countyFeatures) {
     const s = toShape(f);
     (countiesByState[s.id.slice(0, 2)] ??= []).push(s);
+    countyBoxes[s.id] = path.bounds(f) as Box;
   }
   GEO = {
     states: stateFeatures.map(toShape),
     stateBounds: Object.fromEntries(stateFeatures.map((f) => [String(f.id), fit(path.bounds(f) as [[number, number], [number, number]])])),
     countiesByState,
+    countyBoxes,
     stateBorders: path(mesh(topo, topo.objects.states, (a, b) => a !== b)) ?? "",
     nation: path(mesh(topo, topo.objects.nation)) ?? "",
   };
@@ -103,11 +115,16 @@ type Props = {
   focusFips: string[];
   onStateClick: (fips: string) => void;
   onCountyClick: (fips: string) => void;
+  /** lift the selected county in 3D and blur the rest (frustration view) */
+  focusSelected?: boolean;
+  onClearFocus?: () => void;
 };
 
-export default function UsMap({ states, counties, stateFips, layer, topic, selectedFips, focusFips, onStateClick, onCountyClick }: Props) {
+export default function UsMap({ states, counties, stateFips, layer, topic, selectedFips, focusFips, onStateClick, onCountyClick, focusSelected, onClearFocus }: Props) {
   const g = geo();
-  const target = stateFips && g.stateBounds[stateFips] ? g.stateBounds[stateFips] : FULL;
+  const focusShape = focusSelected && selectedFips && stateFips ? g.countiesByState[stateFips]?.find((c) => c.id === selectedFips) : undefined;
+  const target = focusShape ? fitFocus(g.countyBoxes[focusShape.id]) : stateFips && g.stateBounds[stateFips] ? g.stateBounds[stateFips] : FULL;
+  const depth = target[3] * 0.03; // lift height in map units, from the final view so it does not wobble while zooming
   const vb = useAnimatedViewBox(target);
   const k = vb[2] / W; // zoom factor for strokes, patterns and glyphs
   const wrap = useRef<HTMLDivElement>(null);
@@ -122,7 +139,7 @@ export default function UsMap({ states, counties, stateFips, layer, topic, selec
   const allShapes = [...g.states, ...countyShapes];
   const hovered = hover ? (counties.get(hover.fips) ?? states.get(hover.fips)) : undefined;
 
-  const track = (fips: string) => (e: React.MouseEvent) => {
+  const track = (fips: string, e: React.MouseEvent) => {
     const r = wrap.current?.getBoundingClientRect();
     if (r) setHover({ fips, x: e.clientX - r.left, y: e.clientY - r.top, w: r.width });
   };
@@ -135,7 +152,11 @@ export default function UsMap({ states, counties, stateFips, layer, topic, selec
             <rect width={6 * k} height={6 * k} fill="#f1f0ec" />
             <line x1="0" y1="0" x2="0" y2={6 * k} stroke="#c8c4ba" strokeWidth={2 * k} />
           </pattern>
+          <filter id="lift-shadow" x="-50%" y="-50%" width="200%" height="200%">
+            <feDropShadow dx="0" dy={depth * 0.6} stdDeviation={depth * 0.9} floodColor="#0b1f3a" floodOpacity="0.45" />
+          </filter>
         </defs>
+        <g className={`map-layer ${focusShape ? "map-dim" : ""}`}>
 
         {g.states.map((s) => {
           const inState = s.id === stateFips;
@@ -149,7 +170,7 @@ export default function UsMap({ states, counties, stateFips, layer, topic, selec
               stroke="#ffffff"
               strokeWidth={0.6}
               onClick={() => onStateClick(s.id)}
-              onMouseMove={stateFips ? undefined : track(s.id)}
+              onMouseMove={stateFips ? undefined : (e) => track(s.id, e)}
             />
           );
         })}
@@ -163,7 +184,7 @@ export default function UsMap({ states, counties, stateFips, layer, topic, selec
             stroke="#ffffff"
             strokeWidth={0.4}
             onClick={() => onCountyClick(c.id)}
-            onMouseMove={track(c.id)}
+            onMouseMove={(e) => track(c.id, e)}
           />
         ))}
 
@@ -193,6 +214,43 @@ export default function UsMap({ states, counties, stateFips, layer, topic, selec
           .map((s) => (
             <path key={`h${s.id}`} d={s.d} fill="none" stroke="#f79e1b" strokeWidth={3} className="map-path pointer-events-none" />
           ))}
+        </g>
+
+        {focusShape && (
+          <>
+            {/* clicking anywhere on the blurred map goes back to the state view */}
+            <rect x={vb[0]} y={vb[1]} width={vb[2]} height={vb[3]} fill="transparent" className="cursor-zoom-out" onClick={onClearFocus} onMouseMove={() => setHover(null)} />
+            <g className="county-lift" style={{ "--lift": `${depth}px` } as React.CSSProperties}>
+              {Array.from({ length: 6 }, (_, i) => 6 - i).map((i) => (
+                <path
+                  key={i}
+                  d={focusShape.d}
+                  transform={`translate(0 ${(depth * i) / 6})`}
+                  fill="#0b1f3a"
+                  opacity={0.22 + (6 - i) * 0.05}
+                  filter={i === 6 ? "url(#lift-shadow)" : undefined}
+                  className="map-path pointer-events-none"
+                />
+              ))}
+              <path d={focusShape.d} fill={fillFor(counties.get(focusShape.id))} stroke="#ffffff" strokeWidth={1.5} className="map-path" onMouseMove={(e) => track(focusShape.id, e)} />
+              <path d={focusShape.d} fill="none" stroke="#f79e1b" strokeWidth={2.5} className="map-path pointer-events-none" />
+            </g>
+            <text
+              x={focusShape.centroid[0]}
+              y={g.countyBoxes[focusShape.id][0][1] - depth * 2.2}
+              textAnchor="middle"
+              fontSize={target[3] * 0.04}
+              fontWeight={600}
+              fill="#0b1f3a"
+              stroke="#ffffff"
+              strokeWidth={target[3] * 0.012}
+              paintOrder="stroke"
+              className="county-label pointer-events-none"
+            >
+              {counties.get(focusShape.id)?.name ?? ""}
+            </text>
+          </>
+        )}
       </svg>
 
       {hover && hovered && <Tooltip s={hovered} x={hover.x} y={hover.y} width={hover.w} />}
