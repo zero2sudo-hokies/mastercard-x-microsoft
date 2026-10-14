@@ -15,7 +15,7 @@ The Next.js app, the shared typed API layer, the two-heatmap dashboard (the demo
 
 ## Step 2: shell + shared UI (`app/layout.tsx`, `components/ui/*`)
 - Clean fintech look: off-white background, deep navy `#0B1F3A` text/primary, warm orange `#F79E1B` accent used sparingly, Inter. No Mastercard logos or official branding.
-- Top bar: "Navigator", a "Prototype" pill, API status dot from `getHealth` (green = pipeline for both files, amber = any fixtures/mock, red = down) with a tooltip naming each source.
+- Top bar: "Monopoly", a "Prototype" pill, API status dot from `getHealth` (green = pipeline for both files, amber = any fixtures/mock, red = down) with a tooltip naming each source.
 - Footer: "Prototype for LEAD ASPIRE 2026. Modeled data; not financial advice. No protected attributes are used."
 - Shared components P5 reuses: `Card`, `Stat` (label, value, sublabel, tag "modeled" | "placeholder" | "sourced"), `Button`, `Badge`, `Tabs`, `Spinner`, `ErrorBox` (friendly + retry), `EmptyState`, `SourceNote`, `DataStatusBadge` (ok / low data / no data).
 

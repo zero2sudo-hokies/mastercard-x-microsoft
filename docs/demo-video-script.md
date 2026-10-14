@@ -1,4 +1,4 @@
-# Navigator: recruiter demo video script
+# Monopoly: recruiter demo video script
 
 **Length:** about 5 minutes, 10 scenes. **Voiceover:** about 750 words at a calm pace.
 **Format per scene:** what to **show** (exact clicks), what to **say**, an optional **caption** to overlay, and **why we built it** (say it if time allows, or use it to answer questions).
@@ -30,7 +30,7 @@
 **Show:** the national Underserved map, still. Slow zoom if your editor can.
 
 **Say:**
-"Twenty-four point six million US households are unbanked or underbanked. For Mastercard, that's growth and inclusion. But picking where to launch, what to offer and which bank to partner with is slow, manual, and risky if targeting goes wrong. We built Navigator to answer all of that in minutes."
+"Twenty-four point six million US households are unbanked or underbanked. For Mastercard, that's growth and inclusion. But picking where to launch, what to offer and which bank to partner with is slow, manual, and risky if targeting goes wrong. We built Monopoly to answer all of that in minutes."
 
 **Caption:** `24.6M unbanked + underbanked US households · FDIC 2023`
 
@@ -80,7 +80,7 @@
 **Show:** **Ask the agent** tab. Click the chip **"Which areas have the most frustrated customers?"** (or type "Where should we pilot a no-fee account?"). When it answers, show the cited numbers, the recommendation cards, the map highlights, and open **How I got this**.
 
 **Say:**
-"The agent runs on Azure AI Foundry with gpt-5-mini and tool calling. It doesn't answer from memory. It calls Navigator's own API: recommendations, area profiles, bank and ROI tools. Then it cites the numbers and highlights the areas on the map. 'How I got this' shows every tool call. Every number in the answer is checked against the tool results. And if you ask it to target people by a protected characteristic, it declines and offers the economic-access view instead."
+"The agent runs on Azure AI Foundry with gpt-5-mini and tool calling. It doesn't answer from memory. It calls Monopoly's own API: recommendations, area profiles, bank and ROI tools. Then it cites the numbers and highlights the areas on the map. 'How I got this' shows every tool call. Every number in the answer is checked against the tool results. And if you ask it to target people by a protected characteristic, it declines and offers the economic-access view instead."
 
 **Caption:** `Azure AI Foundry · gpt-5-mini · tool calling over our API · number check · rules fallback`
 
@@ -143,9 +143,9 @@
 **Show:** back to the Bronx pop-out with its pins, or the approved plan. Hold.
 
 **Say:**
-"Navigator answers four questions in one flow: where people are left out, what to offer them, whether it pays, and who to partner with. Then it hands a human a plan to approve. Prove it in one county, then scale to the country."
+"Monopoly answers four questions in one flow: where people are left out, what to offer them, whether it pays, and who to partner with. Then it hands a human a plan to approve. Prove it in one county, then scale to the country."
 
-**Caption:** `Navigator · LEAD ASPIRE 2026 · Built for Mastercard`
+**Caption:** `Monopoly · LEAD ASPIRE 2026 · Built for Mastercard`
 
 ---
 

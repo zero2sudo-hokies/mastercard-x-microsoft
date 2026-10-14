@@ -1,10 +1,10 @@
-# Navigator AI (Foundry, gpt-5-mini)
+# Monopoly AI (Foundry, gpt-5-mini)
 
 Two features, both on our Microsoft Foundry deployment via the Azure OpenAI v1 endpoint, both with a no-AI fallback.
 
 | Feature | Route | What it does | Fallback |
 |---|---|---|---|
-| Agent | `POST /api/chat` | Answers "where should we pilot X?" by calling the Navigator API as tools, cites the numbers, returns `focus_fips` for the map | Keyword rules over `/api/recommendations` (`mode: "rules"`) |
+| Agent | `POST /api/chat` | Answers "where should we pilot X?" by calling the Monopoly API as tools, cites the numbers, returns `focus_fips` for the map | Keyword rules over `/api/recommendations` (`mode: "rules"`) |
 | Pilot plan | `POST /api/plan`, `POST /api/plan/{id}/approve` | Drafts a 10-section pilot program plan for one area; a human edits, ticks the safe-outreach checklist and approves | Template plan from the same facts (`mode: "rules"`) |
 
 Run `python -m app.ai.smoke` from `backend/` to check the Foundry connection (one plain call, one tool call).

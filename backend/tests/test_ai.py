@@ -1,4 +1,4 @@
-"""AI tests with no network: the Navigator API is served in-process and Foundry is mocked."""
+"""AI tests with no network: the Monopoly API is served in-process and Foundry is mocked."""
 from types import SimpleNamespace
 
 import pytest

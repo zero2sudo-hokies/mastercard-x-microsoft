@@ -6,8 +6,8 @@ import "./globals.css";
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Navigator",
-  description: "Underserved Market Navigator prototype",
+  title: "Monopoly",
+  description: "Monopoly prototype",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

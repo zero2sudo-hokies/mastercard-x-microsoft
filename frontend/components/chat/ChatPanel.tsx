@@ -53,7 +53,7 @@ export default function ChatPanel({ context, onFocus, onSelect }: { context: Cha
       <div className="flex-1 space-y-3 overflow-y-auto pr-1">
         {turns.length === 0 && (
           <div className="space-y-2">
-            <p className="text-sm text-muted">Ask where to pilot, which frustration to fix, or how an area compares. Answers cite Navigator data.</p>
+            <p className="text-sm text-muted">Ask where to pilot, which frustration to fix, or how an area compares. Answers cite Monopoly data.</p>
             <div className="flex flex-wrap gap-2">
               {STARTERS.map((s) => (
                 <button key={s} onClick={() => send(s)} className="rounded-full border border-line bg-white px-3 py-1 text-left text-xs text-navy hover:border-accent hover:bg-accent/5">

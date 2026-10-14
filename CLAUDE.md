@@ -1,9 +1,9 @@
-# Navigator v2 — shared context for every Claude Code session
+# Monopoly v2 — shared context for every Claude Code session
 
 ## What this is
 LEAD ASPIRE 2026 (Microsoft Times Square). Client: Mastercard. Our Statement of Work was approved by the EY Partner; we are in the 3-hour BUILD phase, then PITCH to judges.
 
-We are building the **Underserved Market Navigator**: it shows Mastercard employees where people are left out of banking and what frustrates them most, recommends where to pilot, and drafts a pilot program plan for a human to approve. Pilot-first (EY's recommendation): prove it in one county, then scale to the US (24.6M unbanked + underbanked households, FDIC 2023) and globally (about 1.3B unbanked adults).
+We are building **Monopoly**: it shows Mastercard employees where people are left out of banking and what frustrates them most, recommends where to pilot, and drafts a pilot program plan for a human to approve. Pilot-first (EY's recommendation): prove it in one county, then scale to the US (24.6M unbanked + underbanked households, FDIC 2023) and globally (about 1.3B unbanked adults).
 
 ## v1 workflow (what the demo must do end to end)
 1. **Dashboard** (`/`): US map, toggle between two heatmaps:

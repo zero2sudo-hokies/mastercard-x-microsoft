@@ -13,7 +13,7 @@ from app.routers import areas, banks, meta, recommend, roi
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger("navigator")
 
-app = FastAPI(title="Underserved Market Navigator API", version="2.0")
+app = FastAPI(title="Monopoly API", version="2.0")
 
 
 @app.middleware("http")

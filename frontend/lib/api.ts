@@ -42,7 +42,7 @@ async function request<T>(path: string, mock: string, init?: RequestInit): Promi
     // mock files are static, so always GET them
     res = await fetch(url, USE_MOCK ? undefined : { ...init, headers: { "Content-Type": "application/json", ...init?.headers } });
   } catch {
-    throw new ApiError("Can't reach the Navigator API. Is the backend running?", 0);
+    throw new ApiError("Can't reach the Monopoly API. Is the backend running?", 0);
   }
   if (!res.ok) {
     let detail = `Request failed (${res.status})`;

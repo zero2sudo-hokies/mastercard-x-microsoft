@@ -1,4 +1,4 @@
-# Navigator API (FastAPI). Build from the repo root:  docker build -t navigator-api .
+# Monopoly API (FastAPI). Build from the repo root:  docker build -t navigator-api .
 FROM python:3.11-slim
 WORKDIR /srv/backend
 COPY backend/requirements.txt .

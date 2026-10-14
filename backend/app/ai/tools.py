@@ -1,4 +1,4 @@
-"""Agent tools. Each calls the Navigator HTTP API (never the Python internals) and returns compact JSON."""
+"""Agent tools. Each calls the Monopoly HTTP API (never the Python internals) and returns compact JSON."""
 import json
 
 import httpx
@@ -139,4 +139,4 @@ def run(name: str, args: dict):
     except (TypeError, ValueError) as e:
         return {"error": f"Bad arguments: {e}"}
     except httpx.HTTPError:
-        return {"error": "Navigator API unreachable"}
+        return {"error": "Monopoly API unreachable"}

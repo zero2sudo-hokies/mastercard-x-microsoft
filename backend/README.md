@@ -1,4 +1,4 @@
-# Navigator API (P1 core)
+# Monopoly API (P1 core)
 
 FastAPI on :8000. Serves the exclusion layer, merges P2's frustration layer, and computes recommendations, look-alikes and ROI. Contracts: `../CONTRACTS.md`.
 

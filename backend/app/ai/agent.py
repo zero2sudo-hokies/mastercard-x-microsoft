@@ -1,4 +1,4 @@
-"""Chat agent: Foundry tool-calling loop over the Navigator API, with a no-AI rules fallback."""
+"""Chat agent: Foundry tool-calling loop over the Monopoly API, with a no-AI rules fallback."""
 import json
 import logging
 import re
@@ -147,7 +147,7 @@ def _rules(req: ChatRequest) -> ChatResponse:
                      f"about {r['est_underserved_hh']:,} underserved households (modeled)" for r in ranked]
             head = "Not enough complaint data to score frustration here, so these are ranked by exclusion index only:"
     except Exception:
-        return ChatResponse(reply="The Navigator API is not reachable right now. Please try again.", mode="rules",
-                            warnings=["Navigator API unreachable."])
+        return ChatResponse(reply="The Monopoly API is not reachable right now. Please try again.", mode="rules",
+                            warnings=["Monopoly API unreachable."])
     reply = "\n".join([head, *lines, "", "Open an area's profile or build a pilot plan to go deeper."])
     return _assemble(reply, calls, results, "rules")

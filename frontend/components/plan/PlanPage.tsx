@@ -212,7 +212,7 @@ function PlanDraft({ fips, getRoi, bank }: { fips: string; getRoi: () => RoiRequ
           </div>
           {busy && (
             <div className="mt-3">
-              <Spinner label="Drafting the pilot plan from Navigator data... (20-40 s)" />
+              <Spinner label="Drafting the pilot plan from Monopoly data... (20-40 s)" />
             </div>
           )}
           {error && (

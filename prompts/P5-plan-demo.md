@@ -25,7 +25,7 @@ Props exactly per CONTRACTS.md: `{ context, onFocus, onSelect }`.
 Read `fips` from the query; EmptyState with a link back to `/` if missing.
 1. **Header:** area name, state, `DataStatusBadge`, top frustration + matched benefit, back link to `/?fips=...`.
 2. **Economics:** P4's `<RoiPanel fips onChange={(req, result) => ...} />`; keep the latest `req` for the plan request. Until P4 pushes RoiPanel (~1:50), render a placeholder card that calls `postRoi` with defaults so the page still works.
-3. **Generate:** partner name input (default "Community credit union (TBD)"), notes textarea, "Generate pilot plan with Azure AI" -> `postPlan({ fips, roi: latestReq, partner_name, notes })`. Loading "Drafting the pilot plan from Navigator data..." (can take 20-40 s).
+3. **Generate:** partner name input (default "Community credit union (TBD)"), notes textarea, "Generate pilot plan with Azure AI" -> `postPlan({ fips, roi: latestReq, partner_name, notes })`. Loading "Drafting the pilot plan from Monopoly data..." (can take 20-40 s).
 4. **Review:** yellow banner "AI-generated draft. Review before use." + mode badge; amber warnings box listing every warning (a feature in the demo); rendered markdown with an Edit toggle (textarea); collapsible "Facts the AI was allowed to use" from `facts_used`.
 5. **Approve:** safe-outreach checklist, all required: "Issuer compliance team has reviewed targeting and marketing", "Outreach runs through named community partner organizations", "No immigration, citizenship, language, race or other protected attributes used in targeting or messaging". Reviewer name. "Approve pilot plan" disabled until complete -> `approvePlan`. On success: green "Approved by X at <time>", editing locked, "Copy" and "Download .md" buttons. Show API 400 messages inline.
 
@@ -38,7 +38,7 @@ Read `fips` from the query; EmptyState with a link back to `/` if missing.
 2. Toggle Frustration: hatched areas = not enough data (honesty), colored = scored; switch the topic select to Fees.
 3. Ask the agent "Where should we pilot a no-fee account?": cited answer, map highlights, click the top recommendation.
 4. Area profile: exclusion facts, top frustration, excerpts, look-alikes -> Build pilot plan.
-5. ROI panel: community vs large bank, then churn from 40% to breakeven ~16%: "this is the lever the Navigator targets".
+5. ROI panel: community vs large bank, then churn from 40% to breakeven ~16%: "this is the lever the Monopoly targets".
 6. Generate the plan with Azure AI, point at warnings and the facts panel, tick the checklist, approve, download.
 7. Close: security and governance in 3 bullets.
 

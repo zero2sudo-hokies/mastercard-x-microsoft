@@ -43,7 +43,7 @@ export default function TopBar() {
   return (
     <header className="flex items-center gap-3 border-b border-line bg-white px-6 py-3">
       <Link href="/" className="text-lg font-semibold tracking-tight text-navy">
-        Navigator
+        Monopoly
       </Link>
       <span className="rounded-full border border-accent/60 bg-accent/10 px-2 py-0.5 text-xs font-medium text-navy">
         Prototype

@@ -1,10 +1,10 @@
-# Underserved Market Navigator
+# Monopoly
 
 **Where people are left out of banking, what frustrates them, whether a pilot pays, which bank to partner with, and an AI-drafted pilot plan a human approves.**
 
 <!-- DEMO VIDEO: replace this block with the recording.
      Easiest: drag the .mp4 into this README while editing on github.com (GitHub hosts it and inserts the link),
-     or paste a YouTube/Loom thumbnail link:  [![Navigator demo](thumbnail.png)](https://link-to-video) -->
+     or paste a YouTube/Loom thumbnail link:  [![Monopoly demo](thumbnail.png)](https://link-to-video) -->
 
 > 🎬 **Demo video:** _coming soon_
 
@@ -22,11 +22,11 @@ About 24.6 million US households are unbanked or underbanked (FDIC 2023), and ab
 
 EY's recommendation, which shaped everything: **pilot first.** Prove it in one county, then scale to the state, the US and globally.
 
-## What Navigator does
+## What Monopoly does
 
 1. **Underserved map.** Every state and all 3,144 counties scored on an exclusion index built from FDIC unbanked and underbanked rates, Census poverty, homes without internet, income and bank-branch density.
 2. **Frustration map.** 20,811 CFPB complaints for New York (Aug 2024 to Jul 2026), placed in counties by ZIP and sorted into six topics: fees, fraud and scams, transfers, account closures, customer service, distrust. Each topic is matched to a pilot benefit (for example account closures → second-chance account).
-3. **AI agent.** Ask "where should we pilot a no-fee account?" An Azure AI Foundry agent calls Navigator's own data as tools, ranks areas, cites the numbers and highlights them on the map.
+3. **AI agent.** Ask "where should we pilot a no-fee account?" An Azure AI Foundry agent calls Monopoly's own data as tools, ranks areas, cites the numbers and highlights them on the map.
 4. **ROI.** Unit economics per account, lifetime value versus churn, breakeven churn, and county → state → US → global scale. Every benchmark is sourced and shown in the app.
 5. **Bank partners.** The top banks in any county by local deposits, a side-by-side comparison of 3 to 5 banks at their own debit pricing tier, and a pitch tailored to the bank you choose.
 6. **Pilot plan.** Foundry drafts a 10-section plan from the facts only. A reviewer edits it, completes a safe-outreach checklist and approves it, then downloads it.
@@ -83,7 +83,7 @@ flowchart LR
 - **One flow from question to decision.** Where people are left out, what they complain about, whether it pays, which bank to approach, and a plan ready for approval, instead of five separate analyses.
 - **Honest numbers.** Every figure is sourced or tagged "modeled" or "placeholder", and the sources are listed in the app. It shows where a pilot does **not** pay (a large-bank issuer loses money at any churn), because that's what makes the rest credible.
 - **Responsible targeting by design.** No race, ethnicity, citizenship, national origin, language or religion data is used anywhere. Targeting is by economic access and complaint topics only, and outreach goes through community partners with issuer compliance review.
-- **AI that drafts and a human who decides.** The agent can only use Navigator's data, guardrails flag anything it can't trace, and approval needs a named reviewer and a completed checklist.
+- **AI that drafts and a human who decides.** The agent can only use Monopoly's data, guardrails flag anything it can't trace, and approval needs a named reviewer and a completed checklist.
 - **Built to measure.** Each plan includes a look-alike comparison group, a 6-month read and a scale / rework / drop rule, so the pilot produces evidence rather than anecdotes.
 
 ## Run it locally

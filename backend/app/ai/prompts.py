@@ -68,4 +68,4 @@ usage up + pain flat = rework benefit, usage flat + pain down = fix outreach, bo
 9: complaint data skews banked, modeled counts, older servicing benchmark, issuer partner required.
 10: the decision and budget ask, in one or two sentences."""
 
-PLAN_FOOTER = "\n\n_Draft generated with AI from Navigator data. Modeled and placeholder figures must be validated in the pilot._"
+PLAN_FOOTER = "\n\n_Draft generated with AI from Monopoly data. Modeled and placeholder figures must be validated in the pilot._"

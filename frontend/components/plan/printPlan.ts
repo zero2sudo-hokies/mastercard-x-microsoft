@@ -36,7 +36,7 @@ export function printPlan(plan: PilotPlan, html: string, bankName?: string) {
     : "";
   const doc = `<!doctype html><html><head><meta charset="utf-8"><title>Pilot plan - ${esc(plan.area_name)}</title><style>${STYLE}</style></head><body>
     <header>
-      <div class="brand">Underserved Market Navigator · Pilot program plan</div>
+      <div class="brand">Monopoly · Pilot program plan</div>
       <h1>${esc(plan.area_name)}</h1>
       ${bankName ? `<p class="pitch">Pitch for <strong>${esc(bankName)}</strong></p>` : ""}
       <div class="meta">Generated ${esc(new Date(plan.generated_at).toLocaleString())} · ${plan.mode === "foundry" ? `Azure AI Foundry (${esc(plan.model)})` : "Template"} · Plan ${esc(plan.id)}</div>
