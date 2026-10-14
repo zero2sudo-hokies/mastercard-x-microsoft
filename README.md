@@ -6,7 +6,7 @@
      Easiest: drag the .mp4 into this README while editing on github.com (GitHub hosts it and inserts the link),
      or paste a YouTube/Loom thumbnail link:  [![Monopoly demo](thumbnail.png)](https://link-to-video) -->
 
-> 🎬 **Demo video:** _coming soon_
+> 🎬 **Demo video:** https://www.youtube.com/watch?v=aluuY3pYIac
 
 **Live site:** https://ashy-desert-0ad29150f.3.azurestaticapps.net · Built for **LEAD ASPIRE 2026** at Microsoft Times Square, for the client **Mastercard**.
 
@@ -139,9 +139,13 @@ Open http://localhost:3000. Tests: `pytest -q` in `backend/`.
 
 ## Team
 
-<!-- Fill in names and roles -->
-| Name | Role |
-|---|---|
-| | |
+| Name |
+|---|
+| Laksh Bharani |
+| Aaditya Arora |
+| Atharv Kumar |
+| Advaith Malka |
+| Sahaj Chettri |
+| Lokesh Donnepudi |
 
 _Prototype for LEAD ASPIRE 2026. Modeled data; not financial advice. No protected attributes are used._
