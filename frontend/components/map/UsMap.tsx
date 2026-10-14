@@ -9,7 +9,7 @@ import us from "us-atlas/counties-10m.json";
 import { Map as RegionMap, MapControls, MapGeoJSON, MapMarker, MarkerContent, MarkerTooltip, useMap, type MapGeoJSONEvent } from "@/components/ui/map";
 import BankLogo from "@/components/ui/BankLogo";
 import { bankDotColor, crowdedMarkers } from "@/lib/marker-layout";
-import { mapBounds } from "@/lib/map-bounds";
+import { NORTH_AMERICA_BOUNDS } from "@/lib/map-bounds";
 import { fmtInt, fmtScore } from "@/lib/format";
 import { TOPIC_LABEL } from "@/lib/topics";
 import type { AreaSummary, BranchPin, Layer, TopicId } from "@/lib/types";
@@ -100,9 +100,9 @@ export default function UsMap(props: Props) {
   const [hover, setHover] = useState<MapGeoJSONEvent<{ fips: string }> | null>(null);
   const hovered = hover ? (stateFips ? counties : states).get(hover.feature.properties.fips) : undefined;
   return (
-    <div className="relative w-full">
-      <div className="relative h-[610px] max-h-[75vh] min-h-[360px] overflow-hidden rounded-lg border border-line bg-white" onMouseLeave={() => setHover(null)}>
-        <RegionMap theme="light" styles={{ light: `${process.env.NEXT_PUBLIC_BASE_PATH || ""}/map-style-light.json` }} center={[-98, 38]} zoom={3.3} minZoom={2} maxZoom={18} maxBounds={mapBounds(stateFips)} renderWorldCopies={false}>
+    <div className="relative flex min-h-0 w-full flex-1 flex-col">
+      <div className="relative h-[420px] min-h-[240px] overflow-hidden lg:h-auto lg:flex-1 rounded-lg border border-line bg-white" onMouseLeave={() => setHover(null)}>
+        <RegionMap theme="light" styles={{ light: `${process.env.NEXT_PUBLIC_BASE_PATH || ""}/map-style-light.json` }} center={[-98, 38]} zoom={3.3} minZoom={2} maxZoom={18} maxBounds={NORTH_AMERICA_BOUNDS} renderWorldCopies={false}>
           {stateFips && <MapGeoJSON<{ fips: string }> id="surrounding-states" beforeId="waterway_label" data={contextStates} promoteId="fips" interactive
             fillPaint={{ "fill-color": "#ebe9e3", "fill-opacity": ["interpolate", ["linear"], ["zoom"], 6, 0.55, 12, 0.08, 15, 0] }}
             linePaint={{ "line-color": "#ffffff", "line-width": 0.7 }}
@@ -155,11 +155,31 @@ function MapNavigation({ stateFips, focused, focusColor, onClearFocus }: { state
     if (!map || !isLoaded) return;
     const duration = navigationStarted.current ? 650 : 0;
     navigationStarted.current = true;
-    map.setMaxBounds(mapBounds(stateFips));
+    map.setMaxBounds(NORTH_AMERICA_BOUNDS);
     const shape = focused ?? stateShapes.find((s) => String(s.id) === stateFips);
-    if (shape) map.fitBounds(regionBounds(shape), { padding: focused ? 100 : 40, maxZoom: focused ? 12 : 8, pitch: focused ? 35 : 0, duration });
-    else map.fitBounds([[-125, 24], [-66, 50]], { padding: 30, pitch: 0, duration });
+    const fit = (duration: number) => {
+      if (shape) map.fitBounds(regionBounds(shape), { padding: Math.min(focused ? 60 : 40, map.getContainer().clientHeight * 0.15), maxZoom: focused ? 12 : 8, pitch: focused ? 35 : 0, duration });
+      else map.fitBounds([[-172, 18], [-66, 72]], { padding: 30, pitch: 0, duration });
+    };
+    fit(duration);
+    const observer = new ResizeObserver(() => {
+      map.resize();
+    });
+    observer.observe(map.getContainer());
+    return () => observer.disconnect();
   }, [map, isLoaded, stateFips, focused]);
+  useEffect(() => {
+    if (!map || !isLoaded) return;
+    const container = map.getContainer();
+    const pan = (event: WheelEvent) => {
+      if (event.ctrlKey || event.deltaX === 0) return;
+      event.preventDefault();
+      event.stopPropagation();
+      map.panBy([event.deltaX, event.deltaY], { duration: 0 });
+    };
+    container.addEventListener("wheel", pan, { passive: false, capture: true });
+    return () => container.removeEventListener("wheel", pan, { capture: true });
+  }, [map, isLoaded]);
   useEffect(() => {
     if (!map || !isLoaded || !focused) return;
     const bounds = regionBounds(focused);

@@ -112,9 +112,9 @@ export default function Dashboard() {
   const selectedName = fips ? (counties.get(fips)?.name ?? states?.get(fips)?.name) : null;
 
   return (
-    <div className="grid gap-4 p-4 lg:h-[calc(100vh-7.5rem)] lg:grid-cols-[62fr_38fr]">
+    <div className="grid gap-4 p-4 lg:h-[calc(100vh-7.5rem)] lg:min-h-[640px] lg:grid-cols-[62fr_38fr]">
       <section className="flex min-h-0 flex-col rounded-xl border border-line bg-white p-4 shadow-sm">
-        <div className="mb-3 flex flex-wrap items-center gap-3">
+        <div className="mb-3 flex shrink-0 flex-wrap items-center gap-3">
           <div role="radiogroup" aria-label="Map layer" className="flex rounded-lg bg-paper p-1">
             {(["underserved", "frustration"] as Layer[]).map((l) => (
               <button
@@ -164,7 +164,7 @@ export default function Dashboard() {
           </nav>
         </div>
 
-        <div className="relative min-h-0 flex-1 overflow-auto">
+        <div className="relative flex min-h-0 flex-1 flex-col">
           {statesErrorMsg ? (
             <ErrorBox message={statesErrorMsg} onRetry={retry} />
           ) : !states ? (
@@ -200,7 +200,7 @@ export default function Dashboard() {
                   onSelect={pinFips ? (cert) => setPinBank(cert ? { fips, cert } : null) : undefined}
                 />
               )}
-              <p className="mt-1 text-[11px] text-muted">
+              <p className="mt-1 shrink-0 text-[11px] text-muted">
                 {layer === "underserved"
                   ? "Exclusion index: FDIC 2023 unbanked and underbanked, ACS poverty, no internet, income, and bank branch density."
                   : "Frustration score: percentile of CFPB complaints per 100k residents. Under 30 complaints is not scored (hatched)."}

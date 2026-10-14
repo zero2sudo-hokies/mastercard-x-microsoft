@@ -26,9 +26,9 @@ export default function TopBanksStrip({ fips, name, selected = null, onSelect }:
   const loading = result?.fips !== fips;
 
   return (
-    <div className="mt-3 rounded-xl border border-line bg-paper/60 p-3">
-      <div className="mb-2 flex items-center justify-between gap-2">
-        <h3 className="text-sm font-semibold text-navy">Top banks in {name}</h3>
+    <div className="mt-2 shrink-0 rounded-lg border border-line bg-paper/60 p-2">
+      <div className="mb-1.5 flex items-center justify-between gap-2">
+        <h3 className="text-xs font-semibold text-navy">Top banks in {name}</h3>
         <Link href={`/banks?fips=${fips}`} className="rounded-lg border border-navy px-2.5 py-1 text-xs font-medium text-navy hover:bg-white">
           Expand: compare banks →
         </Link>
@@ -55,7 +55,7 @@ export default function TopBanksStrip({ fips, name, selected = null, onSelect }:
                 style={on ? { borderColor: "#0b1f3a" } : undefined}
                 title={onSelect ? (on ? "Show all branches" : `Show only ${b.name} branches`) : undefined}
               >
-              <div className="flex items-start gap-2">
+              <div className="flex items-start gap-1.5 [&>span:first-child]:h-8 [&>span:first-child]:w-8 [&_img]:h-8 [&_img]:w-8">
                 <BankLogo name={b.name} website={b.website} />
                 <span className="line-clamp-2 font-medium text-navy" title={b.name}>
                   {b.name}
@@ -75,7 +75,7 @@ export default function TopBanksStrip({ fips, name, selected = null, onSelect }:
         </ol>
       )}
       {data && (
-        <p className="mt-2 text-[11px] text-muted">
+        <p className="mt-1.5 text-[10px] text-muted">
           FDIC Summary of Deposits, {data.as_of}. Ranked by local deposits, the public proxy for customers. Crowded branches appear as dots; zoom in for bank logos.{onSelect ? " Click a bank to show only its branches." : ""}
         </p>
       )}
