@@ -279,6 +279,7 @@ export interface BankLeaderboard {
 export interface BranchPin {
   cert: string;
   bank: string | null;
+  website?: string | null;
   branch: string;
   lat: number;
   lon: number;

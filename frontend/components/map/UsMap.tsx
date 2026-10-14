@@ -6,7 +6,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { feature, mesh } from "topojson-client";
 import type { GeometryCollection, Topology } from "topojson-specification";
 import us from "us-atlas/counties-albers-10m.json";
-import { pinColor } from "@/lib/banks";
+import BankLogo from "@/components/ui/BankLogo";
 import { fmtInt, fmtScore } from "@/lib/format";
 import { TOPIC_ICON, TOPIC_LABEL } from "@/lib/topics";
 import type { AreaSummary, BranchPin, Layer, TopicId } from "@/lib/types";
@@ -253,11 +253,14 @@ export default function UsMap({ states, counties, stateFips, layer, topic, selec
                   if (!xy) return null;
                   const top = p.rank != null && p.rank <= 3;
                   const lit = highlightCert ? p.cert === highlightCert : true;
-                  const r = target[3] * (highlightCert && lit ? 0.014 : top ? 0.011 : 0.0065);
+                  const r = target[3] * (highlightCert && lit ? 0.028 : top ? 0.023 : 0.016);
                   return (
-                    <circle key={i} cx={xy[0]} cy={xy[1]} r={r} fill={pinColor(p.rank)} stroke="#ffffff" strokeWidth={target[3] * 0.0025} opacity={!lit ? 0.12 : top || highlightCert ? 1 : 0.75} className="pin">
+                    <svg key={i} x={xy[0] - r} y={xy[1] - r} width={r * 2} height={r * 2} viewBox="0 0 40 40" opacity={!lit ? 0.12 : 1} className="pin">
                       <title>{`${p.bank ?? "Other bank"} · ${p.branch}`}</title>
-                    </circle>
+                      <foreignObject width="40" height="40">
+                        <BankLogo name={p.bank ?? "Other bank"} website={p.website} />
+                      </foreignObject>
+                    </svg>
                   );
                 })}
               </g>

@@ -263,3 +263,5 @@ All three must be true, else 400 `"Complete the safe-outreach checklist before a
 - Shared component contracts:
   - `components/chat/ChatPanel.tsx` (P5): `export default function ChatPanel(props: { context: ChatContext; onFocus: (fips: string[]) => void; onSelect: (fips: string) => void })`.
   - `components/roi/RoiPanel.tsx` (P4): `export default function RoiPanel(props: { fips: string; onChange?: (req: RoiRequest, result: RoiResult) => void })`.
+
+Branch map markers: `GET /api/areas/{fips}/branches` returns `{ fips, as_of, branches: [{ cert, bank, website?, branch, lat, lon, rank }] }`. `website` is the optional FDIC institution website used for logos. Missing institution metadata leaves `bank` and `website` null; markers use initials when no logo is available.
