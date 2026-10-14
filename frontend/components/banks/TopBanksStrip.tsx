@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui";
+import BankLogo from "@/components/ui/BankLogo";
 import { getBanks } from "@/lib/api";
 import { pinColor } from "@/lib/banks";
 import { fmtPct } from "@/lib/format";
@@ -44,6 +45,7 @@ export default function TopBanksStrip({ fips, name }: { fips: string; name: stri
           {data.banks.map((b) => (
             <li key={b.cert} className="rounded-lg border border-line bg-white p-2 text-xs">
               <div className="flex items-start gap-2">
+                <BankLogo name={b.name} website={b.website} />
                 <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold text-white" style={{ background: pinColor(b.rank) }}>
                   {b.rank}
                 </span>

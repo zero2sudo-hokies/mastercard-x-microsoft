@@ -19,7 +19,8 @@
     "specialization": "INTERNATIONAL",
     "net_interest_margin": 0.02882,
     "efficiency_ratio": 0.54378,
-    "return_on_assets": 0.01585
+    "return_on_assets": 0.01585,
+    "website": "www.jpmorganchase.com"
    },
    "underserved_households_per_branch": 6590,
    "roi": {
@@ -259,7 +260,8 @@
     "specialization": "INTERNATIONAL",
     "net_interest_margin": 0.03019,
     "efficiency_ratio": 0.51393,
-    "return_on_assets": 0.01056
+    "return_on_assets": 0.01056,
+    "website": "www.citibank.com"
    },
    "underserved_households_per_branch": 14497,
    "roi": {
@@ -499,7 +501,8 @@
     "specialization": "COMMERCIAL LENDING",
     "net_interest_margin": 0.03662,
     "efficiency_ratio": 0.54122,
-    "return_on_assets": 0.0115
+    "return_on_assets": 0.0115,
+    "website": "www.poncebank.com"
    },
    "underserved_households_per_branch": 43491,
    "roi": {

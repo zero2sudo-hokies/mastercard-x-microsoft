@@ -20,7 +20,8 @@
    "specialization": "INTERNATIONAL",
    "net_interest_margin": 0.02882,
    "efficiency_ratio": 0.54378,
-   "return_on_assets": 0.01585
+   "return_on_assets": 0.01585,
+   "website": "www.jpmorganchase.com"
   },
   {
    "rank": 2,
@@ -38,7 +39,8 @@
    "specialization": "INTERNATIONAL",
    "net_interest_margin": 0.03019,
    "efficiency_ratio": 0.51393,
-   "return_on_assets": 0.01056
+   "return_on_assets": 0.01056,
+   "website": "www.citibank.com"
   },
   {
    "rank": 3,
@@ -56,7 +58,8 @@
    "specialization": "COMMERCIAL LENDING",
    "net_interest_margin": 0.03662,
    "efficiency_ratio": 0.54122,
-   "return_on_assets": 0.0115
+   "return_on_assets": 0.0115,
+   "website": "www.poncebank.com"
   },
   {
    "rank": 4,
@@ -74,7 +77,8 @@
    "specialization": "ALL OTHER > $1 BILLION",
    "net_interest_margin": 0.03237,
    "efficiency_ratio": 0.6658,
-   "return_on_assets": 0.00826
+   "return_on_assets": 0.00826,
+   "website": "www.td.com/us/en/personal-banking/"
   },
   {
    "rank": 5,
@@ -92,7 +96,8 @@
    "specialization": "COMMERCIAL LENDING",
    "net_interest_margin": 0.02306,
    "efficiency_ratio": 0.8024,
-   "return_on_assets": 0.00394
+   "return_on_assets": 0.00394,
+   "website": "www.applebank.com"
   },
   {
    "rank": 6,
@@ -110,7 +115,8 @@
    "specialization": "ALL OTHER > $1 BILLION",
    "net_interest_margin": 0.02526,
    "efficiency_ratio": 0.53906,
-   "return_on_assets": 0.01126
+   "return_on_assets": 0.01126,
+   "website": "www.bankofamerica.com"
   },
   {
    "rank": 7,
@@ -128,7 +134,8 @@
    "specialization": "CREDIT-CARD",
    "net_interest_margin": 0.08472,
    "efficiency_ratio": 0.50605,
-   "return_on_assets": 0.01672
+   "return_on_assets": 0.01672,
+   "website": "www.capitalone.com"
   },
   {
    "rank": 8,
@@ -146,7 +153,8 @@
    "specialization": "COMMERCIAL LENDING",
    "net_interest_margin": 0.04106,
    "efficiency_ratio": 0.41205,
-   "return_on_assets": 0.01709
+   "return_on_assets": 0.01709,
+   "website": "www.spring.bank"
   },
   {
    "rank": 9,
@@ -164,7 +172,8 @@
    "specialization": "COMMERCIAL LENDING",
    "net_interest_margin": 0.03198,
    "efficiency_ratio": 0.55128,
-   "return_on_assets": 0.0098
+   "return_on_assets": 0.0098,
+   "website": "www.popularbank.com"
   },
   {
    "rank": 10,
@@ -182,7 +191,8 @@
    "specialization": "ALL OTHER > $1 BILLION",
    "net_interest_margin": 0.0326,
    "efficiency_ratio": 0.60288,
-   "return_on_assets": 0.00992
+   "return_on_assets": 0.00992,
+   "website": "www.citizensbank.com"
   }
  ],
  "labels": [

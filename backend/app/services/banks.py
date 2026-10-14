@@ -14,7 +14,7 @@ COMPARE_LABELS = [
 
 def _entry(rank: int, row: dict) -> BankEntry:
     inst = store.banks["institutions"][row["cert"]]
-    return BankEntry(rank=rank, cert=row["cert"], name=inst["name"], deposits=row["deposits"], deposit_share=row["deposit_share"],
+    return BankEntry(rank=rank, cert=row["cert"], name=inst["name"], website=inst.get("website"), deposits=row["deposits"], deposit_share=row["deposit_share"],
                      branches=row["branches"], total_assets=inst["total_assets"], issuer_type=inst["issuer_type"],
                      fdic_community_bank=inst["fdic_community_bank"], holding_company=inst.get("holding_company"),
                      hq_city=inst.get("hq_city"), hq_state=inst.get("hq_state"), specialization=inst.get("specialization"),

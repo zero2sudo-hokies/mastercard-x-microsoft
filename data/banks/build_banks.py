@@ -64,9 +64,23 @@ def fetch_ratios() -> dict[str, dict]:
     return {str(d["CERT"]): d for d in json.loads(path.read_text())}
 
 
+def fetch_websites() -> dict[str, str | None]:
+    """Official bank websites, matched by FDIC certificate rather than bank name."""
+    path = RAW / "websites.json"
+    if not path.exists():
+        r = httpx.get("https://api.fdic.gov/banks/institutions", params={"filters": "ACTIVE:1",
+                      "fields": "CERT,WEBADDR", "limit": 10000, "format": "json"}, timeout=180)
+        r.raise_for_status()
+        payload = r.json()
+        assert len(payload["data"]) == payload["meta"]["total"], "Bank website response was truncated"
+        path.write_text(json.dumps({str(d["data"]["CERT"]): d["data"].get("WEBADDR") or None for d in payload["data"]}))
+    return json.loads(path.read_text())
+
+
 def main():
     rows = fetch()
     ratios = fetch_ratios()
+    websites = fetch_websites()
     known = {a["fips"] for a in json.loads(AREAS.read_text(encoding="utf-8"))["counties"]}
     institutions, by_area = {}, defaultdict(lambda: defaultdict(lambda: {"deposits": 0, "branches": 0}))
     pins = defaultdict(list)
@@ -79,6 +93,7 @@ def main():
             continue
         institutions.setdefault(cert, {
             "cert": cert, "name": r["NAMEFULL"], "holding_company": r.get("NAMEHCR") or None,
+            "website": websites.get(cert),
             "hq_city": r.get("CITY"), "hq_state": r.get("STALP"),
             "total_assets": (r.get("ASSET") or 0) * 1000,
             "fdic_community_bank": r.get("CB") == 1,

@@ -251,6 +251,7 @@ export interface BankEntry {
   rank: number;
   cert: string;
   name: string;
+  website?: string | null;
   deposits: number;
   deposit_share: number;
   branches: number;

@@ -251,6 +251,7 @@ class BankEntry(BaseModel):
     rank: int
     cert: str
     name: str
+    website: Optional[str] = None
     deposits: int
     deposit_share: float
     branches: int
