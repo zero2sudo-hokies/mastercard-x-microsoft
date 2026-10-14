@@ -81,6 +81,7 @@ def test_bank_leaderboard_and_compare():
     lb = client.get(f"/api/areas/{fips}/banks?n=5").json()
     banks = lb["banks"]
     assert banks and [b["rank"] for b in banks] == list(range(1, len(banks) + 1))
+    assert all(b["website"] == store.banks["institutions"][b["cert"]].get("website") for b in banks)
     shares = [b["deposit_share"] for b in banks]
     assert shares == sorted(shares, reverse=True) and sum(shares) <= 1.0001
     assert all(b["issuer_type"] == ("community" if b["total_assets"] < 10e9 else "large_bank") for b in banks)

@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import RoiPanel from "@/components/roi/RoiPanel";
+import BankLogo from "@/components/ui/BankLogo";
 import { Badge, Button, Card, DataStatusBadge, EmptyState, ErrorBox, Spinner, TopicIcon } from "@/components/ui";
 import { approvePlan, getBanks, getProfile, postPlan } from "@/lib/api";
 import { TOPIC_LABEL } from "@/lib/topics";
@@ -101,6 +102,7 @@ export default function PlanPage() {
 
       {target && (
         <div className="flex flex-wrap items-center gap-2 rounded-lg border border-accent/40 bg-accent/10 px-3 py-2 text-sm text-navy">
+          {targetBank && <BankLogo name={targetBank.name} website={targetBank.website} />}
           <strong>Pitch for {targetBank?.name ?? "the selected bank"}</strong>
           {targetBank && (
             <span className="text-muted">

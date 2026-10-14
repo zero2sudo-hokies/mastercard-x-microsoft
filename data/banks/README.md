@@ -23,3 +23,5 @@ python build_banks.py     # fetch cached in raw/ (gitignored)
 - Regulation II exemption uses consolidated (holding company) assets; confirm the tier with the issuer.
 - Card network (Mastercard or other) per bank is not public.
 - Call-report ratios are whole-bank figures, shown as context only; they never feed the ROI math.
+
+Bank logos use official website addresses (`WEBADDR`) from the FDIC BankFind `institutions` endpoint, matched by `CERT`. The pipeline caches active institutions' websites in `raw/websites.json`; delete that cache to refresh them. Missing websites remain null and the frontend shows initials. Financial and deposit figures keep their original reporting dates.

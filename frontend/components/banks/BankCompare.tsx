@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
 import { EmptyState, ErrorBox, SourceNote, Spinner, Tag } from "@/components/ui";
+import BankLogo from "@/components/ui/BankLogo";
 import { compareBanks } from "@/lib/api";
 import { fmtInt, fmtPct, fmtUSD } from "@/lib/format";
 import type { AudienceBasis, BankCompare as Compare } from "@/lib/types";
@@ -57,6 +58,7 @@ export default function BankCompare({ fips, certs, shared = {}, planHref }: { fi
               <th className="py-2 pr-2 font-normal text-muted">{data.area_name}</th>
               {data.rows.map((r) => (
                 <th key={r.bank.cert} className="py-2 pr-2 align-bottom font-semibold text-navy">
+                  <BankLogo name={r.bank.name} website={r.bank.website} />
                   <span className="text-muted">#{r.bank.rank} </span>
                   {r.bank.name}
                 </th>

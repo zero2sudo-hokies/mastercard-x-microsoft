@@ -39,6 +39,7 @@ jobs:
           NEXT_PUBLIC_USE_MOCK: "0"
           NEXT_PUBLIC_BASE_PATH: ""
           NEXT_PUBLIC_API_BASE: ${{ vars.NAVIGATOR_API_BASE }}
+          NEXT_PUBLIC_BRANDFETCH_CLIENT_ID: ${{ vars.NEXT_PUBLIC_BRANDFETCH_CLIENT_ID }}
         run: |
           test -n "$NEXT_PUBLIC_API_BASE"
           npm run build

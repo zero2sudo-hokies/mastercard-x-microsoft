@@ -34,3 +34,7 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+### Bank logos
+
+Bank cards, comparison headers and bank-specific pilot plans use Brandfetch logos. Official websites come from FDIC BankFind institutions, matched by certificate number. Set `NEXT_PUBLIC_BRANDFETCH_CLIENT_ID` in `.env.local` using the public Logo API client ID from https://developers.brandfetch.com (not a secret Brand API key). For Azure builds, set the repository Actions variable with the same name and redeploy. Next.js embeds this value at build time. Missing configuration, missing websites and image errors show bank initials instead.

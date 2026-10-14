@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Badge, EmptyState, ErrorBox, SourceNote, Spinner } from "@/components/ui";
+import BankLogo from "@/components/ui/BankLogo";
 import { getBanks } from "@/lib/api";
 import { fmtPct, fmtUSD } from "@/lib/format";
 import type { BankLeaderboard as Board } from "@/lib/types";
@@ -41,9 +42,10 @@ export default function BankLeaderboard({ fips, selected, onToggle, showNotes = 
           const full = !on && selected.length >= MAX_COMPARE;
           return (
             <li key={b.cert}>
-              <label className={`grid grid-cols-[1rem_1.25rem_1fr_auto] items-center gap-2 rounded-lg px-1 py-1.5 text-xs ${full ? "opacity-50" : "cursor-pointer hover:bg-paper"}`}>
+              <label className={`grid grid-cols-[1rem_1.25rem_2.5rem_1fr_auto] items-center gap-2 rounded-lg px-1 py-1.5 text-xs ${full ? "opacity-50" : "cursor-pointer hover:bg-paper"}`}>
                 <input type="checkbox" checked={on} disabled={full} onChange={() => onToggle(b.cert)} className="accent-navy" aria-label={`Compare ${b.name}`} />
                 <span className="text-right font-semibold tabular-nums text-muted">{b.rank}</span>
+                <BankLogo name={b.name} website={b.website} />
                 <span className="min-w-0">
                   <span className="block truncate font-medium text-navy" title={b.name}>
                     {b.name}
