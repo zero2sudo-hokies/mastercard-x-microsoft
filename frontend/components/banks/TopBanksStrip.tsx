@@ -10,7 +10,7 @@ import { fmtPct } from "@/lib/format";
 import type { BankLeaderboard } from "@/lib/types";
 
 /** Top 3 banks for the selected county, shown under the map, with a link to the full bank page. */
-export default function TopBanksStrip({ fips, name }: { fips: string; name: string }) {
+export default function TopBanksStrip({ fips, name, selected = null, onSelect }: { fips: string; name: string; selected?: string | null; onSelect?: (cert: string | null) => void }) {
   const [result, setResult] = useState<{ fips: string; data?: BankLeaderboard; error?: boolean } | null>(null);
 
   useEffect(() => {
@@ -42,8 +42,20 @@ export default function TopBanksStrip({ fips, name }: { fips: string; name: stri
         <p className="text-xs text-muted">No FDIC-insured bank branches recorded here.</p>
       ) : (
         <ol className="grid gap-2 sm:grid-cols-3">
-          {data.banks.map((b) => (
-            <li key={b.cert} className="rounded-lg border border-line bg-white p-2 text-xs">
+          {data.banks.map((b) => {
+            const on = selected === b.cert;
+            const dimmed = selected != null && !on;
+            return (
+            <li key={b.cert}>
+              <button
+                type="button"
+                disabled={!onSelect}
+                aria-pressed={on}
+                onClick={() => onSelect?.(on ? null : b.cert)}
+                className={`h-full w-full rounded-lg border bg-white p-2 text-left text-xs transition ${on ? "border-2 shadow-sm" : "border-line"} ${dimmed ? "opacity-50" : ""} ${onSelect ? "cursor-pointer hover:border-navy" : "cursor-default"}`}
+                style={on ? { borderColor: pinColor(b.rank) } : undefined}
+                title={onSelect ? (on ? "Show all branches" : `Show only ${b.name} branches`) : undefined}
+              >
               <div className="flex items-start gap-2">
                 <BankLogo name={b.name} website={b.website} />
                 <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold text-white" style={{ background: pinColor(b.rank) }}>
@@ -60,13 +72,15 @@ export default function TopBanksStrip({ fips, name }: { fips: string; name: stri
                 <Badge tone={b.issuer_type === "community" ? "good" : "neutral"}>{b.issuer_type === "community" ? "Exempt tier" : "Covered tier"}</Badge>
                 {b.fdic_community_bank && <Badge tone="accent">Community bank</Badge>}
               </div>
+              </button>
             </li>
-          ))}
+            );
+          })}
         </ol>
       )}
       {data && (
         <p className="mt-2 text-[11px] text-muted">
-          FDIC Summary of Deposits, {data.as_of}. Ranked by local deposits, the public proxy for customers. Map pins: numbered colors = these banks, grey = other banks.
+          FDIC Summary of Deposits, {data.as_of}. Ranked by local deposits, the public proxy for customers. Map pins: numbered colors = these banks, grey = other banks.{onSelect ? " Click a bank to show only its branches." : ""}
         </p>
       )}
     </div>

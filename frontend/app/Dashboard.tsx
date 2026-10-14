@@ -90,6 +90,9 @@ export default function Dashboard() {
     };
   }, [pinFips]);
   const pins = pinData && pinData.fips === pinFips ? pinData.pins : NO_PINS;
+  // bank chosen in the strip: only its pins stay lit (cleared when the county changes)
+  const [pinBank, setPinBank] = useState<{ fips: string; cert: string } | null>(null);
+  const pinCert = pinBank && pinBank.fips === fips ? pinBank.cert : null;
   const statesErrorMsg = statesError?.attempt === attempt && !states ? statesError.message : null;
   const countyErrorMsg = countyError?.key === countyKey && !cached ? countyError.message : null;
 
@@ -187,8 +190,16 @@ export default function Dashboard() {
                 focusSelected={layer === "frustration"}
                 onClearFocus={() => setQuery({ fips: null })}
                 pins={pins}
+                highlightCert={pinCert}
               />
-              {fips?.length === 5 && <TopBanksStrip fips={fips} name={selectedName ? `${selectedName}` : "this county"} />}
+              {fips?.length === 5 && (
+                <TopBanksStrip
+                  fips={fips}
+                  name={selectedName ? `${selectedName}` : "this county"}
+                  selected={pinCert}
+                  onSelect={pinFips ? (cert) => setPinBank(cert ? { fips, cert } : null) : undefined}
+                />
+              )}
               <p className="mt-1 text-[11px] text-muted">
                 {layer === "underserved"
                   ? "Exclusion index: FDIC 2023 unbanked and underbanked, ACS poverty, no internet, income, and bank branch density."

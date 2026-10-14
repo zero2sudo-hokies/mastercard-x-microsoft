@@ -10,6 +10,7 @@ import { Badge, Button, Card, DataStatusBadge, EmptyState, ErrorBox, Spinner, To
 import { approvePlan, getBanks, getProfile, postPlan } from "@/lib/api";
 import { TOPIC_LABEL } from "@/lib/topics";
 import type { AreaProfile, BankEntry, PilotPlan, RoiRequest } from "@/lib/types";
+import { printPlan } from "./printPlan";
 
 const CHECKLIST = [
   { key: "compliance_review", label: "Issuer compliance team has reviewed targeting and marketing" },
@@ -155,6 +156,8 @@ function PlanDraft({ fips, getRoi, bank }: { fips: string; getRoi: () => RoiRequ
   const [reviewer, setReviewer] = useState("");
   const [approving, setApproving] = useState(false);
   const [approveError, setApproveError] = useState<string | null>(null);
+  const printable = useRef<HTMLDivElement>(null);
+  const makePdf = () => plan && printable.current && printPlan({ ...plan, markdown: text }, printable.current.innerHTML, bank?.name);
 
   async function generate() {
     setBusy(true);
@@ -247,20 +250,25 @@ function PlanDraft({ fips, getRoi, bank }: { fips: string; getRoi: () => RoiRequ
           <Card
             title={plan.area_name}
             action={
-              approved ? (
-                <div className="flex gap-2">
-                  <Button variant="secondary" onClick={() => navigator.clipboard?.writeText(text)}>
-                    Copy
+              <div className="flex gap-2">
+                {approved ? (
+                  <>
+                    <Button variant="secondary" onClick={() => navigator.clipboard?.writeText(text)}>
+                      Copy
+                    </Button>
+                    <Button variant="secondary" onClick={() => download(`pilot-plan-${plan.fips}.md`, text)}>
+                      Download .md
+                    </Button>
+                  </>
+                ) : (
+                  <Button variant="secondary" onClick={() => setEditing((e) => !e)}>
+                    {editing ? "Preview" : "Edit"}
                   </Button>
-                  <Button variant="secondary" onClick={() => download(`pilot-plan-${plan.fips}.md`, text)}>
-                    Download .md
-                  </Button>
-                </div>
-              ) : (
-                <Button variant="secondary" onClick={() => setEditing((e) => !e)}>
-                  {editing ? "Preview" : "Edit"}
+                )}
+                <Button onClick={makePdf} title="Opens the print dialog: choose Save as PDF">
+                  Make PDF
                 </Button>
-              )
+              </div>
             }
           >
             {editing && !approved ? (
@@ -270,6 +278,10 @@ function PlanDraft({ fips, getRoi, bank }: { fips: string; getRoi: () => RoiRequ
                 <ReactMarkdown>{text}</ReactMarkdown>
               </div>
             )}
+            {/* always-rendered copy for the PDF, so it works in edit mode too */}
+            <div ref={printable} hidden>
+              <ReactMarkdown>{text}</ReactMarkdown>
+            </div>
           </Card>
 
           <details className="rounded-lg border border-line bg-white p-3 text-xs">

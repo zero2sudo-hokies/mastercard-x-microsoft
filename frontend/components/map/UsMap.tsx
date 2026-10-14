@@ -123,9 +123,11 @@ type Props = {
   onClearFocus?: () => void;
   /** branch locations for the focused county */
   pins?: BranchPin[];
+  /** when set, only this bank's pins are highlighted */
+  highlightCert?: string | null;
 };
 
-export default function UsMap({ states, counties, stateFips, layer, topic, selectedFips, focusFips, onStateClick, onCountyClick, focusSelected, onClearFocus, pins = [] }: Props) {
+export default function UsMap({ states, counties, stateFips, layer, topic, selectedFips, focusFips, onStateClick, onCountyClick, focusSelected, onClearFocus, pins = [], highlightCert = null }: Props) {
   const g = geo();
   const focusShape = focusSelected && selectedFips && stateFips ? g.countiesByState[stateFips]?.find((c) => c.id === selectedFips) : undefined;
   const target = focusShape ? fitFocus(g.countyBoxes[focusShape.id]) : stateFips && g.stateBounds[stateFips] ? g.stateBounds[stateFips] : FULL;
@@ -242,13 +244,18 @@ export default function UsMap({ states, counties, stateFips, layer, topic, selec
               <path d={focused.d} fill={fillFor(counties.get(focused.id))} stroke="#ffffff" strokeWidth={1.5} className="map-path" onMouseMove={(e) => track(focused.id, e)} />
               <path d={focused.d} fill="none" stroke="#f79e1b" strokeWidth={2.5} className="map-path pointer-events-none" />
               <g className="branch-pins">
-                {/* other banks first so the top 3 sit on top */}
-                {[...pins].sort((a, b) => (b.rank && b.rank <= 3 ? 0 : 1) - (a.rank && a.rank <= 3 ? 0 : 1)).map((p, i) => {
+                {/* drawn bottom-up: other banks, then the top 3, then the highlighted bank */}
+                {[...pins]
+                  .map((p) => ({ p, z: highlightCert ? (p.cert === highlightCert ? 2 : 0) : p.rank && p.rank <= 3 ? 1 : 0 }))
+                  .sort((a, b) => a.z - b.z)
+                  .map(({ p }, i) => {
                   const xy = PROJECT([p.lon, p.lat]);
                   if (!xy) return null;
                   const top = p.rank != null && p.rank <= 3;
+                  const lit = highlightCert ? p.cert === highlightCert : true;
+                  const r = target[3] * (highlightCert && lit ? 0.014 : top ? 0.011 : 0.0065);
                   return (
-                    <circle key={i} cx={xy[0]} cy={xy[1]} r={target[3] * (top ? 0.011 : 0.0065)} fill={pinColor(p.rank)} stroke="#ffffff" strokeWidth={target[3] * 0.0025} opacity={top ? 1 : 0.75}>
+                    <circle key={i} cx={xy[0]} cy={xy[1]} r={r} fill={pinColor(p.rank)} stroke="#ffffff" strokeWidth={target[3] * 0.0025} opacity={!lit ? 0.12 : top || highlightCert ? 1 : 0.75} className="pin">
                       <title>{`${p.bank ?? "Other bank"} · ${p.branch}`}</title>
                     </circle>
                   );
