@@ -275,6 +275,21 @@ class BankLeaderboard(BaseModel):
     labels: list[str] = []
 
 
+class BranchPin(BaseModel):
+    cert: str
+    bank: Optional[str] = None  # null for banks outside the area's top 10
+    branch: str
+    lat: float
+    lon: float
+    rank: Optional[int] = None  # leaderboard rank in this area, if top 10
+
+
+class BranchPins(BaseModel):
+    fips: str
+    as_of: Optional[str] = None
+    branches: list[BranchPin] = []
+
+
 class BankCompareRequest(BaseModel):
     fips: str
     certs: list[str] = Field(min_length=2, max_length=5)

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Query
 
-from app.models import BankCompare, BankCompareRequest, BankLeaderboard
+from app.models import BankCompare, BankCompareRequest, BankLeaderboard, BranchPins
 from app.routers.areas import known
 from app.services import banks
 from app.services.roi import area_audience
@@ -12,6 +12,13 @@ router = APIRouter(prefix="/api", tags=["banks"])
 @router.get("/areas/{fips}/banks", response_model=BankLeaderboard)
 def get_banks(fips: str, n: int = Query(10, ge=1, le=10)):
     return banks.leaderboard(known(fips), n)
+
+
+@router.get("/areas/{fips}/branches", response_model=BranchPins)
+def get_branches(fips: str):
+    if len(known(fips)) != 5:
+        raise HTTPException(400, "Branch pins are available for counties only")
+    return banks.branch_pins(fips)
 
 
 @router.post("/banks/compare", response_model=BankCompare)

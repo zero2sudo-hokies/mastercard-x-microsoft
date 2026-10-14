@@ -1,7 +1,7 @@
 """Bank partner leaderboard and side-by-side ROI comparison, from the FDIC Summary of Deposits."""
 from fastapi import HTTPException
 
-from app.models import BankCompare, BankCompareRequest, BankCompareRow, BankEntry, BankLeaderboard, RoiRequest
+from app.models import BankCompare, BankCompareRequest, BankCompareRow, BankEntry, BankLeaderboard, BranchPin, BranchPins, RoiRequest
 from app.services.roi import compute_roi
 from app.store import store
 
@@ -33,6 +33,16 @@ def leaderboard(fips: str, n: int = 10) -> BankLeaderboard:
                                labels=["No FDIC-insured bank branches recorded in this area."] if data else ["Bank data not loaded."])
     return BankLeaderboard(fips=fips, as_of=data.get("as_of"), total_deposits=area["total_deposits"], banks_present=area["banks_present"],
                            banks=[_entry(i, b) for i, b in enumerate(area["banks"][:n], start=1)], labels=labels)
+
+
+def branch_pins(fips: str) -> BranchPins:
+    """Every insured branch in a county with coordinates, tagged with its bank's rank in the area's top 10."""
+    rows = (store.branches.get("counties") or {}).get(fips, [])
+    ranks = {b["cert"]: i for i, b in enumerate(((store.banks.get("areas") or {}).get(fips) or {}).get("banks", []), start=1)}
+    names = store.banks.get("institutions") or {}
+    return BranchPins(fips=fips, as_of=store.branches.get("as_of"), branches=[
+        BranchPin(cert=c, bank=names.get(c, {}).get("name") if c in ranks else None, branch=b, lat=lat, lon=lon, rank=ranks.get(c))
+        for c, lat, lon, b in rows])
 
 
 def find_bank(fips: str, cert: str) -> BankEntry | None:

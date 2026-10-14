@@ -16,11 +16,12 @@ HERE = Path(__file__).parent
 RAW = HERE / "raw"
 ROOT = HERE.parent.parent
 OUT = ROOT / "backend" / "app" / "data" / "banks.json"
+BRANCHES_OUT = ROOT / "backend" / "app" / "data" / "branches.json"  # county -> [cert, lat, lon, branch name] for map pins
 AREAS = ROOT / "backend" / "app" / "data" / "areas.json"
 
 API = "https://api.fdic.gov/banks/sod"
 YEAR = 2026
-FIELDS = "CERT,NAMEFULL,DEPSUMBR,ASSET,CB,STCNTYBR,NAMEHCR,SPECDESC,STALP,CITY"
+FIELDS = "CERT,NAMEFULL,DEPSUMBR,ASSET,CB,STCNTYBR,NAMEHCR,SPECDESC,STALP,CITY,NAMEBR,SIMS_LATITUDE,SIMS_LONGITUDE"
 TOP_N = 10
 CALL_REPORT = "20260630"  # quarterly call report used for per-bank ratios
 REG_II_THRESHOLD = 10_000_000  # $ thousands: under $10B in assets = exempt from the Regulation II interchange cap
@@ -32,7 +33,7 @@ def _pct(v):
 
 
 def fetch() -> list[dict]:
-    path = RAW / f"sod_{YEAR}.json"
+    path = RAW / f"sod_{YEAR}_v2.json"  # v2 adds branch names and coordinates
     if path.exists():
         return json.loads(path.read_text())
     rows, offset = [], 0
@@ -68,6 +69,7 @@ def main():
     ratios = fetch_ratios()
     known = {a["fips"] for a in json.loads(AREAS.read_text(encoding="utf-8"))["counties"]}
     institutions, by_area = {}, defaultdict(lambda: defaultdict(lambda: {"deposits": 0, "branches": 0}))
+    pins = defaultdict(list)
     skipped = 0
     for r in rows:
         county = str(r.get("STCNTYBR") or "").zfill(5)
@@ -87,6 +89,9 @@ def main():
             "efficiency_ratio": _pct(ratios.get(cert, {}).get("EEFFR")),
             "return_on_assets": _pct(ratios.get(cert, {}).get("ROA")),
         })
+        lat, lon = r.get("SIMS_LATITUDE"), r.get("SIMS_LONGITUDE")
+        if lat and lon:
+            pins[county].append([cert, round(lat, 5), round(lon, 5), r.get("NAMEBR") or ""])
         dep = (r.get("DEPSUMBR") or 0) * 1000
         for area in (county, county[:2]):  # county and its state
             by_area[area][cert]["deposits"] += dep
@@ -116,6 +121,9 @@ def main():
         "areas": dict(sorted(areas.items())),
     }
     OUT.write_text(json.dumps(out, separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
+    BRANCHES_OUT.write_text(json.dumps({"as_of": f"{YEAR}-06-30", "counties": dict(sorted(pins.items()))},
+                                       separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
+    print(f"branch pins: {sum(len(v) for v in pins.values())} in {len(pins)} counties, {BRANCHES_OUT.stat().st_size / 1e6:.1f} MB")
     counties = sum(1 for f in areas if len(f) == 5)
     print(f"branches {len(rows)}, skipped {skipped}; areas: {counties} counties, {len(areas) - counties} states; "
           f"institutions kept {len(out['institutions'])}; {OUT.stat().st_size / 1e6:.1f} MB")

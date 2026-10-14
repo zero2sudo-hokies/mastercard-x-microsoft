@@ -91,3 +91,16 @@ def test_bank_leaderboard_and_compare():
         assert r["roi"]["inputs"]["issuer_type"] == r["bank"]["issuer_type"] and r["roi"]["inputs"]["churn"] == 0.2
     assert client.post("/api/banks/compare", json={"fips": fips, "certs": certs[:1]}).status_code == 422
     assert client.post("/api/banks/compare", json={"fips": fips, "certs": ["0", certs[0]]}).status_code == 404
+
+
+def test_branch_pins():
+    if not store.branches:
+        import pytest
+        pytest.skip("branches.json not built")
+    fips = next(f for f in ("36005", "48215") if f in store.areas)
+    pins = client.get(f"/api/areas/{fips}/branches").json()["branches"]
+    assert pins and all(-180 < p["lon"] < -60 and 15 < p["lat"] < 72 for p in pins)
+    top = client.get(f"/api/areas/{fips}/banks?n=1").json()["banks"][0]
+    ranked = [p for p in pins if p["rank"] == 1]
+    assert len(ranked) == top["branches"] and all(p["bank"] == top["name"] for p in ranked)
+    assert client.get("/api/areas/36/branches").status_code == 400

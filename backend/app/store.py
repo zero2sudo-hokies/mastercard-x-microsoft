@@ -57,7 +57,14 @@ class Store:
                 log.warning("could not read %s", ROI_INPUTS)
         self.state_audience = {r["state"]: r for r in (self.roi_inputs or {}).get("state_opportunities", [])}
 
-        # optional bank leaderboard (data/banks pipeline); the app runs without it
+        # optional bank leaderboard and branch pins (data/banks pipeline); the app runs without them
+        self.branches = {}
+        branches_path = APP / "data" / "branches.json"
+        if branches_path.exists():
+            try:
+                self.branches = json.loads(branches_path.read_text(encoding="utf-8"))
+            except (OSError, ValueError):
+                log.warning("could not read %s", branches_path)
         self.banks = {}
         banks_path = APP / "data" / "banks.json"
         if banks_path.exists():
