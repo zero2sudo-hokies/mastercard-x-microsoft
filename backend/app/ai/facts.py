@@ -3,7 +3,7 @@ TOPIC_LABEL = {"fees": "fees", "fraud_scams": "fraud and scams", "transfers": "t
                "customer_service": "customer service", "distrust": "distrust"}
 
 
-def build_facts(profile: dict, roi: dict, partner_name: str, notes: str) -> dict:
+def build_facts(profile: dict, roi: dict, partner_name: str, notes: str, bank: dict | None = None) -> dict:
     a, fr, b = profile["area"], profile.get("frustration") or {}, profile.get("benefit") or {}
     pain = fr.get("pain_scores") or {}
     top, second = fr.get("top_topic"), fr.get("second_topic")
@@ -51,4 +51,16 @@ def build_facts(profile: dict, roi: dict, partner_name: str, notes: str) -> dict
         "data_labels": profile.get("labels", []),
         "partner_name": partner_name, "notes": notes[:1000],
     }
+    if bank:
+        facts.update({
+            "target_bank": bank["name"], "target_bank_rank_by_local_deposits": bank["rank"],
+            "target_bank_local_deposit_share": bank["deposit_share"], "target_bank_local_deposits": bank["deposits"],
+            "target_bank_local_branches": bank["branches"], "target_bank_total_assets": bank["total_assets"],
+            "target_bank_pricing_tier": "exempt (under $10B assets)" if bank["issuer_type"] == "community" else "covered ($10B+ assets)",
+            "target_bank_fdic_community_bank": bank["fdic_community_bank"],
+            "target_bank_holding_company": bank.get("holding_company"),
+            "target_bank_headquarters": ", ".join(x for x in (bank.get("hq_city"), bank.get("hq_state")) if x) or None,
+            "target_bank_net_interest_margin_whole_bank": bank.get("net_interest_margin"),
+            "target_bank_efficiency_ratio_whole_bank": bank.get("efficiency_ratio"),
+        })
     return {k: v for k, v in facts.items() if v is not None and v != []}

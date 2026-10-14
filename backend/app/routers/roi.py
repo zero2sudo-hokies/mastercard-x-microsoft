@@ -2,15 +2,14 @@ from fastapi import APIRouter, HTTPException
 
 from app.models import BankBenchmark, RoiContext, RoiRequest, RoiResult, StateAudience
 from app.routers.areas import known
-from app.services.roi import audience_bases, compute_roi
+from app.services.roi import area_audience, compute_roi
 from app.store import store
 
 router = APIRouter(prefix="/api", tags=["roi"])
 
 
 def _bases(area):
-    row = store.state_audience.get(area.state_abbr)
-    return audience_bases(area, row, list(store.state_audience.values()), store.state_households(area.state_fips), store.benchmarks)
+    return area_audience(area)
 
 
 @router.post("/roi", response_model=RoiResult)

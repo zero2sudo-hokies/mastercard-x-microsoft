@@ -71,3 +71,23 @@ def test_ai_routes_are_rate_limited(monkeypatch):
     assert codes[:2] != [429, 429] and codes[2] == 429
     assert client.get("/api/health", headers=headers).status_code == 200  # reads are never limited
     main._ai_calls.clear()
+
+
+def test_bank_leaderboard_and_compare():
+    if not store.banks:
+        import pytest
+        pytest.skip("banks.json not built")
+    fips = next(f for f in ("36005", "48215") if f in store.areas)
+    lb = client.get(f"/api/areas/{fips}/banks?n=5").json()
+    banks = lb["banks"]
+    assert banks and [b["rank"] for b in banks] == list(range(1, len(banks) + 1))
+    shares = [b["deposit_share"] for b in banks]
+    assert shares == sorted(shares, reverse=True) and sum(shares) <= 1.0001
+    assert all(b["issuer_type"] == ("community" if b["total_assets"] < 10e9 else "large_bank") for b in banks)
+    certs = [b["cert"] for b in banks[:3]]
+    cmp = client.post("/api/banks/compare", json={"fips": fips, "certs": certs, "churn": 0.2}).json()
+    assert [r["bank"]["cert"] for r in cmp["rows"]] == certs
+    for r in cmp["rows"]:
+        assert r["roi"]["inputs"]["issuer_type"] == r["bank"]["issuer_type"] and r["roi"]["inputs"]["churn"] == 0.2
+    assert client.post("/api/banks/compare", json={"fips": fips, "certs": certs[:1]}).status_code == 422
+    assert client.post("/api/banks/compare", json={"fips": fips, "certs": ["0", certs[0]]}).status_code == 404

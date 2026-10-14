@@ -26,6 +26,14 @@ def _fdic_line(f: dict) -> str:
     return line + "."
 
 
+def _bank_line(f: dict) -> str:
+    if not f.get("target_bank"):
+        return ""
+    return (f"Proposed issuer: {f['target_bank']}, #{f['target_bank_rank_by_local_deposits']} by local deposits "
+            f"({_pct(f['target_bank_local_deposit_share'])} share, {f['target_bank_local_branches']} local branches, "
+            f"{f['target_bank_pricing_tier']} debit pricing tier). ")
+
+
 def render(f: dict) -> str:
     name = f["area_name"]
     top = f.get("top_topic") or "not yet classified"
@@ -53,7 +61,7 @@ A low-cost card account issued by the partner on Mastercard's network, built aro
 Outreach only through trusted community organizations, with the issuer's compliance review of every message. No targeting by any protected attribute; eligibility and outreach follow economic access only.
 
 ## 6. Why Mastercard
-Network reach, fraud tools and partner programs let a community issuer offer the benefit at low cost. Network volume is spend on Mastercard's network, not Mastercard revenue.
+{_bank_line(f)}Network reach, fraud tools and partner programs let the issuer offer the benefit at low cost. Network volume is spend on Mastercard's network, not Mastercard revenue.
 
 ## 7. Economics and the two levers
 {f['issuer_type'].replace('_', ' ')} issuer, adoption {_pct(f['adoption_rate_placeholder'])} (placeholder): {f['pilot_accounts_modeled']:,} accounts (modeled). Annual margin {_usd(f['annual_margin_per_account'])} per account, lifetime value {_usd(f['lifetime_value_per_account'])} at {_pct(f['yearly_churn'], 0)} churn, acquisition cost {_usd(f['acquisition_cost_per_account'])}. Breakeven churn: {breakeven}. Issuer net lifetime {_usd(f['issuer_net_lifetime_modeled'])} (modeled). Year 1 network volume {_usd(f['network_volume_year1_modeled'])} (modeled).

@@ -32,6 +32,11 @@ Use ONLY the numbers in the FACTS JSON. Do not add any other figures. Write for 
 - Show rates as percentages (0.2483 -> 24.8%), money as dollars ($52,601; $27.7M), counts with commas.
 - Label modeled and placeholder figures in words, e.g. "about 62,316 underserved households (modeled)".
 - If a fact is missing (for example no top complaint topic), say it is not yet available instead of guessing.
+If the facts name a target_bank, write the plan as a pitch to that bank: name it in the executive summary, explain
+in section 6 why Mastercard and this bank fit (its local deposit share and branches, its pricing tier, community-bank
+status), run outreach through its local branches plus community organizations, and say the economics use its pricing
+tier. Whole-bank ratios (net interest margin, efficiency) are context only, not account economics. Never claim which
+card network the bank uses today.
 Network volume is spend on Mastercard's network, not Mastercard revenue. Mastercard does not hold accounts, so an
 issuer partner is required. Outreach only through community organizations, with the issuer's compliance review.
 Never target or describe people by protected attributes, and do not list those attributes: just say

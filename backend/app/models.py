@@ -246,6 +246,58 @@ class RoiContext(BaseModel):
     labels: list[str]
 
 
+# ---- bank partners (FDIC Summary of Deposits) ----
+class BankEntry(BaseModel):
+    rank: int
+    cert: str
+    name: str
+    deposits: int
+    deposit_share: float
+    branches: int
+    total_assets: int
+    issuer_type: IssuerType
+    fdic_community_bank: bool
+    holding_company: Optional[str] = None
+    hq_city: Optional[str] = None
+    hq_state: Optional[str] = None
+    specialization: Optional[str] = None
+    net_interest_margin: Optional[float] = None  # whole-bank call-report ratios: context, not per-account economics
+    efficiency_ratio: Optional[float] = None
+    return_on_assets: Optional[float] = None
+
+
+class BankLeaderboard(BaseModel):
+    fips: str
+    as_of: Optional[str] = None
+    total_deposits: int = 0
+    banks_present: int = 0
+    banks: list[BankEntry] = []
+    labels: list[str] = []
+
+
+class BankCompareRequest(BaseModel):
+    fips: str
+    certs: list[str] = Field(min_length=2, max_length=5)
+    adoption_rate: Optional[float] = Field(None, gt=0, le=1)
+    churn: Optional[float] = Field(None, gt=0, le=1)
+    cac: Optional[float] = Field(None, ge=0)
+    fixed_program_cost: Optional[float] = Field(None, ge=0)
+    audience_basis: AudienceBasis = "underserved"
+
+
+class BankCompareRow(BaseModel):
+    bank: BankEntry
+    underserved_households_per_branch: Optional[int] = None
+    roi: RoiResult
+
+
+class BankCompare(BaseModel):
+    fips: str
+    area_name: str
+    rows: list[BankCompareRow]
+    labels: list[str]
+
+
 # ---- chat + plan (P3 implements the routes) ----
 class ChatMessage(BaseModel):
     role: Literal["user", "assistant"]
@@ -280,6 +332,7 @@ class ChatResponse(BaseModel):
 class PlanRequest(BaseModel):
     fips: str
     roi: Optional[RoiRequest] = None
+    bank_cert: Optional[str] = None  # target issuer from the bank leaderboard; tailors the pitch and sets its pricing tier
     partner_name: str = "Community credit union (TBD)"
     notes: str = ""
 

@@ -88,3 +88,10 @@ def audience_bases(area, state_row: dict | None, all_states: list[dict], state_h
             "us": round(sum(r["interested_unbanked_households"] or 0 for r in all_states)),
         }
     return bases
+
+
+def area_audience(area) -> dict[str, dict]:
+    """Audience bases for an area using the loaded FDIC state rows (shared by the ROI and bank routes)."""
+    from app.store import store
+    row = store.state_audience.get(area.state_abbr)
+    return audience_bases(area, row, list(store.state_audience.values()), store.state_households(area.state_fips), store.benchmarks)

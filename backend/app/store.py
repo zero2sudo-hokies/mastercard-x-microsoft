@@ -57,6 +57,15 @@ class Store:
                 log.warning("could not read %s", ROI_INPUTS)
         self.state_audience = {r["state"]: r for r in (self.roi_inputs or {}).get("state_opportunities", [])}
 
+        # optional bank leaderboard (data/banks pipeline); the app runs without it
+        self.banks = {}
+        banks_path = APP / "data" / "banks.json"
+        if banks_path.exists():
+            try:
+                self.banks = json.loads(banks_path.read_text(encoding="utf-8"))
+            except (OSError, ValueError):
+                log.warning("could not read %s", banks_path)
+
     def state_households(self, state_fips: str) -> int:
         """Underserved households for a state: the state Area if present, else the sum of its counties."""
         state = self.areas.get(state_fips)

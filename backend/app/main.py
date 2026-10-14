@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.config import settings
-from app.routers import areas, meta, recommend, roi
+from app.routers import areas, banks, meta, recommend, roi
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger("navigator")
@@ -60,7 +60,7 @@ async def validation_error(request: Request, exc: RequestValidationError):
     return JSONResponse({"detail": f"{field}: {err.get('msg', 'invalid input')}".strip(": ")}, status_code=422)
 
 
-for module in (meta, areas, recommend, roi):
+for module in (meta, areas, recommend, roi, banks):
     app.include_router(module.router)
 
 for name in ("chat", "plan"):

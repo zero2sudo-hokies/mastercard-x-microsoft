@@ -36,12 +36,20 @@ def generate_plan(req: PlanRequest) -> PilotPlan:
         raise HTTPException(400, "Not enough complaint data to plan a pilot here")
     roi_body = req.roi.model_dump() if req.roi else {}
     roi_body["fips"] = req.fips
+    bank = None
+    if req.bank_cert:
+        board = _get("GET", f"/api/areas/{req.fips}/banks?n=10")
+        bank = next((b for b in board.get("banks", []) if b["cert"] == req.bank_cert), None)
+        if not bank:
+            raise HTTPException(404, f"Bank {req.bank_cert} is not among the top banks in this area")
+        roi_body["issuer_type"] = bank["issuer_type"]  # the target bank's own debit pricing tier
     roi = _get("POST", "/api/roi", roi_body)
     bench = _get("GET", "/api/assumptions")
     roi["benchmarks"] = {k: bench.get(k) for k in ("transactions_per_month", "avg_ticket")}
     ctx = tools._request("GET", f"/api/roi/context/{req.fips}")  # optional sourced audience (data/p3 FDIC inputs)
     roi["context"] = ctx if isinstance(ctx, dict) and "error" not in ctx else {}
-    facts = build_facts(profile, roi, req.partner_name, req.notes)
+    partner = bank["name"] if bank else req.partner_name
+    facts = build_facts(profile, roi, partner, req.notes, bank)
 
     warnings, mode = [], "rules"
     markdown = None

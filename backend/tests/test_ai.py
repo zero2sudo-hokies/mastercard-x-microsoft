@@ -118,3 +118,17 @@ def test_plan_uses_roi_panel_inputs_and_fdic_context(monkeypatch):
     assert f["pilot_audience_basis"] == "interested_unbanked" and f["state_fdic_unbanked_households"] > 0
     assert "Audience:" in plan["markdown"] and "State FDIC survey" in plan["markdown"]
     assert not [w for w in plan["warnings"] if w.startswith("Number")], plan["warnings"]
+
+
+def test_plan_for_target_bank_uses_its_tier(monkeypatch):
+    ai_off(monkeypatch)
+    fips = next((f for f, fr in store.frustration.items() if len(f) == 5 and fr.status == "ok" and f in store.banks.get("areas", {})), None)
+    if not fips:
+        pytest.skip("needs frustration and bank data for the same county")
+    bank = client.get(f"/api/areas/{fips}/banks?n=10").json()["banks"][0]
+    plan = client.post("/api/plan", json={"fips": fips, "bank_cert": bank["cert"]}).json()
+    f = plan["facts_used"]
+    assert f["target_bank"] == bank["name"] and f["partner_name"] == bank["name"]
+    assert f["issuer_type"] == bank["issuer_type"]
+    assert "Proposed issuer: " + bank["name"] in plan["markdown"]
+    assert client.post("/api/plan", json={"fips": fips, "bank_cert": "0"}).status_code == 404
