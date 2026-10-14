@@ -100,7 +100,7 @@ export default function AreaProfilePanel({ fips, onSelect }: { fips: string | nu
                       <span className={`block h-2 rounded ${top ? "bg-accent" : "bg-navy-soft/60"}`} style={{ width: `${(share / maxShare) * 100}%` }} />
                     </span>
                     <span className="whitespace-nowrap text-right tabular-nums text-navy">{fmtPct(share, 0)}</span>
-                    <span className="whitespace-nowrap text-right tabular-nums text-muted" title="Pain score: topic share vs national, weighted by intensity">
+                    <span className="whitespace-nowrap text-right tabular-nums text-muted" title={fr.mean_intensity == null ? "Pain score: topic share vs national" : "Pain score: topic share vs national, weighted by intensity"}>
                       {pain?.toFixed(2) ?? "—"}
                     </span>
                   </li>
