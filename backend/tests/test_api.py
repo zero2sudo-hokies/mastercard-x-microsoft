@@ -101,6 +101,7 @@ def test_branch_pins():
     fips = next(f for f in ("36005", "48215") if f in store.areas)
     pins = client.get(f"/api/areas/{fips}/branches").json()["branches"]
     assert pins and all(-180 < p["lon"] < -60 and 15 < p["lat"] < 72 for p in pins)
+    assert all(p["website"] == store.banks["institutions"].get(p["cert"], {}).get("website") for p in pins)
     top = client.get(f"/api/areas/{fips}/banks?n=1").json()["banks"][0]
     ranked = [p for p in pins if p["rank"] == 1]
     assert len(ranked) == top["branches"] and all(p["bank"] == top["name"] for p in ranked)

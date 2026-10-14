@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui";
 import BankLogo from "@/components/ui/BankLogo";
 import { getBanks } from "@/lib/api";
-import { pinColor } from "@/lib/banks";
 import { fmtPct } from "@/lib/format";
 import type { BankLeaderboard } from "@/lib/types";
 
@@ -53,14 +52,11 @@ export default function TopBanksStrip({ fips, name, selected = null, onSelect }:
                 aria-pressed={on}
                 onClick={() => onSelect?.(on ? null : b.cert)}
                 className={`h-full w-full rounded-lg border bg-white p-2 text-left text-xs transition ${on ? "border-2 shadow-sm" : "border-line"} ${dimmed ? "opacity-50" : ""} ${onSelect ? "cursor-pointer hover:border-navy" : "cursor-default"}`}
-                style={on ? { borderColor: pinColor(b.rank) } : undefined}
+                style={on ? { borderColor: "#0b1f3a" } : undefined}
                 title={onSelect ? (on ? "Show all branches" : `Show only ${b.name} branches`) : undefined}
               >
               <div className="flex items-start gap-2">
                 <BankLogo name={b.name} website={b.website} />
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold text-white" style={{ background: pinColor(b.rank) }}>
-                  {b.rank}
-                </span>
                 <span className="line-clamp-2 font-medium text-navy" title={b.name}>
                   {b.name}
                 </span>
@@ -80,7 +76,7 @@ export default function TopBanksStrip({ fips, name, selected = null, onSelect }:
       )}
       {data && (
         <p className="mt-2 text-[11px] text-muted">
-          FDIC Summary of Deposits, {data.as_of}. Ranked by local deposits, the public proxy for customers. Map pins: numbered colors = these banks, grey = other banks.{onSelect ? " Click a bank to show only its branches." : ""}
+          FDIC Summary of Deposits, {data.as_of}. Ranked by local deposits, the public proxy for customers. Map logos show bank branches.{onSelect ? " Click a bank to show only its branches." : ""}
         </p>
       )}
     </div>

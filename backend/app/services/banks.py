@@ -41,7 +41,7 @@ def branch_pins(fips: str) -> BranchPins:
     ranks = {b["cert"]: i for i, b in enumerate(((store.banks.get("areas") or {}).get(fips) or {}).get("banks", []), start=1)}
     names = store.banks.get("institutions") or {}
     return BranchPins(fips=fips, as_of=store.branches.get("as_of"), branches=[
-        BranchPin(cert=c, bank=names.get(c, {}).get("name") if c in ranks else None, branch=b, lat=lat, lon=lon, rank=ranks.get(c))
+        BranchPin(cert=c, bank=names.get(c, {}).get("name"), website=names.get(c, {}).get("website"), branch=b, lat=lat, lon=lon, rank=ranks.get(c))
         for c, lat, lon, b in rows])
 
 

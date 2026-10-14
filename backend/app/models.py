@@ -277,8 +277,9 @@ class BankLeaderboard(BaseModel):
 
 
 class BranchPin(BaseModel):
+    website: Optional[str] = None
     cert: str
-    bank: Optional[str] = None  # null for banks outside the area's top 10
+    bank: Optional[str] = None  # null when institution metadata is unavailable
     branch: str
     lat: float
     lon: float
