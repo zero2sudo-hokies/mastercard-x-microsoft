@@ -8,7 +8,7 @@
 
 > 🎬 **Demo video:** _coming soon_
 
-**Live site:** https://zero2sudo-hokies.github.io/mastercard-x-microsoft/ · Built for **LEAD ASPIRE 2026** at Microsoft Times Square, for the client **Mastercard**.
+**Live site:** https://ashy-desert-0ad29150f.3.azurestaticapps.net · Built for **LEAD ASPIRE 2026** at Microsoft Times Square, for the client **Mastercard**.
 
 ---
 
@@ -65,7 +65,7 @@ flowchart LR
 3. **Foundry agent and pilot plan.** We tested the agent with varied prompts and tightened it each round: a fixed refusal for protected-attribute requests, plain wording instead of field names, correct "volume is not revenue" language, and a number check that catches invented figures.
 4. **Sourcing every number.** An audit found ROI inputs without citations. Each was traced to the Federal Reserve, FDIC, PULSE, Moebs, FirstPage Sage, the Mastercard 10-K or the Global Findex. Values changed where a source disagreed, which moved breakeven churn from 16.1% to 8.8%. We kept that harder number.
 5. **Bank partners.** We added FDIC branch deposits and call reports, so the question "which issuer do we approach?" has data behind it.
-6. **Hosting.** A static frontend on GitHub Pages and a containerized backend with rate limiting, so the Foundry key never reaches the browser.
+6. **Hosting.** We first prepared a GitHub Pages build, then moved to Azure: Static Web Apps for the frontend and App Service for the API, deployed by GitHub Actions with keyless OIDC sign-in. The Foundry key lives only in App Service settings, and AI calls are rate limited per visitor.
 
 ## Built with
 
@@ -75,7 +75,7 @@ flowchart LR
 | Backend | FastAPI, Python 3.11, pydantic v2, NumPy |
 | AI | **Azure AI Foundry** (Azure OpenAI v1 endpoint, `gpt-5-mini`) with tool calling |
 | Data | Census ACS 2020-2024, FDIC household survey 2023, FDIC BankFind and Summary of Deposits 2026, FDIC call reports Q2 2026, CFPB Consumer Complaint Database, Census Gazetteer and ZCTA crosswalk |
-| Hosting | **GitHub Pages** (frontend, GitHub Actions) + Docker container for the API (Azure Container Apps ready) |
+| Hosting | **Azure Static Web Apps** (frontend) + **Azure App Service** (API), deployed by **GitHub Actions** CI/CD (lint, tests, build, OIDC deploy, health checks) |
 | Tooling | GitHub, pytest, ESLint |
 
 ## Why it's different
@@ -118,7 +118,7 @@ Open http://localhost:3000. Tests: `pytest -q` in `backend/`.
 
 **Rebuild the data:** `data/exclusion/` (fetch.py, then build.py), `data/frustration/build_ny.py`, `data/banks/build_banks.py`. Each folder has a README with sources, method and limits.
 
-**Host it:** see [docs/deploy.md](docs/deploy.md).
+**Deploy:** open a pull request to `main`. CI checks the frontend and backend, and merging deploys to Azure. Details in [docs/deploy.md](docs/deploy.md).
 
 ## Limits we state openly
 
@@ -135,7 +135,7 @@ Open http://localhost:3000. Tests: `pytest -q` in `backend/`.
 | `backend/app/` | API, services (merge, recommend, look-alikes, ROI, banks), Foundry agent and plan (`ai/`) |
 | `data/exclusion/`, `data/frustration/`, `data/banks/`, `data/p3/` | Data pipelines and inputs |
 | `CONTRACTS.md` | API and data contracts |
-| `docs/deploy.md` | Hosting guide |
+| `docs/deploy.md`, `.github/workflows/azure.yml` | Hosting guide and CI/CD pipeline |
 
 ## Team
 
