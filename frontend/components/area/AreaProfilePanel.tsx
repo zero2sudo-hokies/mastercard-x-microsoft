@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Badge, Card, DataStatusBadge, EmptyState, ErrorBox, SourceNote, Spinner, Stat, TopicIcon } from "@/components/ui";
 import { getProfile } from "@/lib/api";
-import { fmtInt, fmtPct, fmtScore } from "@/lib/format";
+import { fmtInt, fmtMiles, fmtPct, fmtScore } from "@/lib/format";
 import { TOPIC_LABEL, TOPICS } from "@/lib/topics";
 import type { AreaProfile } from "@/lib/types";
 
@@ -143,7 +143,7 @@ export default function AreaProfilePanel({ fips, onSelect }: { fips: string | nu
 
       <Card title={`Look-alike ${isCounty ? "counties" : "states"}`}>
         {lookalikes.length === 0 ? (
-          <EmptyState title="No look-alikes yet">Look-alikes need areas with enough complaint data at least 150 km away.</EmptyState>
+          <EmptyState title="No look-alikes yet">Look-alikes need areas with enough complaint data at least about 93 miles away.</EmptyState>
         ) : (
           <ul className="divide-y divide-line">
             {lookalikes.map((l) => (
@@ -154,7 +154,7 @@ export default function AreaProfilePanel({ fips, onSelect }: { fips: string | nu
                       {l.name}, {l.state_abbr}
                     </span>
                     <span className="block text-muted">
-                      {fmtInt(l.distance_km)} km away · exclusion {fmtScore(l.exclusion_index)}
+                      {fmtMiles(l.distance_km)} away · exclusion {fmtScore(l.exclusion_index)}
                       {l.top_topic ? ` · ${TOPIC_LABEL[l.top_topic]}` : ""}
                     </span>
                   </span>

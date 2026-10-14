@@ -1,6 +1,7 @@
 const dash = "—";
 
 export const fmtInt = (n: number | null | undefined) => (n == null ? dash : Math.round(n).toLocaleString("en-US"));
+export const fmtMiles = (km: number | null | undefined) => (km == null ? dash : `${fmtInt(km / 1.609344)} miles`);
 
 export function fmtUSD(n: number | null | undefined) {
   if (n == null) return dash;
