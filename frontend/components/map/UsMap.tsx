@@ -215,10 +215,10 @@ function Tooltip({ s, x, y, width }: { s: AreaSummary; x: number; y: number; wid
         {s.name}
         {s.level === "county" ? `, ${s.state_abbr}` : ""}
       </div>
-      <Row k="Exclusion index" v={fmtScore(s.exclusion_index)} />
-      <Row k="Frustration score" v={s.frustration_status === "ok" ? fmtScore(s.frustration_score) : "Not enough data"} />
-      <Row k="Top frustration" v={s.top_topic && s.frustration_status === "ok" ? TOPIC_LABEL[s.top_topic] : "—"} />
-      <Row k="Est. underserved households" v={`${fmtInt(s.est_underserved_hh)} (modeled)`} />
+      {s.exclusion_index != null && <Row k="Exclusion index" v={fmtScore(s.exclusion_index)} />}
+      {s.frustration_status === "ok" && s.frustration_score != null && <Row k="Frustration score" v={fmtScore(s.frustration_score)} />}
+      {s.frustration_status === "ok" && s.top_topic && <Row k="Top frustration" v={TOPIC_LABEL[s.top_topic]} />}
+      {s.est_underserved_hh != null && <Row k="Est. underserved households" v={`${fmtInt(s.est_underserved_hh)} (modeled)`} />}
     </div>
   );
 }
