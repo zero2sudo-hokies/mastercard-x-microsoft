@@ -1,6 +1,13 @@
 @import "tailwindcss";
 
 @theme inline {
+  --color-background: #ffffff;
+  --color-foreground: #0b1f3a;
+  --color-popover: #ffffff;
+  --color-popover-foreground: #0b1f3a;
+  --color-muted-foreground: #5b6577;
+  --color-border: #e4e2dc;
+  --color-ring: #f79e1b;
   --color-navy: #0b1f3a;
   --color-navy-soft: #1d3557;
   --color-accent: #f79e1b;
@@ -41,3 +48,6 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .map-layer, .county-lift, .county-label, .branch-pins { transition: none; animation: none; }
 }
+
+.maplibregl-popup-content { background: transparent !important; box-shadow: none !important; padding: 0 !important; }
+.maplibregl-popup-tip { display: none; }

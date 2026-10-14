@@ -38,3 +38,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 ### Bank logos
 
 Bank cards, comparison headers and bank-specific pilot plans use Brandfetch logos. Official websites come from FDIC BankFind institutions, matched by certificate number. Set `NEXT_PUBLIC_BRANDFETCH_CLIENT_ID` in `.env.local` using the public Logo API client ID from https://developers.brandfetch.com (not a secret Brand API key). For Azure builds, set the repository Actions variable with the same name and redeploy. Next.js embeds this value at build time. Missing configuration, missing websites and image errors show bank initials instead.
+
+### County map navigation
+
+Pinch within a focused county to zoom; drag to pan. Desktop trackpad pinch is supported, with two-finger scrolling to pan when zoomed. Crowded branch markers use dots and switch to logos as room opens up. Reset view returns to the county overview; keyboard users can focus the map and use plus/minus and zero. Run `npm test` for marker overlap and zoom-anchor checks.

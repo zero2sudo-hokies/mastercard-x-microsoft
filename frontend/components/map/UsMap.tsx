@@ -1,79 +1,25 @@
 "use client";
 
-import { geoAlbersUsa, geoPath } from "d3-geo";
-import type { Feature, Geometry } from "geojson";
+import { geoBounds, geoCentroid } from "d3-geo";
+import type { Feature, FeatureCollection, Geometry } from "geojson";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { feature, mesh } from "topojson-client";
+import { feature } from "topojson-client";
 import type { GeometryCollection, Topology } from "topojson-specification";
-import us from "us-atlas/counties-albers-10m.json";
+import us from "us-atlas/counties-10m.json";
+import { Map as RegionMap, MapControls, MapGeoJSON, MapMarker, MarkerContent, MarkerTooltip, useMap, type MapGeoJSONEvent } from "@/components/ui/map";
 import BankLogo from "@/components/ui/BankLogo";
+import { bankDotColor, crowdedMarkers } from "@/lib/marker-layout";
 import { fmtInt, fmtScore } from "@/lib/format";
 import { TOPIC_ICON, TOPIC_LABEL } from "@/lib/topics";
 import type { AreaSummary, BranchPin, Layer, TopicId } from "@/lib/types";
 
-const W = 975;
-const H = 610;
-const FULL: ViewBox = [0, 0, W, H];
-type ViewBox = [number, number, number, number];
+const topology = us as unknown as Topology<{ states: GeometryCollection; counties: GeometryCollection }>;
+const stateShapes = (feature(topology, topology.objects.states) as FeatureCollection).features;
+const countyShapes = (feature(topology, topology.objects.counties) as FeatureCollection).features;
+const regionBounds = (shape: Feature) => geoBounds(shape) as [[number, number], [number, number]];
 
 export const NAVY_RAMP = ["#e6ebf3", "#b4c3da", "#7a92ba", "#3f5f96", "#0b1f3a"];
 export const HEAT_RAMP = ["#fdebd0", "#fbc580", "#f79e1b", "#dd5a26", "#a8231c"];
-
-// ---- geometry, computed once per page load ----
-type Shape = { id: string; d: string; centroid: [number, number] };
-type Box = [[number, number], [number, number]];
-type Geo = {
-  states: Shape[];
-  stateBounds: Record<string, ViewBox>;
-  countyBoxes: Record<string, Box>;
-  countiesByState: Record<string, Shape[]>;
-  stateBorders: string;
-  nation: string;
-};
-let GEO: Geo | null = null;
-// us-atlas counties-albers-10m is pre-projected with exactly this projection, so lat/lon pins line up with the shapes
-const PROJECT = geoAlbersUsa().scale(1300).translate([487.5, 305]);
-
-function fit([[x0, y0], [x1, y1]]: [[number, number], [number, number]]): ViewBox {
-  const pad = 24;
-  let w = x1 - x0 + 2 * pad;
-  let h = y1 - y0 + 2 * pad;
-  if (w / h > W / H) h = w / (W / H);
-  else w = h * (W / H);
-  return [(x0 + x1) / 2 - w / 2, (y0 + y1) / 2 - h / 2, w, h];
-}
-
-/** A view where the county fills about half the frame, leaving room for the lift and the blurred context. */
-function fitFocus([[x0, y0], [x1, y1]]: Box): ViewBox {
-  // pad relative to the county so small and large counties both fill about 45% of the frame
-  const pad = Math.max(x1 - x0, y1 - y0) * 0.6;
-  return fit([[x0 - pad + 24, y0 - pad + 24], [x1 + pad - 24, y1 + pad - 24]]);
-}
-
-function geo(): Geo {
-  if (GEO) return GEO;
-  const topo = us as unknown as Topology<{ states: GeometryCollection; counties: GeometryCollection; nation: GeometryCollection }>;
-  const path = geoPath();
-  const toShape = (f: Feature<Geometry>) => ({ id: String(f.id), d: path(f) ?? "", centroid: path.centroid(f) as [number, number] });
-  const stateFeatures = (feature(topo, topo.objects.states) as unknown as { features: Feature<Geometry>[] }).features;
-  const countyFeatures = (feature(topo, topo.objects.counties) as unknown as { features: Feature<Geometry>[] }).features;
-  const countiesByState: Record<string, Shape[]> = {};
-  const countyBoxes: Record<string, Box> = {};
-  for (const f of countyFeatures) {
-    const s = toShape(f);
-    (countiesByState[s.id.slice(0, 2)] ??= []).push(s);
-    countyBoxes[s.id] = path.bounds(f) as Box;
-  }
-  GEO = {
-    states: stateFeatures.map(toShape),
-    stateBounds: Object.fromEntries(stateFeatures.map((f) => [String(f.id), fit(path.bounds(f) as [[number, number], [number, number]])])),
-    countiesByState,
-    countyBoxes,
-    stateBorders: path(mesh(topo, topo.objects.states, (a, b) => a !== b)) ?? "",
-    nation: path(mesh(topo, topo.objects.nation)) ?? "",
-  };
-  return GEO;
-}
 
 // ---- color scales ----
 export type Scale = { thresholds: number[]; ramp: string[]; color: (s: AreaSummary) => string | null; title: string };
@@ -107,7 +53,6 @@ export function makeScale(rows: AreaSummary[], layer: Layer, topic: TopicId | nu
   };
 }
 
-// ---- component ----
 type Props = {
   states: Map<string, AreaSummary>;
   counties: Map<string, AreaSummary>;
@@ -127,166 +72,148 @@ type Props = {
   highlightCert?: string | null;
 };
 
-export default function UsMap({ states, counties, stateFips, layer, topic, selectedFips, focusFips, onStateClick, onCountyClick, focusSelected, onClearFocus, pins = [], highlightCert = null }: Props) {
-  const g = geo();
-  const focusShape = focusSelected && selectedFips && stateFips ? g.countiesByState[stateFips]?.find((c) => c.id === selectedFips) : undefined;
-  const target = focusShape ? fitFocus(g.countyBoxes[focusShape.id]) : stateFips && g.stateBounds[stateFips] ? g.stateBounds[stateFips] : FULL;
-  const depth = target[3] * 0.03; // lift height in map units, from the final view so it does not wobble while zooming
-  const [vb, settled] = useAnimatedViewBox(target);
-  // effects start only after the zoom lands: blurring the whole map on every zoom frame is what made it lag
-  const focused = focusShape && settled ? focusShape : undefined;
-  const k = vb[2] / W; // zoom factor for strokes, patterns and glyphs
-  const wrap = useRef<HTMLDivElement>(null);
-  const [hover, setHover] = useState<{ fips: string; x: number; y: number; w: number } | null>(null);
-
-  const countyShapes = stateFips ? (g.countiesByState[stateFips] ?? []) : [];
-  const visibleRows = stateFips ? countyShapes.map((c) => counties.get(c.id)).filter((s): s is AreaSummary => !!s) : [...states.values()];
-  const scale = useMemo(() => makeScale(visibleRows, layer, topic), [visibleRows.length, layer, topic, states, counties, stateFips]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const fillFor = (s: AreaSummary | undefined) => (s ? (scale.color(s) ?? "url(#hatch)") : "url(#hatch)");
-  const highlighted = new Set([...(selectedFips ? [selectedFips] : []), ...focusFips]);
-  const allShapes = [...g.states, ...countyShapes];
-  const hovered = hover ? (counties.get(hover.fips) ?? states.get(hover.fips)) : undefined;
-
-  const track = (fips: string, e: React.MouseEvent) => {
-    const r = wrap.current?.getBoundingClientRect();
-    if (r) setHover({ fips, x: e.clientX - r.left, y: e.clientY - r.top, w: r.width });
-  };
-
+export default function UsMap(props: Props) {
+  const { states, counties, stateFips, layer, topic, selectedFips, focusFips, focusSelected } = props;
+  const shapes = useMemo(() => stateFips ? countyShapes.filter((s) => String(s.id).slice(0, 2) === stateFips) : stateShapes, [stateFips]);
+  const rows = useMemo(() => shapes.flatMap((s) => {
+    const row = (stateFips ? counties : states).get(String(s.id));
+    return row ? [row] : [];
+  }), [shapes, stateFips, counties, states]);
+  const scale = useMemo(() => makeScale(rows, layer, topic), [rows, layer, topic]);
+  const focused = focusSelected && stateFips ? shapes.find((s) => String(s.id) === selectedFips) : undefined;
+  const data = useMemo<FeatureCollection<Geometry, { fips: string; color: string; opacity: number; outline: string; width: number }>>(() => ({
+    type: "FeatureCollection",
+    features: shapes.map((s) => {
+      const fips = String(s.id);
+      const row = (stateFips ? counties : states).get(fips);
+      return { ...s, properties: { fips, color: row ? scale.color(row) ?? "#f1f0ec" : "#f1f0ec",
+        opacity: focused && fips !== selectedFips ? 0.25 : 0.65,
+        outline: fips === selectedFips || focusFips.includes(fips) ? "#f79e1b" : "#ffffff",
+        width: fips === selectedFips || focusFips.includes(fips) ? 3 : 0.7 } };
+    }),
+  }), [shapes, stateFips, counties, states, scale, focused, selectedFips, focusFips]);
+  const contextStates = useMemo<FeatureCollection<Geometry, { fips: string }>>(() => ({
+    type: "FeatureCollection",
+    features: stateShapes.filter((s) => String(s.id) !== stateFips).map((s) => ({ ...s, properties: { fips: String(s.id) } })),
+  }), [stateFips]);
+  const [hover, setHover] = useState<MapGeoJSONEvent<{ fips: string }> | null>(null);
+  const hovered = hover ? (stateFips ? counties : states).get(hover.feature.properties.fips) : undefined;
   return (
-    <div ref={wrap} className="relative w-full" onMouseLeave={() => setHover(null)}>
-      <svg viewBox={vb.join(" ")} className="block h-auto w-full" role="img" aria-label={`US map, ${scale.title}`}>
-        <defs>
-          <pattern id="hatch" patternUnits="userSpaceOnUse" width={6 * k} height={6 * k} patternTransform="rotate(45)">
-            <rect width={6 * k} height={6 * k} fill="#f1f0ec" />
-            <line x1="0" y1="0" x2="0" y2={6 * k} stroke="#c8c4ba" strokeWidth={2 * k} />
-          </pattern>
-          <filter id="lift-shadow" x="-50%" y="-50%" width="200%" height="200%">
-            <feDropShadow dx="0" dy={depth * 0.6} stdDeviation={depth * 0.9} floodColor="#0b1f3a" floodOpacity="0.45" />
-          </filter>
-        </defs>
-        <g className={`map-layer ${focused ? "map-dim" : ""}`}>
-
-        {g.states.map((s) => {
-          const inState = s.id === stateFips;
-          const dim = stateFips && !inState;
-          return (
-            <path
-              key={s.id}
-              d={s.d}
-              className="map-path cursor-pointer"
-              fill={dim ? "#ebe9e3" : stateFips ? "none" : fillFor(states.get(s.id))}
-              stroke="#ffffff"
-              strokeWidth={0.6}
-              onClick={() => onStateClick(s.id)}
-              onMouseMove={stateFips ? undefined : (e) => track(s.id, e)}
-            />
-          );
-        })}
-
-        {countyShapes.map((c) => (
-          <path
-            key={c.id}
-            d={c.d}
-            className="map-path cursor-pointer hover:opacity-80"
-            fill={fillFor(counties.get(c.id))}
-            stroke="#ffffff"
-            strokeWidth={0.4}
-            onClick={() => onCountyClick(c.id)}
-            onMouseMove={(e) => track(c.id, e)}
-          />
-        ))}
-
-        <path d={g.stateBorders} fill="none" stroke="#ffffff" strokeWidth={1.2} className="map-path pointer-events-none" />
-        {stateFips && (
-          <path d={g.states.find((s) => s.id === stateFips)?.d} fill="none" stroke="#0b1f3a" strokeWidth={1.2} className="map-path pointer-events-none" />
-        )}
-
-        {layer === "frustration" &&
-          stateFips &&
-          countyShapes.map((c) => {
-            const s = counties.get(c.id);
-            if (!s?.top_topic || s.frustration_status !== "ok" || !s.pain_scores) return null;
-            const clear = isClearLead(s);
-            if (!clear) return null;
-            const size = 6 * k;
-            return (
-              <g key={`g${c.id}`} transform={`translate(${c.centroid[0] - size / 2},${c.centroid[1] - size / 2}) scale(${size / 24})`} className="pointer-events-none">
-                <circle cx="12" cy="12" r="13" fill="#ffffff" opacity="0.85" />
-                <path d={TOPIC_ICON[s.top_topic]} fill="none" stroke="#0b1f3a" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
-              </g>
-            );
+    <div className="relative w-full">
+      <div className="relative h-[610px] max-h-[75vh] min-h-[360px] overflow-hidden rounded-lg border border-line bg-white" onMouseLeave={() => setHover(null)}>
+        <RegionMap theme="light" styles={{ light: `${process.env.NEXT_PUBLIC_BASE_PATH || ""}/map-style-light.json` }} center={[-98, 38]} zoom={3.3} minZoom={2} maxZoom={18} renderWorldCopies={false}>
+          {stateFips && <MapGeoJSON<{ fips: string }> id="surrounding-states" beforeId="waterway_label" data={contextStates} promoteId="fips" interactive
+            fillPaint={{ "fill-color": "#ebe9e3", "fill-opacity": ["interpolate", ["linear"], ["zoom"], 6, 0.55, 12, 0.08, 15, 0] }}
+            linePaint={{ "line-color": "#ffffff", "line-width": 0.7 }}
+            onClick={(e) => {
+              setHover(null);
+              if (focused) props.onClearFocus?.();
+              else props.onStateClick(e.feature.properties.fips);
+            }} />}
+          <MapGeoJSON<{ fips: string }> id="regions" beforeId="waterway_label" data={data} promoteId="fips" interactive
+            fillPaint={{ "fill-color": ["get", "color"], "fill-opacity": ["interpolate", ["linear"], ["zoom"], 7, ["case", ["boolean", ["feature-state", "hover"], false], 0.85, ["get", "opacity"]], 11, ["case", ["boolean", ["feature-state", "hover"], false], 0.25, 0.18], 14, ["case", ["boolean", ["feature-state", "hover"], false], 0.06, 0.03]] }}
+            linePaint={{ "line-color": ["get", "outline"], "line-width": ["get", "width"] }}
+            onHover={setHover} onClick={(e) => {
+              setHover(null);
+              if (focused && e.feature.properties.fips !== selectedFips) props.onClearFocus?.();
+              else if (!focused) (stateFips ? props.onCountyClick : props.onStateClick)(e.feature.properties.fips);
+            }} />
+          <MapNavigation stateFips={stateFips} focused={focused} focusColor={selectedFips && counties.has(selectedFips) ? scale.color(counties.get(selectedFips)!) ?? "#f1f0ec" : "#f1f0ec"} onClearFocus={props.onClearFocus} />
+          {layer === "frustration" && stateFips && shapes.map((shape) => {
+            const row = counties.get(String(shape.id));
+            if (!row?.top_topic || row.frustration_status !== "ok" || !isClearLead(row) || (focused && String(shape.id) !== selectedFips)) return null;
+            const [longitude, latitude] = geoCentroid(shape);
+            return <MapMarker key={String(shape.id)} longitude={longitude} latitude={latitude}>
+              <MarkerContent className="pointer-events-none"><svg width="20" height="20" viewBox="0 0 24 24" className="pointer-events-none rounded-full bg-white p-0.5" aria-label={TOPIC_LABEL[row.top_topic]}><path d={TOPIC_ICON[row.top_topic]} fill="none" stroke="#0b1f3a" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" /></svg></MarkerContent>
+            </MapMarker>;
           })}
-
-        {allShapes
-          .filter((s) => highlighted.has(s.id))
-          .map((s) => (
-            <path key={`h${s.id}`} d={s.d} fill="none" stroke="#f79e1b" strokeWidth={3} className="map-path pointer-events-none" />
-          ))}
-        </g>
-
-        {focused && (
-          <>
-            {/* clicking anywhere on the blurred map goes back to the state view */}
-            <rect x={vb[0]} y={vb[1]} width={vb[2]} height={vb[3]} fill="transparent" className="cursor-zoom-out" onClick={onClearFocus} onMouseMove={() => setHover(null)} />
-            <g className="county-lift" style={{ "--lift": `${depth}px` } as React.CSSProperties}>
-              {Array.from({ length: 6 }, (_, i) => 6 - i).map((i) => (
-                <path
-                  key={i}
-                  d={focused.d}
-                  transform={`translate(0 ${(depth * i) / 6})`}
-                  fill="#0b1f3a"
-                  opacity={0.22 + (6 - i) * 0.05}
-                  filter={i === 6 ? "url(#lift-shadow)" : undefined}
-                  className="map-path pointer-events-none"
-                />
-              ))}
-              <path d={focused.d} fill={fillFor(counties.get(focused.id))} stroke="#ffffff" strokeWidth={1.5} className="map-path" onMouseMove={(e) => track(focused.id, e)} />
-              <path d={focused.d} fill="none" stroke="#f79e1b" strokeWidth={2.5} className="map-path pointer-events-none" />
-              <g className="branch-pins">
-                {/* drawn bottom-up: other banks, then the top 3, then the highlighted bank */}
-                {[...pins]
-                  .map((p) => ({ p, z: highlightCert ? (p.cert === highlightCert ? 2 : 0) : p.rank && p.rank <= 3 ? 1 : 0 }))
-                  .sort((a, b) => a.z - b.z)
-                  .map(({ p }, i) => {
-                  const xy = PROJECT([p.lon, p.lat]);
-                  if (!xy) return null;
-                  const top = p.rank != null && p.rank <= 3;
-                  const lit = highlightCert ? p.cert === highlightCert : true;
-                  const r = target[3] * (highlightCert && lit ? 0.028 : top ? 0.023 : 0.016);
-                  return (
-                    <svg key={i} x={xy[0] - r} y={xy[1] - r} width={r * 2} height={r * 2} viewBox="0 0 40 40" opacity={!lit ? 0.12 : 1} className="pin">
-                      <title>{`${p.bank ?? "Other bank"} · ${p.branch}`}</title>
-                      <foreignObject width="40" height="40">
-                        <BankLogo name={p.bank ?? "Other bank"} website={p.website} />
-                      </foreignObject>
-                    </svg>
-                  );
-                })}
-              </g>
-            </g>
-            <text
-              x={focused.centroid[0]}
-              y={g.countyBoxes[focused.id][0][1] - depth * 2.2}
-              textAnchor="middle"
-              fontSize={target[3] * 0.04}
-              fontWeight={600}
-              fill="#0b1f3a"
-              stroke="#ffffff"
-              strokeWidth={target[3] * 0.012}
-              paintOrder="stroke"
-              className="county-label pointer-events-none"
-            >
-              {counties.get(focused.id)?.name ?? ""}
-            </text>
-          </>
-        )}
-      </svg>
-
-      {hover && hovered && <Tooltip s={hovered} x={hover.x} y={hover.y} width={hover.w} />}
+          {focused && <BranchMarkers pins={props.pins ?? []} highlightCert={props.highlightCert ?? null} />}
+          <MapControls position="bottom-right" showZoom showCompass />
+        </RegionMap>
+        {focused && <button onClick={props.onClearFocus} className="absolute left-3 top-3 rounded-lg border border-line bg-white px-3 py-2 text-xs shadow-sm">Back to state</button>}
+        {hover && hovered && <Tooltip s={hovered} x={hover.originalEvent.point.x} y={hover.originalEvent.point.y} width={hover.originalEvent.target.getContainer().clientWidth} />}
+      </div>
       <Legend scale={scale} />
     </div>
   );
+}
+
+function MapNavigation({ stateFips, focused, focusColor, onClearFocus }: { stateFips: string | null; focused?: Feature<Geometry>; focusColor: string; onClearFocus?: () => void }) {
+  const { map, isLoaded } = useMap();
+  const navigationStarted = useRef(false);
+  useEffect(() => {
+    if (!map || !isLoaded) return;
+    const pixels = new Uint8Array(8 * 8 * 4);
+    for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) {
+      const color = (x + y) % 8 < 2 ? [200, 196, 186, 255] : [241, 240, 236, 255];
+      pixels.set(color, (y * 8 + x) * 4);
+    }
+    map.addImage("no-data-hatch", { width: 8, height: 8, data: pixels });
+    map.addLayer({ id: "no-data-hatch", type: "fill", source: "geojson-source-regions",
+      filter: ["==", ["get", "color"], "#f1f0ec"],
+      paint: { "fill-pattern": "no-data-hatch", "fill-opacity": ["interpolate", ["linear"], ["zoom"], 7, ["get", "opacity"], 11, 0.18, 14, 0.03] } }, "waterway_label");
+    return () => {
+      if (!map.getStyle()) return;
+      if (map.getLayer("no-data-hatch")) map.removeLayer("no-data-hatch");
+      if (map.hasImage("no-data-hatch")) map.removeImage("no-data-hatch");
+    };
+  }, [map, isLoaded]);
+  useEffect(() => {
+    if (!map || !isLoaded) return;
+    const duration = navigationStarted.current ? 650 : 0;
+    navigationStarted.current = true;
+    const shape = focused ?? stateShapes.find((s) => String(s.id) === stateFips);
+    if (shape) map.fitBounds(regionBounds(shape), { padding: focused ? 100 : 40, maxZoom: focused ? 12 : 8, pitch: focused ? 35 : 0, duration });
+    else map.fitBounds([[-125, 24], [-66, 50]], { padding: 30, pitch: 0, duration });
+  }, [map, isLoaded, stateFips, focused]);
+  useEffect(() => {
+    if (!map || !isLoaded || !focused) return;
+    const bounds = regionBounds(focused);
+    const height = Math.max(500, (bounds[1][1] - bounds[0][1]) * 4000);
+    map.addSource("county-focus", { type: "geojson", data: focused });
+    map.addLayer({ id: "county-focus", type: "fill-extrusion", source: "county-focus", paint: {
+      "fill-extrusion-color": focusColor, "fill-extrusion-height": ["interpolate", ["linear"], ["zoom"], 10, height, 13, 0], "fill-extrusion-opacity": ["interpolate", ["linear"], ["zoom"], 10, 0.2, 13, 0],
+    } }, "waterway_label");
+    return () => {
+      if (!map.getStyle()) return;
+      if (map.getLayer("county-focus")) map.removeLayer("county-focus");
+      if (map.getSource("county-focus")) map.removeSource("county-focus");
+    };
+  }, [map, isLoaded, focused, focusColor]);
+  useEffect(() => {
+    if (!map || !isLoaded || !focused) return;
+    const clear = (e: import("maplibre-gl").MapMouseEvent) => {
+      if (!map.queryRenderedFeatures(e.point, { layers: ["geojson-fill-regions"] }).length) onClearFocus?.();
+    };
+    map.on("click", clear);
+    return () => { map.off("click", clear); };
+  }, [map, isLoaded, focused, onClearFocus]);
+  return null;
+}
+
+function BranchMarkers({ pins, highlightCert }: { pins: BranchPin[]; highlightCert: string | null }) {
+  const { map } = useMap();
+  const [, setRevision] = useState(0);
+  useEffect(() => {
+    if (!map) return;
+    const update = () => setRevision((n) => n + 1);
+    map.on("moveend", update);
+    return () => { map.off("moveend", update); };
+  }, [map]);
+  const crowded = (() => {
+    const active = pins.map((p, i) => ({ p, i })).filter(({ p }) => !highlightCert || p.cert === highlightCert);
+    const overlapping = crowdedMarkers(active.map(({ p }) => map?.project([p.lon, p.lat]) ?? { x: 0, y: 0 }), 36);
+    return new Set(active.filter((_, i) => overlapping.has(i)).map(({ i }) => i));
+  })();
+  return pins.map((p, i) => {
+    const lit = !highlightCert || p.cert === highlightCert;
+    return <MapMarker key={`${p.cert}-${i}`} longitude={p.lon} latitude={p.lat}>
+      <MarkerContent><div style={{ opacity: lit ? 1 : 0.15 }}>
+        {lit && !crowded.has(i) ? <div className="h-8 w-8 [&>span]:h-8 [&>span]:w-8 [&>span]:rounded-sm [&>span]:text-xs [&_img]:h-8 [&_img]:w-8 [&_img]:p-0.5"><BankLogo name={p.bank ?? "Other bank"} website={p.website} /></div> : <div className="h-2 w-2 rounded-full border border-white" style={{ background: bankDotColor(p.rank) }} />}
+      </div></MarkerContent>
+      <MarkerTooltip className="border border-line bg-white text-navy">{p.bank ?? "Other bank"} · {p.branch}</MarkerTooltip>
+    </MapMarker>;
+  });
 }
 
 // clear_lead lives on FrustrationArea; summaries carry pain scores, so recompute the same rule (lead >= 1.15)
@@ -340,29 +267,4 @@ function Legend({ scale }: { scale: Scale }) {
       </span>
     </div>
   );
-}
-
-/** Animates the viewBox to the target and reports when it has landed (true at mount and after each zoom). */
-function useAnimatedViewBox(target: ViewBox): [ViewBox, boolean] {
-  const key = target.join(",");
-  const [vb, setVb] = useState<ViewBox>(target);
-  const [landed, setLanded] = useState(key);
-  const from = useRef<ViewBox>(target);
-  useEffect(() => {
-    const start = performance.now();
-    const a = from.current;
-    let raf = 0;
-    const step = (now: number) => {
-      const t = Math.min(1, (now - start) / 550);
-      const e = t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
-      const next = a.map((v, i) => v + (target[i] - v) * e) as ViewBox;
-      from.current = next;
-      setVb(next);
-      if (t < 1) raf = requestAnimationFrame(step);
-      else setLanded(key);
-    };
-    raf = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(raf);
-  }, [key]); // eslint-disable-line react-hooks/exhaustive-deps
-  return [vb, landed === key];
 }
