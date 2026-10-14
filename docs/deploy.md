@@ -1,59 +1,66 @@
-# Hosting Navigator live
+# Azure hosting and automatic deployments
 
-GitHub Pages serves static files only, so the app is split in two:
+All app resources are in `navigator-rg` in the Azure for Students subscription.
 
-| Part | Where | Why |
+| Component | Resource | Plan |
 |---|---|---|
-| Frontend (Next.js) | **GitHub Pages**, built by `.github/workflows/pages.yml` | Static export, free, on the sponsor's platform |
-| Backend (FastAPI + Foundry agent) | **Azure Container Apps** (or any Docker host) from the root `Dockerfile` | Needs a server, and the Foundry key must stay server-side |
+| Frontend | `navigator-web` (Azure Static Web Apps) | Free |
+| Backend | `navigator-api-f801edf9` on `navigator-free-plan` (Linux App Service, Central US) | F1 Free, Python 3.12 |
+| AI | `foundry-demo-ms`, including `proj-default` | Existing model billing; deployment `gpt-5-mini` |
+| GitHub deployment identity | `navigator-github-deploy` | Managed identity, no client secret |
 
-Site URL once live: `https://zero2sudo-hokies.github.io/mastercard-x-microsoft/`
+- Website: https://ashy-desert-0ad29150f.3.azurestaticapps.net
+- API health: https://navigator-api-f801edf9.azurewebsites.net/api/health
+- Workflow: `.github/workflows/azure.yml`
 
-Until a backend URL is set, Pages builds in **mock mode** (static sample data for New York, no live AI), so the link works from day one.
+The existing Foundry account was moved from `rg-im-demo`; its endpoint is unchanged. The backend stores its Foundry key in server-side App Service settings. HTTPS is required, and CORS allows the Azure frontend origin. GitHub Pages is disabled and its workflow has been removed.
 
-## 1. Repo visibility (decision)
-Pages on a private repo in a free organization is not available. Either make the repo **public** (Settings, General, Danger zone) or upgrade the org to GitHub Team. History has been checked: no keys were ever committed (`backend/.env` is gitignored).
+## Deploy a change
 
-## 2. Turn on Pages
-1. Settings, Pages, Source: **GitHub Actions**.
-2. Settings, Secrets and variables, Actions, **Variables** tab: add `NAVIGATOR_PAGES` = `on`.
-3. Actions, "Deploy frontend to GitHub Pages", **Run workflow**. The site appears at the URL above in about 2 minutes (mock mode).
+1. Push a branch and open a pull request targeting `main`.
+2. Wait for **Check frontend** (lint, TypeScript and production build) and **Check backend** (pytest and deployment packaging).
+3. Merge the pull request into `main`. A direct push to `main` also triggers deployment.
+4. Open GitHub **Actions → Check and deploy to Azure**. After both checks pass, **Deploy live site** deploys the backend, checks its health, deploys the frontend, then checks the website.
+5. Wait for the workflow to finish before refreshing the live site.
 
-## 3. Host the backend on Azure Container Apps
-Needs the Azure CLI and a subscription (Azure for Students works). From the repo root:
+Pull requests never deploy and cannot authenticate to Azure. The frontend is built with mock mode off, an empty base path, and the live API URL. The backend package contains `app/`, `requirements.txt`, and `data/p3/roi-inputs.json`; local environment files are excluded. Deployments run in sequence so an older in-flight run cannot overwrite a newer deployment.
 
-```bash
-az login
-az group create --name navigator-rg --location eastus
-az containerapp up --name navigator-api --resource-group navigator-rg --location eastus --source . --ingress external --target-port 8000
-az containerapp secret set --name navigator-api --resource-group navigator-rg --secrets openai-key=<FOUNDRY_API_KEY>
-az containerapp update --name navigator-api --resource-group navigator-rg --set-env-vars AZURE_OPENAI_ENDPOINT=<FOUNDRY_ENDPOINT> AZURE_OPENAI_API_KEY=secretref:openai-key AZURE_OPENAI_DEPLOYMENT=gpt-5-mini ALLOWED_ORIGINS=https://zero2sudo-hokies.github.io AI_REQUESTS_PER_HOUR=30
-```
+To redeploy `main` without another commit, choose **Run workflow → main**. To undo a change, revert its commit on `main`; the revert runs through the same checks and deployment. There is no automatic rollback: if a deployment fails after updating the backend, investigate the failed step before rerunning.
 
-`az containerapp up` prints the app URL (`https://navigator-api.<region>.azurecontainerapps.io`). Check it: open `<url>/api/health`, which should show `"ai_configured": true`.
+## GitHub and Azure authentication
 
-Alternative with no Azure account: Render.com, New Web Service, Docker, this repo, same environment variables (free tier sleeps when idle, so the first request is slow).
+These repository **Actions variables** are configured:
 
-## 4. Point the site at the backend
-Add the repo variable `NAVIGATOR_API_BASE` = the backend URL (no trailing slash), then re-run the Pages workflow. The status dot turns green ("API live").
-
-## Environment variables (backend)
-| Name | Value |
+| Variable | Purpose |
 |---|---|
-| `AZURE_OPENAI_ENDPOINT` | Foundry "Azure OpenAI endpoint" ending in `/openai/v1` |
-| `AZURE_OPENAI_API_KEY` | Foundry key, stored as a secret, never in the repo |
+| `AZURE_CLIENT_ID` | Client ID of `navigator-github-deploy` |
+| `AZURE_TENANT_ID` | Azure tenant |
+| `AZURE_SUBSCRIPTION_ID` | Azure subscription |
+| `NAVIGATOR_API_BASE` | `https://navigator-api-f801edf9.azurewebsites.net` |
+
+The repository **Actions secret** `AZURE_STATIC_WEB_APPS_API_TOKEN` holds the frontend deployment token. It is encrypted in GitHub and is only used by the deployment job. If it is rotated in Azure, update this GitHub secret too.
+
+The backend uses [GitHub OIDC](https://learn.microsoft.com/en-us/azure/app-service/deploy-github-actions), without an Azure password or publish profile. The managed identity has **Website Contributor** on the backend app only. Its federated credential trusts issuer `https://token.actions.githubusercontent.com`, audience `api://AzureADTokenExchange`, and subject `repo:zero2sudo-hokies/mastercard-x-microsoft:ref:refs/heads/main`. Moving the repo or renaming `main` requires updating that trust. Adding a GitHub deployment environment also changes the OIDC subject and requires updating the credential.
+
+## Backend configuration
+
+Keep these settings in Azure App Service; the workflow preserves them:
+
+| Setting | Value |
+|---|---|
+| `SCM_DO_BUILD_DURING_DEPLOYMENT` | `true` (Azure installs Python dependencies during ZIP deployment) |
+| `API_BASE` | `http://127.0.0.1:8000` (AI tools call the same API) |
+| `ROI_INPUTS_PATH` | `data/p3/roi-inputs.json` |
+| `AZURE_OPENAI_ENDPOINT` | `https://foundry-demo-ms.openai.azure.com/openai/v1` |
+| `AZURE_OPENAI_API_KEY` | Foundry key; never commit or copy into GitHub |
 | `AZURE_OPENAI_DEPLOYMENT` | `gpt-5-mini` |
-| `ALLOWED_ORIGINS` | `https://zero2sudo-hokies.github.io` (comma separated if more) |
-| `AI_REQUESTS_PER_HOUR` | Foundry calls per visitor IP per hour on chat and plan (default 30) |
+| `ALLOWED_ORIGINS` | `https://ashy-desert-0ad29150f.3.azurestaticapps.net` |
+| `AI_REQUESTS_PER_HOUR` | `30` |
 
-## Safety for a public demo
-- The browser never sees the Foundry key. CORS only allows the Pages origin.
-- Chat and plan are capped per visitor IP (429 after the limit), so a public link can't run up the Foundry bill. Also set a budget alert on the Azure subscription.
-- Rotate the Foundry key before going public: it was shared in a chat during the build.
+Startup command: `python -m uvicorn app.main:app --host 0.0.0.0 --port 8000`.
 
-## Local check of the Pages build
-```bash
-cd frontend
-STATIC_EXPORT=1 NEXT_PUBLIC_BASE_PATH=/mastercard-x-microsoft NEXT_PUBLIC_API_BASE=http://localhost:8000 npm run build
-```
-Output lands in `frontend/out/`. (In Git Bash on Windows, prefix with `MSYS_NO_PATHCONV=1` so the base path is not rewritten.)
+The deployment health check verifies `status: "ok"` and `ai_configured: true`. It does not make a billable AI call or prove model connectivity. To check Foundry end to end, send a chat question and generate a pilot plan; both should return `mode: "foundry"`, rather than `"rules"`.
+
+## Costs and limits
+
+Both hosting plans are Free. Foundry calls retain their existing model charges, and GitHub Actions uses the repository's applicable usage allowance. [F1 has shared compute and a daily CPU quota](https://learn.microsoft.com/en-us/azure/azure-subscription-service-limits#app-service-limits), sleeps when idle, and does not support Always On. Pilot drafts and per-IP rate limits are in memory and reset when the backend restarts, sleeps, or redeploys. This setup suits the demo rather than production traffic.
