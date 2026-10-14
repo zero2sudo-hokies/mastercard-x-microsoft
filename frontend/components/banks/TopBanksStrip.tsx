@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui";
 import { getBanks } from "@/lib/api";
+import { pinColor } from "@/lib/banks";
 import { fmtPct } from "@/lib/format";
 import type { BankLeaderboard } from "@/lib/types";
 
@@ -43,7 +44,9 @@ export default function TopBanksStrip({ fips, name }: { fips: string; name: stri
           {data.banks.map((b) => (
             <li key={b.cert} className="rounded-lg border border-line bg-white p-2 text-xs">
               <div className="flex items-start gap-2">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-navy text-[10px] font-semibold text-white">{b.rank}</span>
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold text-white" style={{ background: pinColor(b.rank) }}>
+                  {b.rank}
+                </span>
                 <span className="line-clamp-2 font-medium text-navy" title={b.name}>
                   {b.name}
                 </span>
@@ -59,7 +62,11 @@ export default function TopBanksStrip({ fips, name }: { fips: string; name: stri
           ))}
         </ol>
       )}
-      {data && <p className="mt-2 text-[11px] text-muted">FDIC Summary of Deposits, {data.as_of}. Ranked by local deposits, the public proxy for customers.</p>}
+      {data && (
+        <p className="mt-2 text-[11px] text-muted">
+          FDIC Summary of Deposits, {data.as_of}. Ranked by local deposits, the public proxy for customers. Map pins: numbered colors = these banks, grey = other banks.
+        </p>
+      )}
     </div>
   );
 }

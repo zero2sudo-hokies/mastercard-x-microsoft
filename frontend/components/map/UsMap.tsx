@@ -1,14 +1,15 @@
 "use client";
 
-import { geoPath } from "d3-geo";
+import { geoAlbersUsa, geoPath } from "d3-geo";
 import type { Feature, Geometry } from "geojson";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { feature, mesh } from "topojson-client";
 import type { GeometryCollection, Topology } from "topojson-specification";
 import us from "us-atlas/counties-albers-10m.json";
+import { pinColor } from "@/lib/banks";
 import { fmtInt, fmtScore } from "@/lib/format";
 import { TOPIC_ICON, TOPIC_LABEL } from "@/lib/topics";
-import type { AreaSummary, Layer, TopicId } from "@/lib/types";
+import type { AreaSummary, BranchPin, Layer, TopicId } from "@/lib/types";
 
 const W = 975;
 const H = 610;
@@ -30,6 +31,8 @@ type Geo = {
   nation: string;
 };
 let GEO: Geo | null = null;
+// us-atlas counties-albers-10m is pre-projected with exactly this projection, so lat/lon pins line up with the shapes
+const PROJECT = geoAlbersUsa().scale(1300).translate([487.5, 305]);
 
 function fit([[x0, y0], [x1, y1]]: [[number, number], [number, number]]): ViewBox {
   const pad = 24;
@@ -118,14 +121,18 @@ type Props = {
   /** lift the selected county in 3D and blur the rest (frustration view) */
   focusSelected?: boolean;
   onClearFocus?: () => void;
+  /** branch locations for the focused county */
+  pins?: BranchPin[];
 };
 
-export default function UsMap({ states, counties, stateFips, layer, topic, selectedFips, focusFips, onStateClick, onCountyClick, focusSelected, onClearFocus }: Props) {
+export default function UsMap({ states, counties, stateFips, layer, topic, selectedFips, focusFips, onStateClick, onCountyClick, focusSelected, onClearFocus, pins = [] }: Props) {
   const g = geo();
   const focusShape = focusSelected && selectedFips && stateFips ? g.countiesByState[stateFips]?.find((c) => c.id === selectedFips) : undefined;
   const target = focusShape ? fitFocus(g.countyBoxes[focusShape.id]) : stateFips && g.stateBounds[stateFips] ? g.stateBounds[stateFips] : FULL;
   const depth = target[3] * 0.03; // lift height in map units, from the final view so it does not wobble while zooming
-  const vb = useAnimatedViewBox(target);
+  const [vb, settled] = useAnimatedViewBox(target);
+  // effects start only after the zoom lands: blurring the whole map on every zoom frame is what made it lag
+  const focused = focusShape && settled ? focusShape : undefined;
   const k = vb[2] / W; // zoom factor for strokes, patterns and glyphs
   const wrap = useRef<HTMLDivElement>(null);
   const [hover, setHover] = useState<{ fips: string; x: number; y: number; w: number } | null>(null);
@@ -156,7 +163,7 @@ export default function UsMap({ states, counties, stateFips, layer, topic, selec
             <feDropShadow dx="0" dy={depth * 0.6} stdDeviation={depth * 0.9} floodColor="#0b1f3a" floodOpacity="0.45" />
           </filter>
         </defs>
-        <g className={`map-layer ${focusShape ? "map-dim" : ""}`}>
+        <g className={`map-layer ${focused ? "map-dim" : ""}`}>
 
         {g.states.map((s) => {
           const inState = s.id === stateFips;
@@ -216,7 +223,7 @@ export default function UsMap({ states, counties, stateFips, layer, topic, selec
           ))}
         </g>
 
-        {focusShape && (
+        {focused && (
           <>
             {/* clicking anywhere on the blurred map goes back to the state view */}
             <rect x={vb[0]} y={vb[1]} width={vb[2]} height={vb[3]} fill="transparent" className="cursor-zoom-out" onClick={onClearFocus} onMouseMove={() => setHover(null)} />
@@ -224,7 +231,7 @@ export default function UsMap({ states, counties, stateFips, layer, topic, selec
               {Array.from({ length: 6 }, (_, i) => 6 - i).map((i) => (
                 <path
                   key={i}
-                  d={focusShape.d}
+                  d={focused.d}
                   transform={`translate(0 ${(depth * i) / 6})`}
                   fill="#0b1f3a"
                   opacity={0.22 + (6 - i) * 0.05}
@@ -232,12 +239,25 @@ export default function UsMap({ states, counties, stateFips, layer, topic, selec
                   className="map-path pointer-events-none"
                 />
               ))}
-              <path d={focusShape.d} fill={fillFor(counties.get(focusShape.id))} stroke="#ffffff" strokeWidth={1.5} className="map-path" onMouseMove={(e) => track(focusShape.id, e)} />
-              <path d={focusShape.d} fill="none" stroke="#f79e1b" strokeWidth={2.5} className="map-path pointer-events-none" />
+              <path d={focused.d} fill={fillFor(counties.get(focused.id))} stroke="#ffffff" strokeWidth={1.5} className="map-path" onMouseMove={(e) => track(focused.id, e)} />
+              <path d={focused.d} fill="none" stroke="#f79e1b" strokeWidth={2.5} className="map-path pointer-events-none" />
+              <g className="branch-pins">
+                {/* other banks first so the top 3 sit on top */}
+                {[...pins].sort((a, b) => (b.rank && b.rank <= 3 ? 0 : 1) - (a.rank && a.rank <= 3 ? 0 : 1)).map((p, i) => {
+                  const xy = PROJECT([p.lon, p.lat]);
+                  if (!xy) return null;
+                  const top = p.rank != null && p.rank <= 3;
+                  return (
+                    <circle key={i} cx={xy[0]} cy={xy[1]} r={target[3] * (top ? 0.011 : 0.0065)} fill={pinColor(p.rank)} stroke="#ffffff" strokeWidth={target[3] * 0.0025} opacity={top ? 1 : 0.75}>
+                      <title>{`${p.bank ?? "Other bank"} · ${p.branch}`}</title>
+                    </circle>
+                  );
+                })}
+              </g>
             </g>
             <text
-              x={focusShape.centroid[0]}
-              y={g.countyBoxes[focusShape.id][0][1] - depth * 2.2}
+              x={focused.centroid[0]}
+              y={g.countyBoxes[focused.id][0][1] - depth * 2.2}
               textAnchor="middle"
               fontSize={target[3] * 0.04}
               fontWeight={600}
@@ -247,7 +267,7 @@ export default function UsMap({ states, counties, stateFips, layer, topic, selec
               paintOrder="stroke"
               className="county-label pointer-events-none"
             >
-              {counties.get(focusShape.id)?.name ?? ""}
+              {counties.get(focused.id)?.name ?? ""}
             </text>
           </>
         )}
@@ -312,10 +332,12 @@ function Legend({ scale }: { scale: Scale }) {
   );
 }
 
-function useAnimatedViewBox(target: ViewBox): ViewBox {
-  const [vb, setVb] = useState<ViewBox>(target);
-  const from = useRef<ViewBox>(target);
+/** Animates the viewBox to the target and reports when it has landed (true at mount and after each zoom). */
+function useAnimatedViewBox(target: ViewBox): [ViewBox, boolean] {
   const key = target.join(",");
+  const [vb, setVb] = useState<ViewBox>(target);
+  const [landed, setLanded] = useState(key);
+  const from = useRef<ViewBox>(target);
   useEffect(() => {
     const start = performance.now();
     const a = from.current;
@@ -327,9 +349,10 @@ function useAnimatedViewBox(target: ViewBox): ViewBox {
       from.current = next;
       setVb(next);
       if (t < 1) raf = requestAnimationFrame(step);
+      else setLanded(key);
     };
     raf = requestAnimationFrame(step);
     return () => cancelAnimationFrame(raf);
   }, [key]); // eslint-disable-line react-hooks/exhaustive-deps
-  return vb;
+  return [vb, landed === key];
 }

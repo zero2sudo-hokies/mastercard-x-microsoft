@@ -7,12 +7,13 @@ import TopBanksStrip from "@/components/banks/TopBanksStrip";
 import ChatPanel from "@/components/chat/ChatPanel";
 import UsMap from "@/components/map/UsMap";
 import { ErrorBox, Spinner, Tabs } from "@/components/ui";
-import { getAreas, USE_MOCK } from "@/lib/api";
+import { getAreas, getBranches, USE_MOCK } from "@/lib/api";
 import { TOPIC_LABEL, TOPICS } from "@/lib/topics";
-import type { AreaSummary, Layer, TopicId } from "@/lib/types";
+import type { AreaSummary, BranchPin, Layer, TopicId } from "@/lib/types";
 
 type Side = "agent" | "profile";
 const EMPTY = new Map<string, AreaSummary>();
+const NO_PINS: BranchPin[] = [];
 
 export default function Dashboard() {
   const router = useRouter();
@@ -74,6 +75,21 @@ export default function Dashboard() {
   }, [stateFips, cached, countyKey]);
 
   const counties = cached ?? EMPTY;
+
+  // branch pins for the county popped out in the frustration view
+  const pinFips = layer === "frustration" && fips?.length === 5 ? fips : null;
+  const [pinData, setPinData] = useState<{ fips: string; pins: BranchPin[] } | null>(null);
+  useEffect(() => {
+    if (!pinFips) return;
+    let alive = true;
+    getBranches(pinFips)
+      .then((d) => alive && setPinData({ fips: pinFips, pins: d.branches }))
+      .catch(() => alive && setPinData({ fips: pinFips, pins: [] }));
+    return () => {
+      alive = false;
+    };
+  }, [pinFips]);
+  const pins = pinData && pinData.fips === pinFips ? pinData.pins : NO_PINS;
   const statesErrorMsg = statesError?.attempt === attempt && !states ? statesError.message : null;
   const countyErrorMsg = countyError?.key === countyKey && !cached ? countyError.message : null;
 
@@ -170,6 +186,7 @@ export default function Dashboard() {
                 onCountyClick={select}
                 focusSelected={layer === "frustration"}
                 onClearFocus={() => setQuery({ fips: null })}
+                pins={pins}
               />
               {fips?.length === 5 && <TopBanksStrip fips={fips} name={selectedName ? `${selectedName}` : "this county"} />}
               <p className="mt-1 text-[11px] text-muted">

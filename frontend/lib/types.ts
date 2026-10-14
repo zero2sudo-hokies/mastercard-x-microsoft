@@ -275,6 +275,21 @@ export interface BankLeaderboard {
   labels: string[];
 }
 
+export interface BranchPin {
+  cert: string;
+  bank: string | null;
+  branch: string;
+  lat: number;
+  lon: number;
+  rank: number | null;
+}
+
+export interface BranchPins {
+  fips: string;
+  as_of: string | null;
+  branches: BranchPin[];
+}
+
 export interface BankCompareRequest {
   fips: string;
   certs: string[];
