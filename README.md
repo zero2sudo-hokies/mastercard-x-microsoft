@@ -139,13 +139,13 @@ Open http://localhost:3000. Tests: `pytest -q` in `backend/`.
 
 ## Team
 
-| Name |
-|---|
-| Laksh Bharani |
-| Aaditya Arora |
-| Atharv Kumar |
-| Advaith Malka |
-| Sahaj Chettri |
-| Lokesh Donnepudi |
+| Name | GitHub |
+|---|---|
+| Laksh Bharani | [@username](https://github.com/LakshBharani) |
+| Aaditya Arora | [@username](https://github.com/aaditya0602) |
+| Atharv Kumar | [@username](https://github.com/atharv1730) |
+| Advaith Malka | [@username](https://github.com/advaithmalka) |
+| Sahaj Chettri | [@username](https://github.com/) |
+| Lokesh Donnepudi | [@username](https://github.com/) |
 
 _Prototype for LEAD ASPIRE 2026. Modeled data; not financial advice. No protected attributes are used._
