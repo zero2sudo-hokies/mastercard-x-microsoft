@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { mapBounds } from "../lib/map-bounds.ts";
+import { NORTH_AMERICA_BOUNDS } from "../lib/map-bounds.ts";
 
-test("navigation stays near the mainland and supports Alaska and Hawaii", () => {
-  assert.deepEqual(mapBounds(null), [[-126, 24], [-66, 50]]);
-  assert.deepEqual(mapBounds("36"), mapBounds(null));
-  assert.deepEqual(mapBounds("02"), [[-180, 50], [-129, 72]]);
-  assert.deepEqual(mapBounds("15"), [[-161, 18], [-154, 23]]);
+test("North America limits include Alaska, Hawaii, Canada, and Mexico with margin", () => {
+  const [[west, south], [east, north]] = NORTH_AMERICA_BOUNDS;
+  for (const [longitude, latitude] of [[-170, 65], [-157, 20], [-123, 49], [-99, 19], [-52, 70]]) {
+    assert(longitude > west && longitude < east && latitude > south && latitude < north);
+  }
 });
