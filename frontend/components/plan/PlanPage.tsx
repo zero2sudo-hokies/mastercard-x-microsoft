@@ -4,11 +4,13 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
+import BankCompare from "@/components/banks/BankCompare";
+import BankLeaderboard, { MAX_COMPARE } from "@/components/banks/BankLeaderboard";
 import RoiPanel from "@/components/roi/RoiPanel";
 import { Badge, Button, Card, DataStatusBadge, EmptyState, ErrorBox, Spinner, TopicIcon } from "@/components/ui";
-import { approvePlan, getProfile, postPlan } from "@/lib/api";
+import { approvePlan, getBanks, getProfile, postPlan } from "@/lib/api";
 import { TOPIC_LABEL } from "@/lib/topics";
-import type { AreaProfile, PilotPlan, RoiRequest } from "@/lib/types";
+import type { AreaProfile, BankEntry, PilotPlan, RoiRequest } from "@/lib/types";
 
 const CHECKLIST = [
   { key: "compliance_review", label: "Issuer compliance team has reviewed targeting and marketing" },
@@ -18,9 +20,43 @@ const CHECKLIST = [
 type CheckKey = (typeof CHECKLIST)[number]["key"];
 
 export default function PlanPage() {
-  const fips = useSearchParams().get("fips");
+  const params = useSearchParams();
+  const fips = params.get("fips");
   const [profile, setProfile] = useState<{ fips: string; data?: AreaProfile; error?: string } | null>(null);
   const roiReq = useRef<RoiRequest | null>(null);
+  const urlTarget = params.get("bank");
+  const [certs, setCerts] = useState<string[]>(() =>
+    [...new Set([...(params.get("banks") || "").split(","), urlTarget || ""].filter(Boolean))].slice(0, MAX_COMPARE),
+  );
+  const [target, setTarget] = useState<string | null>(urlTarget);
+  const [shared, setShared] = useState<{ adoption_rate: number | null; fixed_program_cost: number | null; audience_basis: RoiRequest["audience_basis"] }>({
+    adoption_rate: null, fixed_program_cost: null, audience_basis: "underserved",
+  });
+  const [bankInfo, setBankInfo] = useState<Record<string, BankEntry>>({});
+
+  // names and tiers for the selected banks (target pitch + ROI tier)
+  useEffect(() => {
+    if (!fips) return;
+    let alive = true;
+    getBanks(fips, 10)
+      .then((b) => alive && setBankInfo(Object.fromEntries(b.banks.map((x) => [x.cert, x]))))
+      .catch(() => alive && setBankInfo({}));
+    return () => {
+      alive = false;
+    };
+  }, [fips]);
+
+  const toggleBank = (cert: string) => {
+    const next = certs.includes(cert) ? certs.filter((c) => c !== cert) : [...certs, cert];
+    setCerts(next);
+    if (target && !next.includes(target)) setTarget(null);
+  };
+  const targetBank = target ? bankInfo[target] : undefined;
+  const onRoi = (req: RoiRequest) => {
+    roiReq.current = req;
+    const next = { adoption_rate: req.adoption_rate, fixed_program_cost: req.fixed_program_cost, audience_basis: req.audience_basis };
+    if (JSON.stringify(next) !== JSON.stringify(shared)) setShared(next);
+  };
 
   useEffect(() => {
     if (!fips) return;
@@ -79,19 +115,41 @@ export default function PlanPage() {
         </div>
       </header>
 
+      <section aria-label="Bank partners">
+        <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted">1. Bank partners (optional)</h2>
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,4fr)_minmax(0,7fr)]">
+          <Card title="Top banks by local deposits">
+            <BankLeaderboard fips={fips} selected={certs} onToggle={toggleBank} showNotes={false} />
+          </Card>
+          <Card title="Compare banks" action={targetBank ? <Badge tone="accent">Pitching {targetBank.name}</Badge> : undefined}>
+            <BankCompare fips={fips} certs={certs} shared={shared} target={target} onTarget={setTarget} />
+            {target && (
+              <button onClick={() => setTarget(null)} className="mt-2 text-xs text-muted underline">
+                Clear target bank
+              </button>
+            )}
+          </Card>
+        </div>
+      </section>
+
       <div className="grid gap-4 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
         <section aria-label="Economics">
-          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted">1. Economics</h2>
-          <RoiPanel fips={fips} onChange={(req) => (roiReq.current = req)} />
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted">2. Economics</h2>
+          {targetBank && (
+            <p className="mb-2 text-xs text-muted">
+              Using {targetBank.name}&apos;s {targetBank.issuer_type === "community" ? "exempt (under $10B)" : "covered ($10B+)"} debit pricing tier.
+            </p>
+          )}
+          <RoiPanel key={targetBank?.issuer_type ?? "default"} fips={fips} onChange={onRoi} defaultIssuer={targetBank?.issuer_type} />
         </section>
         <section aria-label="Pilot plan">
-          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted">2. Pilot plan</h2>
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted">3. Pilot plan</h2>
           {p && fr?.status !== "ok" ? (
             <EmptyState title="Not enough complaint data to plan a pilot here">
               A plan needs at least 30 CFPB complaints to ground the frustration and benefit. Try a look-alike area.
             </EmptyState>
           ) : (
-            <PlanDraft fips={fips} getRoi={() => roiReq.current} />
+            <PlanDraft key={target ?? "none"} fips={fips} getRoi={() => roiReq.current} bank={targetBank} />
           )}
         </section>
       </div>
@@ -99,8 +157,8 @@ export default function PlanPage() {
   );
 }
 
-function PlanDraft({ fips, getRoi }: { fips: string; getRoi: () => RoiRequest | null }) {
-  const [partner, setPartner] = useState("Community credit union (TBD)");
+function PlanDraft({ fips, getRoi, bank }: { fips: string; getRoi: () => RoiRequest | null; bank?: BankEntry }) {
+  const [partner, setPartner] = useState(bank?.name ?? "Community credit union (TBD)");
   const [notes, setNotes] = useState("");
   const [plan, setPlan] = useState<PilotPlan | null>(null);
   const [busy, setBusy] = useState(false);
@@ -116,7 +174,7 @@ function PlanDraft({ fips, getRoi }: { fips: string; getRoi: () => RoiRequest | 
     setBusy(true);
     setError(null);
     try {
-      const p = await postPlan({ fips, roi: getRoi(), partner_name: partner.trim() || "Community credit union (TBD)", notes });
+      const p = await postPlan({ fips, roi: getRoi(), partner_name: partner.trim() || "Community credit union (TBD)", notes, bank_cert: bank?.cert ?? null });
       setPlan(p);
       setText(p.markdown);
       setEditing(false);
@@ -152,14 +210,15 @@ function PlanDraft({ fips, getRoi }: { fips: string; getRoi: () => RoiRequest | 
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="block text-xs text-muted">
               Issuer partner
-              <input value={partner} maxLength={120} onChange={(e) => setPartner(e.target.value)} className="mt-1 w-full rounded-lg border border-line px-2 py-1.5 text-sm text-navy" />
+              <input value={partner} maxLength={120} disabled={!!bank} onChange={(e) => setPartner(e.target.value)} className="mt-1 w-full rounded-lg border border-line px-2 py-1.5 text-sm text-navy disabled:bg-paper" />
+              {bank && <span className="mt-1 block text-[11px]">Target bank from step 1. The plan is written as a pitch to this bank.</span>}
             </label>
             <label className="block text-xs text-muted sm:row-span-2">
               Notes for the draft (optional)
               <textarea value={notes} maxLength={1000} onChange={(e) => setNotes(e.target.value)} rows={3} className="mt-1 w-full rounded-lg border border-line px-2 py-1.5 text-sm text-navy" />
             </label>
             <Button onClick={generate} disabled={busy} className="self-end">
-              {plan ? "Regenerate with Azure AI" : "Generate pilot plan with Azure AI"}
+              {plan ? "Regenerate with Azure AI" : bank ? `Generate pitch for ${bank.name.split(",")[0]}` : "Generate pilot plan with Azure AI"}
             </Button>
           </div>
           {busy && (

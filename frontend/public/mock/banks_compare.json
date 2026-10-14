@@ -1,0 +1,732 @@
+{
+ "fips": "36005",
+ "area_name": "Bronx County, NY",
+ "rows": [
+  {
+   "bank": {
+    "rank": 1,
+    "cert": "628",
+    "name": "JPMorgan Chase Bank, National Association",
+    "deposits": 7214882000,
+    "deposit_share": 0.3776,
+    "branches": 33,
+    "total_assets": 4091315000000,
+    "issuer_type": "large_bank",
+    "fdic_community_bank": false,
+    "holding_company": "JPMORGAN CHASE & CO.",
+    "hq_city": "Columbus",
+    "hq_state": "OH",
+    "specialization": "INTERNATIONAL",
+    "net_interest_margin": 0.02882,
+    "efficiency_ratio": 0.54378,
+    "return_on_assets": 0.01585
+   },
+   "underserved_households_per_branch": 6590,
+   "roi": {
+    "area": {
+     "fips": "36005",
+     "name": "Bronx County",
+     "state_abbr": "NY",
+     "est_underserved_hh": 217454
+    },
+    "inputs": {
+     "issuer_type": "large_bank",
+     "adoption_rate": 0.03,
+     "churn": 0.24,
+     "cac": 561.0,
+     "fixed_program_cost": 75000.0,
+     "network_yield": 0.0031,
+     "audience_basis": "underserved"
+    },
+    "unit": {
+     "annual_spend": 17274,
+     "swipe_revenue": 85,
+     "deposit_earnings": 30,
+     "fraud_loss": 9,
+     "servicing": 400,
+     "annual_margin": -294,
+     "ltv": -1225,
+     "net_per_account": -1786,
+     "breakeven_churn": null
+    },
+    "program": {
+     "accounts": 6524,
+     "issuer_net_lifetime": -11726646,
+     "network_volume_y1": 112697377,
+     "network_revenue_y1_est": 349362
+    },
+    "ltv_curve": [
+     {
+      "churn": 0.1,
+      "ltv": -2940
+     },
+     {
+      "churn": 0.11,
+      "ltv": -2673
+     },
+     {
+      "churn": 0.12,
+      "ltv": -2450
+     },
+     {
+      "churn": 0.13,
+      "ltv": -2261
+     },
+     {
+      "churn": 0.14,
+      "ltv": -2100
+     },
+     {
+      "churn": 0.15,
+      "ltv": -1960
+     },
+     {
+      "churn": 0.16,
+      "ltv": -1837
+     },
+     {
+      "churn": 0.17,
+      "ltv": -1729
+     },
+     {
+      "churn": 0.18,
+      "ltv": -1633
+     },
+     {
+      "churn": 0.19,
+      "ltv": -1547
+     },
+     {
+      "churn": 0.2,
+      "ltv": -1470
+     },
+     {
+      "churn": 0.21,
+      "ltv": -1400
+     },
+     {
+      "churn": 0.22,
+      "ltv": -1336
+     },
+     {
+      "churn": 0.23,
+      "ltv": -1278
+     },
+     {
+      "churn": 0.24,
+      "ltv": -1225
+     },
+     {
+      "churn": 0.25,
+      "ltv": -1176
+     },
+     {
+      "churn": 0.26,
+      "ltv": -1131
+     },
+     {
+      "churn": 0.27,
+      "ltv": -1089
+     },
+     {
+      "churn": 0.28,
+      "ltv": -1050
+     },
+     {
+      "churn": 0.29,
+      "ltv": -1014
+     },
+     {
+      "churn": 0.3,
+      "ltv": -980
+     },
+     {
+      "churn": 0.31,
+      "ltv": -948
+     },
+     {
+      "churn": 0.32,
+      "ltv": -919
+     },
+     {
+      "churn": 0.33,
+      "ltv": -891
+     },
+     {
+      "churn": 0.34,
+      "ltv": -865
+     },
+     {
+      "churn": 0.35,
+      "ltv": -840
+     },
+     {
+      "churn": 0.36,
+      "ltv": -817
+     },
+     {
+      "churn": 0.37,
+      "ltv": -795
+     },
+     {
+      "churn": 0.38,
+      "ltv": -774
+     },
+     {
+      "churn": 0.39,
+      "ltv": -754
+     },
+     {
+      "churn": 0.4,
+      "ltv": -735
+     },
+     {
+      "churn": 0.41,
+      "ltv": -717
+     },
+     {
+      "churn": 0.42,
+      "ltv": -700
+     },
+     {
+      "churn": 0.43,
+      "ltv": -684
+     },
+     {
+      "churn": 0.44,
+      "ltv": -668
+     },
+     {
+      "churn": 0.45,
+      "ltv": -653
+     }
+    ],
+    "scale": [
+     {
+      "level": "County",
+      "base": 217454,
+      "unit": "households",
+      "accounts": 6524,
+      "network_volume_y1": 112697377
+     },
+     {
+      "level": "State",
+      "base": 1583142,
+      "unit": "households",
+      "accounts": 47494,
+      "network_volume_y1": 820424464
+     },
+     {
+      "level": "United States",
+      "base": 24600000,
+      "unit": "households",
+      "accounts": 738000,
+      "network_volume_y1": 12748415688
+     },
+     {
+      "level": "Global",
+      "base": 1300000000,
+      "unit": "adults",
+      "accounts": 39000000,
+      "network_volume_y1": 673696764000
+     }
+    ],
+    "labels": [
+     "Benchmarks are sourced (Federal Reserve, FDIC, PULSE, Moebs, FirstPage Sage, Mastercard 10-K; see Assumptions and sources). Rerun with the partner issuer's costs.",
+     "Network volume is spend on Mastercard's network, not Mastercard revenue."
+    ],
+    "audience": {
+     "basis": "underserved",
+     "area_households": 217454,
+     "label": "Unbanked + underbanked households (modeled for counties from state FDIC rates and poverty)."
+    }
+   }
+  },
+  {
+   "bank": {
+    "rank": 2,
+    "cert": "7213",
+    "name": "Citibank, National Association",
+    "deposits": 2800000000,
+    "deposit_share": 0.1465,
+    "branches": 15,
+    "total_assets": 1976180000000,
+    "issuer_type": "large_bank",
+    "fdic_community_bank": false,
+    "holding_company": "CITIGROUP INC.",
+    "hq_city": "Sioux Falls",
+    "hq_state": "SD",
+    "specialization": "INTERNATIONAL",
+    "net_interest_margin": 0.03019,
+    "efficiency_ratio": 0.51393,
+    "return_on_assets": 0.01056
+   },
+   "underserved_households_per_branch": 14497,
+   "roi": {
+    "area": {
+     "fips": "36005",
+     "name": "Bronx County",
+     "state_abbr": "NY",
+     "est_underserved_hh": 217454
+    },
+    "inputs": {
+     "issuer_type": "large_bank",
+     "adoption_rate": 0.03,
+     "churn": 0.24,
+     "cac": 561.0,
+     "fixed_program_cost": 75000.0,
+     "network_yield": 0.0031,
+     "audience_basis": "underserved"
+    },
+    "unit": {
+     "annual_spend": 17274,
+     "swipe_revenue": 85,
+     "deposit_earnings": 30,
+     "fraud_loss": 9,
+     "servicing": 400,
+     "annual_margin": -294,
+     "ltv": -1225,
+     "net_per_account": -1786,
+     "breakeven_churn": null
+    },
+    "program": {
+     "accounts": 6524,
+     "issuer_net_lifetime": -11726646,
+     "network_volume_y1": 112697377,
+     "network_revenue_y1_est": 349362
+    },
+    "ltv_curve": [
+     {
+      "churn": 0.1,
+      "ltv": -2940
+     },
+     {
+      "churn": 0.11,
+      "ltv": -2673
+     },
+     {
+      "churn": 0.12,
+      "ltv": -2450
+     },
+     {
+      "churn": 0.13,
+      "ltv": -2261
+     },
+     {
+      "churn": 0.14,
+      "ltv": -2100
+     },
+     {
+      "churn": 0.15,
+      "ltv": -1960
+     },
+     {
+      "churn": 0.16,
+      "ltv": -1837
+     },
+     {
+      "churn": 0.17,
+      "ltv": -1729
+     },
+     {
+      "churn": 0.18,
+      "ltv": -1633
+     },
+     {
+      "churn": 0.19,
+      "ltv": -1547
+     },
+     {
+      "churn": 0.2,
+      "ltv": -1470
+     },
+     {
+      "churn": 0.21,
+      "ltv": -1400
+     },
+     {
+      "churn": 0.22,
+      "ltv": -1336
+     },
+     {
+      "churn": 0.23,
+      "ltv": -1278
+     },
+     {
+      "churn": 0.24,
+      "ltv": -1225
+     },
+     {
+      "churn": 0.25,
+      "ltv": -1176
+     },
+     {
+      "churn": 0.26,
+      "ltv": -1131
+     },
+     {
+      "churn": 0.27,
+      "ltv": -1089
+     },
+     {
+      "churn": 0.28,
+      "ltv": -1050
+     },
+     {
+      "churn": 0.29,
+      "ltv": -1014
+     },
+     {
+      "churn": 0.3,
+      "ltv": -980
+     },
+     {
+      "churn": 0.31,
+      "ltv": -948
+     },
+     {
+      "churn": 0.32,
+      "ltv": -919
+     },
+     {
+      "churn": 0.33,
+      "ltv": -891
+     },
+     {
+      "churn": 0.34,
+      "ltv": -865
+     },
+     {
+      "churn": 0.35,
+      "ltv": -840
+     },
+     {
+      "churn": 0.36,
+      "ltv": -817
+     },
+     {
+      "churn": 0.37,
+      "ltv": -795
+     },
+     {
+      "churn": 0.38,
+      "ltv": -774
+     },
+     {
+      "churn": 0.39,
+      "ltv": -754
+     },
+     {
+      "churn": 0.4,
+      "ltv": -735
+     },
+     {
+      "churn": 0.41,
+      "ltv": -717
+     },
+     {
+      "churn": 0.42,
+      "ltv": -700
+     },
+     {
+      "churn": 0.43,
+      "ltv": -684
+     },
+     {
+      "churn": 0.44,
+      "ltv": -668
+     },
+     {
+      "churn": 0.45,
+      "ltv": -653
+     }
+    ],
+    "scale": [
+     {
+      "level": "County",
+      "base": 217454,
+      "unit": "households",
+      "accounts": 6524,
+      "network_volume_y1": 112697377
+     },
+     {
+      "level": "State",
+      "base": 1583142,
+      "unit": "households",
+      "accounts": 47494,
+      "network_volume_y1": 820424464
+     },
+     {
+      "level": "United States",
+      "base": 24600000,
+      "unit": "households",
+      "accounts": 738000,
+      "network_volume_y1": 12748415688
+     },
+     {
+      "level": "Global",
+      "base": 1300000000,
+      "unit": "adults",
+      "accounts": 39000000,
+      "network_volume_y1": 673696764000
+     }
+    ],
+    "labels": [
+     "Benchmarks are sourced (Federal Reserve, FDIC, PULSE, Moebs, FirstPage Sage, Mastercard 10-K; see Assumptions and sources). Rerun with the partner issuer's costs.",
+     "Network volume is spend on Mastercard's network, not Mastercard revenue."
+    ],
+    "audience": {
+     "basis": "underserved",
+     "area_households": 217454,
+     "label": "Unbanked + underbanked households (modeled for counties from state FDIC rates and poverty)."
+    }
+   }
+  },
+  {
+   "bank": {
+    "rank": 3,
+    "cert": "31189",
+    "name": "Ponce Bank, National Association",
+    "deposits": 1657280000,
+    "deposit_share": 0.0867,
+    "branches": 5,
+    "total_assets": 3485007000,
+    "issuer_type": "community",
+    "fdic_community_bank": true,
+    "holding_company": "PONCE FINANCIAL GROUP, INC.",
+    "hq_city": "Bronx",
+    "hq_state": "NY",
+    "specialization": "COMMERCIAL LENDING",
+    "net_interest_margin": 0.03662,
+    "efficiency_ratio": 0.54122,
+    "return_on_assets": 0.0115
+   },
+   "underserved_households_per_branch": 43491,
+   "roi": {
+    "area": {
+     "fips": "36005",
+     "name": "Bronx County",
+     "state_abbr": "NY",
+     "est_underserved_hh": 217454
+    },
+    "inputs": {
+     "issuer_type": "community",
+     "adoption_rate": 0.03,
+     "churn": 0.4,
+     "cac": 428.0,
+     "fixed_program_cost": 75000.0,
+     "network_yield": 0.0031,
+     "audience_basis": "underserved"
+    },
+    "unit": {
+     "annual_spend": 17274,
+     "swipe_revenue": 192,
+     "deposit_earnings": 30,
+     "fraud_loss": 9,
+     "servicing": 175,
+     "annual_margin": 38,
+     "ltv": 95,
+     "net_per_account": -333,
+     "breakeven_churn": 0.088
+    },
+    "program": {
+     "accounts": 6524,
+     "issuer_net_lifetime": -2250036,
+     "network_volume_y1": 112697377,
+     "network_revenue_y1_est": 349362
+    },
+    "ltv_curve": [
+     {
+      "churn": 0.1,
+      "ltv": 378
+     },
+     {
+      "churn": 0.11,
+      "ltv": 344
+     },
+     {
+      "churn": 0.12,
+      "ltv": 315
+     },
+     {
+      "churn": 0.13,
+      "ltv": 291
+     },
+     {
+      "churn": 0.14,
+      "ltv": 270
+     },
+     {
+      "churn": 0.15,
+      "ltv": 252
+     },
+     {
+      "churn": 0.16,
+      "ltv": 237
+     },
+     {
+      "churn": 0.17,
+      "ltv": 223
+     },
+     {
+      "churn": 0.18,
+      "ltv": 210
+     },
+     {
+      "churn": 0.19,
+      "ltv": 199
+     },
+     {
+      "churn": 0.2,
+      "ltv": 189
+     },
+     {
+      "churn": 0.21,
+      "ltv": 180
+     },
+     {
+      "churn": 0.22,
+      "ltv": 172
+     },
+     {
+      "churn": 0.23,
+      "ltv": 165
+     },
+     {
+      "churn": 0.24,
+      "ltv": 158
+     },
+     {
+      "churn": 0.25,
+      "ltv": 151
+     },
+     {
+      "churn": 0.26,
+      "ltv": 146
+     },
+     {
+      "churn": 0.27,
+      "ltv": 140
+     },
+     {
+      "churn": 0.28,
+      "ltv": 135
+     },
+     {
+      "churn": 0.29,
+      "ltv": 130
+     },
+     {
+      "churn": 0.3,
+      "ltv": 126
+     },
+     {
+      "churn": 0.31,
+      "ltv": 122
+     },
+     {
+      "churn": 0.32,
+      "ltv": 118
+     },
+     {
+      "churn": 0.33,
+      "ltv": 115
+     },
+     {
+      "churn": 0.34,
+      "ltv": 111
+     },
+     {
+      "churn": 0.35,
+      "ltv": 108
+     },
+     {
+      "churn": 0.36,
+      "ltv": 105
+     },
+     {
+      "churn": 0.37,
+      "ltv": 102
+     },
+     {
+      "churn": 0.38,
+      "ltv": 100
+     },
+     {
+      "churn": 0.39,
+      "ltv": 97
+     },
+     {
+      "churn": 0.4,
+      "ltv": 95
+     },
+     {
+      "churn": 0.41,
+      "ltv": 92
+     },
+     {
+      "churn": 0.42,
+      "ltv": 90
+     },
+     {
+      "churn": 0.43,
+      "ltv": 88
+     },
+     {
+      "churn": 0.44,
+      "ltv": 86
+     },
+     {
+      "churn": 0.45,
+      "ltv": 84
+     }
+    ],
+    "scale": [
+     {
+      "level": "County",
+      "base": 217454,
+      "unit": "households",
+      "accounts": 6524,
+      "network_volume_y1": 112697377
+     },
+     {
+      "level": "State",
+      "base": 1583142,
+      "unit": "households",
+      "accounts": 47494,
+      "network_volume_y1": 820424464
+     },
+     {
+      "level": "United States",
+      "base": 24600000,
+      "unit": "households",
+      "accounts": 738000,
+      "network_volume_y1": 12748415688
+     },
+     {
+      "level": "Global",
+      "base": 1300000000,
+      "unit": "adults",
+      "accounts": 39000000,
+      "network_volume_y1": 673696764000
+     }
+    ],
+    "labels": [
+     "Benchmarks are sourced (Federal Reserve, FDIC, PULSE, Moebs, FirstPage Sage, Mastercard 10-K; see Assumptions and sources). Rerun with the partner issuer's costs.",
+     "Network volume is spend on Mastercard's network, not Mastercard revenue."
+    ],
+    "audience": {
+     "basis": "underserved",
+     "area_households": 217454,
+     "label": "Unbanked + underbanked households (modeled for counties from state FDIC rates and poverty)."
+    }
+   }
+  }
+ ],
+ "labels": [
+  "Each bank's ROI uses its own debit pricing tier (interchange, servicing and acquisition benchmarks); other inputs are shared.",
+  "Pilot accounts are the same for every bank: the area audience x adoption. The difference is the issuer's economics and branch reach.",
+  "Which network a bank issues on (Mastercard or another) is not public; confirm before outreach.",
+  "Ranked by deposits held at branches in the area, the public proxy for customers. No public source counts customers by county."
+ ]
+}

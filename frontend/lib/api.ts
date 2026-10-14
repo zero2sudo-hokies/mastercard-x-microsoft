@@ -1,5 +1,8 @@
 import type {
   ApproveRequest,
+  BankCompare,
+  BankCompareRequest,
+  BankLeaderboard,
   AreaProfile,
   AreaSummary,
   Benchmarks,
@@ -78,6 +81,8 @@ export const getBenefits = () => request<Benefit[]>("/api/benefits", "benefits.j
 export const getAssumptions = () => request<Benchmarks>("/api/assumptions", "assumptions.json");
 export const postRoi = (req: RoiRequest) => request<RoiResult>("/api/roi", "roi.json", post(req));
 export const getRoiContext = (fips: string) => request<RoiContext>(`/api/roi/context/${fips}`, "roi_context.json");
+export const getBanks = (fips: string, n = 10) => request<BankLeaderboard>(`/api/areas/${fips}/banks?n=${n}`, "banks.json");
+export const compareBanks = (req: BankCompareRequest) => request<BankCompare>("/api/banks/compare", "banks_compare.json", post(req));
 export const postChat = (req: ChatRequest) => request<ChatResponse>("/api/chat", "chat.json", post(req));
 export const postPlan = (req: PlanRequest) => request<PilotPlan>("/api/plan", "plan.json", post(req));
 export const approvePlan = (id: string, req: ApproveRequest) =>

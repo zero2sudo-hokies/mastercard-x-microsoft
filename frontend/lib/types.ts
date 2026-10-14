@@ -247,9 +247,55 @@ export interface ChatResponse {
   warnings: string[];
 }
 
+export interface BankEntry {
+  rank: number;
+  cert: string;
+  name: string;
+  deposits: number;
+  deposit_share: number;
+  branches: number;
+  total_assets: number;
+  issuer_type: IssuerType;
+  fdic_community_bank: boolean;
+  holding_company: string | null;
+  hq_city: string | null;
+  hq_state: string | null;
+  specialization: string | null;
+  net_interest_margin: number | null;
+  efficiency_ratio: number | null;
+  return_on_assets: number | null;
+}
+
+export interface BankLeaderboard {
+  fips: string;
+  as_of: string | null;
+  total_deposits: number;
+  banks_present: number;
+  banks: BankEntry[];
+  labels: string[];
+}
+
+export interface BankCompareRequest {
+  fips: string;
+  certs: string[];
+  adoption_rate?: number | null;
+  churn?: number | null;
+  cac?: number | null;
+  fixed_program_cost?: number | null;
+  audience_basis?: AudienceBasis;
+}
+
+export interface BankCompare {
+  fips: string;
+  area_name: string;
+  rows: { bank: BankEntry; underserved_households_per_branch: number | null; roi: RoiResult }[];
+  labels: string[];
+}
+
 export interface PlanRequest {
   fips: string;
   roi: RoiRequest | null;
+  bank_cert?: string | null;
   partner_name: string;
   notes: string;
 }

@@ -34,7 +34,7 @@ function defaultsFor(b: Benchmarks, issuer: IssuerType, prev?: Inputs): Inputs {
   };
 }
 
-export default function RoiPanel({ fips, onChange }: { fips: string; onChange?: (req: RoiRequest, result: RoiResult) => void }) {
+export default function RoiPanel({ fips, onChange, defaultIssuer }: { fips: string; onChange?: (req: RoiRequest, result: RoiResult) => void; defaultIssuer?: IssuerType }) {
   const [bench, setBench] = useState<Benchmarks | null>(null);
   const [inputs, setInputs] = useState<Inputs | null>(null);
   const [benchError, setBenchError] = useState<string | null>(null);
@@ -59,13 +59,13 @@ export default function RoiPanel({ fips, onChange }: { fips: string; onChange?: 
       .then((b) => {
         if (!alive) return;
         setBench(b);
-        setInputs(defaultsFor(b, b.roi_defaults.issuer_type));
+        setInputs(defaultsFor(b, defaultIssuer ?? b.roi_defaults.issuer_type));
       })
       .catch((e: Error) => alive && setBenchError(e.message));
     return () => {
       alive = false;
     };
-  }, [attempt]);
+  }, [attempt]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const req: RoiRequest | null = inputs ? { fips, ...inputs } : null;
   const key = req ? `${JSON.stringify(req)}#${attempt}` : "";

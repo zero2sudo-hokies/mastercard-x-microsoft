@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import BankLeaderboard from "@/components/banks/BankLeaderboard";
 import { Badge, Card, DataStatusBadge, EmptyState, ErrorBox, SourceNote, Spinner, Stat, TopicIcon } from "@/components/ui";
 import { getProfile } from "@/lib/api";
 import { fmtInt, fmtPct, fmtScore } from "@/lib/format";
@@ -11,6 +12,10 @@ import type { AreaProfile } from "@/lib/types";
 export default function AreaProfilePanel({ fips, onSelect }: { fips: string | null; onSelect: (fips: string) => void }) {
   const [attempt, setAttempt] = useState(0);
   const [result, setResult] = useState<{ key: string; profile?: AreaProfile; error?: string } | null>(null);
+  const [picked, setPicked] = useState<{ fips: string | null; certs: string[] }>({ fips: null, certs: [] });
+  const banks = picked.fips === fips ? picked.certs : [];
+  const toggleBank = (cert: string) =>
+    setPicked({ fips, certs: banks.includes(cert) ? banks.filter((c) => c !== cert) : [...banks, cert] });
   const key = `${fips}#${attempt}`;
 
   useEffect(() => {
@@ -157,6 +162,19 @@ export default function AreaProfilePanel({ fips, onSelect }: { fips: string | nu
             ))}
           </ul>
         )}
+      </Card>
+
+      <Card title={`Top banks in ${isCounty ? "this county" : "this state"} (by local deposits)`}>
+        <BankLeaderboard fips={area.fips} selected={banks} onToggle={toggleBank} />
+        {ok && banks.length > 0 && (
+          <Link
+            href={banks.length === 1 ? `/plan?fips=${area.fips}&bank=${banks[0]}` : `/plan?fips=${area.fips}&banks=${banks.join(",")}`}
+            className="mt-3 flex w-full items-center justify-center rounded-lg border border-navy px-3 py-2 text-sm font-medium text-navy hover:bg-paper"
+          >
+            {banks.length === 1 ? "Build pilot plan pitched to this bank →" : `Compare ${banks.length} banks on the plan page →`}
+          </Link>
+        )}
+        {!ok && banks.length > 0 && <p className="mt-2 text-xs text-muted">Bank comparison opens on the plan page, which needs 30+ CFPB complaints here.</p>}
       </Card>
 
       <div className="sticky bottom-0 bg-white/90 pt-2 backdrop-blur">
