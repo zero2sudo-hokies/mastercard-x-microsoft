@@ -7,6 +7,7 @@ import { feature, mesh } from "topojson-client";
 import type { GeometryCollection, Topology } from "topojson-specification";
 import us from "us-atlas/counties-albers-10m.json";
 import BankLogo from "@/components/ui/BankLogo";
+import { crowdedMarkers, zoomAround } from "@/lib/marker-layout";
 import { fmtInt, fmtScore } from "@/lib/format";
 import { TOPIC_ICON, TOPIC_LABEL } from "@/lib/topics";
 import type { AreaSummary, BranchPin, Layer, TopicId } from "@/lib/types";
@@ -132,12 +133,72 @@ export default function UsMap({ states, counties, stateFips, layer, topic, selec
   const focusShape = focusSelected && selectedFips && stateFips ? g.countiesByState[stateFips]?.find((c) => c.id === selectedFips) : undefined;
   const target = focusShape ? fitFocus(g.countyBoxes[focusShape.id]) : stateFips && g.stateBounds[stateFips] ? g.stateBounds[stateFips] : FULL;
   const depth = target[3] * 0.03; // lift height in map units, from the final view so it does not wobble while zooming
-  const [vb, settled] = useAnimatedViewBox(target);
+  const [baseView, settled] = useAnimatedViewBox(target);
+  const [navigation, setNavigation] = useState({ fips: "", zoom: 1, x: 0, y: 0 });
+  const nav = focusShape && navigation.fips === focusShape.id ? navigation : { fips: focusShape?.id ?? "", zoom: 1, x: 0, y: 0 };
+  const vb: ViewBox = [baseView[0] + baseView[2] * (1 - 1 / nav.zoom) / 2 + nav.x,
+    baseView[1] + baseView[3] * (1 - 1 / nav.zoom) / 2 + nav.y, baseView[2] / nav.zoom, baseView[3] / nav.zoom];
   // effects start only after the zoom lands: blurring the whole map on every zoom frame is what made it lag
   const focused = focusShape && settled ? focusShape : undefined;
   const k = vb[2] / W; // zoom factor for strokes, patterns and glyphs
   const wrap = useRef<HTMLDivElement>(null);
+  const map = useRef<SVGSVGElement>(null);
+  const [mapWidth, setMapWidth] = useState(W);
+  const drag = useRef<{ x: number; y: number; panX: number; panY: number } | null>(null);
+  const suppressClick = useRef(false);
+  const pointers = useRef(new Map<number, { x: number; y: number }>());
+  const pinch = useRef<{ distance: number; zoom: number; anchorX: number; anchorY: number } | null>(null);
+  useEffect(() => {
+    if (!wrap.current) return;
+    const observer = new ResizeObserver(([entry]) => setMapWidth(Math.max(1, entry.contentRect.width)));
+    observer.observe(wrap.current);
+    return () => observer.disconnect();
+  }, []);
+  const units = vb[2] / mapWidth;
+  const logoSize = 28 * units;
+  const markers = useMemo(() => pins.flatMap((p, id) => {
+    const xy = PROJECT([p.lon, p.lat]);
+    return xy ? [{ p, id, x: xy[0], y: xy[1] }] : [];
+  }), [pins]);
+  const visibleMarkers = markers.filter((m) => m.x >= vb[0] - logoSize && m.x <= vb[0] + vb[2] + logoSize
+    && m.y - depth >= vb[1] - logoSize && m.y - depth <= vb[1] + vb[3] + logoSize);
+  const activeMarkers = visibleMarkers.filter((m) => !highlightCert || m.p.cert === highlightCert);
+  const crowded = crowdedMarkers(activeMarkers, logoSize + 4 * units);
+  const logoMarkers = new Set(activeMarkers.filter((_, i) => !crowded.has(i)));
+  const move = (zoom: number, x: number, y: number) => {
+    const limitX = target[2] * (1 - 1 / zoom) / 2, limitY = target[3] * (1 - 1 / zoom) / 2;
+    setNavigation({ fips: focusShape?.id ?? "", zoom, x: Math.max(-limitX, Math.min(limitX, x)), y: Math.max(-limitY, Math.min(limitY, y)) });
+    setHover(null);
+  };
   const [hover, setHover] = useState<{ fips: string; x: number; y: number; w: number } | null>(null);
+  const zoomAt = (zoom: number, clientX: number, clientY: number, anchor?: { x: number; y: number }) => {
+    const rect = map.current?.getBoundingClientRect();
+    if (!rect) return;
+    const fx = (clientX - rect.left) / rect.width, fy = (clientY - rect.top) / rect.height;
+    const next = zoomAround(target, vb, zoom, fx, fy, anchor);
+    move(next.zoom, next.x, next.y);
+  };
+  // Trackpad pinch arrives as Ctrl+wheel. A non-passive listener keeps it inside the map.
+  useEffect(() => {
+    const svg = map.current;
+    if (!svg || !focused) return;
+    const wheel = (e: WheelEvent) => {
+      if (e.ctrlKey) {
+        e.preventDefault();
+        zoomAt(nav.zoom * Math.exp(-e.deltaY * 0.01), e.clientX, e.clientY);
+      } else if (nav.zoom > 1) {
+        e.preventDefault();
+        move(nav.zoom, nav.x + e.deltaX * units, nav.y + e.deltaY * units);
+      }
+    };
+    svg.addEventListener("wheel", wheel, { passive: false });
+    return () => svg.removeEventListener("wheel", wheel);
+  });
+  const releasePointer = (id: number) => {
+    pointers.current.delete(id);
+    pinch.current = null;
+    drag.current = null;
+  };
 
   const countyShapes = stateFips ? (g.countiesByState[stateFips] ?? []) : [];
   const visibleRows = stateFips ? countyShapes.map((c) => counties.get(c.id)).filter((s): s is AreaSummary => !!s) : [...states.values()];
@@ -149,13 +210,62 @@ export default function UsMap({ states, counties, stateFips, layer, topic, selec
   const hovered = hover ? (counties.get(hover.fips) ?? states.get(hover.fips)) : undefined;
 
   const track = (fips: string, e: React.MouseEvent) => {
+    if (drag.current) return;
     const r = wrap.current?.getBoundingClientRect();
     if (r) setHover({ fips, x: e.clientX - r.left, y: e.clientY - r.top, w: r.width });
   };
 
   return (
     <div ref={wrap} className="relative w-full" onMouseLeave={() => setHover(null)}>
-      <svg viewBox={vb.join(" ")} className="block h-auto w-full" role="img" aria-label={`US map, ${scale.title}`}>
+      {focusShape && (
+        <div className="pointer-events-none absolute right-2 top-2 z-10 flex items-center gap-2 rounded-lg border border-line bg-white/95 px-2 py-1 text-xs shadow-sm">
+          <span>Pinch to zoom · drag to move</span>
+          {nav.zoom > 1 && <button onClick={() => move(1, 0, 0)} className="pointer-events-auto underline" aria-label="Reset county zoom">Reset view</button>}
+        </div>
+      )}
+      <svg ref={map} viewBox={vb.join(" ")} className={`block h-auto w-full ${nav.zoom > 1 ? "cursor-grab active:cursor-grabbing" : ""}`} style={{ touchAction: focusShape ? "none" : "auto" }} role="img" tabIndex={focusShape ? 0 : undefined} aria-label={`US map, ${scale.title}. ${focusShape ? "Pinch to zoom, drag to pan. Keyboard: plus or minus to zoom, zero to reset." : ""}`}
+        onKeyDown={(e) => {
+          if (!focused) return;
+          if (["+", "=", "-", "0"].includes(e.key)) {
+            e.preventDefault();
+            move(e.key === "0" ? 1 : Math.max(1, Math.min(16, nav.zoom * (e.key === "-" ? 1 / 1.5 : 1.5))), e.key === "0" ? 0 : nav.x, e.key === "0" ? 0 : nav.y);
+          }
+        }}
+        onPointerDown={(e) => {
+          if (!focused || e.button !== 0) return;
+          pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+          if (pointers.current.size === 1) suppressClick.current = false;
+          if (nav.zoom > 1 || pointers.current.size === 2) e.currentTarget.setPointerCapture(e.pointerId);
+          if (pointers.current.size === 2) {
+            const [a, b] = [...pointers.current.values()];
+            const rect = e.currentTarget.getBoundingClientRect();
+            pinch.current = { distance: Math.hypot(a.x - b.x, a.y - b.y), zoom: nav.zoom,
+              anchorX: vb[0] + ((a.x + b.x) / 2 - rect.left) / rect.width * vb[2],
+              anchorY: vb[1] + ((a.y + b.y) / 2 - rect.top) / rect.height * vb[3] };
+            drag.current = null;
+            suppressClick.current = true;
+            return;
+          }
+          if (nav.zoom <= 1) return;
+          drag.current = { x: e.clientX, y: e.clientY, panX: nav.x, panY: nav.y };
+          suppressClick.current = false;
+        }}
+        onPointerMove={(e) => {
+          if (pointers.current.has(e.pointerId)) pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+          if (pinch.current && pointers.current.size === 2) {
+            const [a, b] = [...pointers.current.values()];
+            if (pinch.current.distance > 0) zoomAt(pinch.current.zoom * Math.hypot(a.x - b.x, a.y - b.y) / pinch.current.distance,
+              (a.x + b.x) / 2, (a.y + b.y) / 2, { x: pinch.current.anchorX, y: pinch.current.anchorY });
+            return;
+          }
+          if (!drag.current) return;
+          const dx = e.clientX - drag.current.x, dy = e.clientY - drag.current.y;
+          if (Math.hypot(dx, dy) > 3) suppressClick.current = true;
+          move(nav.zoom, drag.current.panX - dx * units, drag.current.panY - dy * units);
+        }}
+        onPointerUp={(e) => releasePointer(e.pointerId)}
+        onPointerCancel={(e) => releasePointer(e.pointerId)}
+        onClickCapture={(e) => { if (suppressClick.current) { e.stopPropagation(); suppressClick.current = false; } }}>
         <defs>
           <pattern id="hatch" patternUnits="userSpaceOnUse" width={6 * k} height={6 * k} patternTransform="rotate(45)">
             <rect width={6 * k} height={6 * k} fill="#f1f0ec" />
@@ -244,18 +354,20 @@ export default function UsMap({ states, counties, stateFips, layer, topic, selec
               <path d={focused.d} fill={fillFor(counties.get(focused.id))} stroke="#ffffff" strokeWidth={1.5} className="map-path" onMouseMove={(e) => track(focused.id, e)} />
               <path d={focused.d} fill="none" stroke="#f79e1b" strokeWidth={2.5} className="map-path pointer-events-none" />
               <g className="branch-pins">
-                {/* drawn bottom-up: other banks, then the top 3, then the highlighted bank */}
-                {[...pins]
-                  .map((p) => ({ p, z: highlightCert ? (p.cert === highlightCert ? 2 : 0) : p.rank && p.rank <= 3 ? 1 : 0 }))
+                {/* Draw dots first so readable bank logos stay on top. */}
+                {visibleMarkers
+                  .map((m) => ({ m, z: logoMarkers.has(m) ? 1 : 0 }))
                   .sort((a, b) => a.z - b.z)
-                  .map(({ p }, i) => {
-                  const xy = PROJECT([p.lon, p.lat]);
-                  if (!xy) return null;
-                  const top = p.rank != null && p.rank <= 3;
+                  .map(({ m }) => {
+                  const { p, x, y } = m;
                   const lit = highlightCert ? p.cert === highlightCert : true;
-                  const r = target[3] * (highlightCert && lit ? 0.028 : top ? 0.023 : 0.016);
+                  if (!logoMarkers.has(m)) return (
+                    <circle key={m.id} className="pin branch-dot" cx={x} cy={y} r={3 * units} fill="#0b1f3a" stroke="white" strokeWidth={units} opacity={lit ? 0.85 : 0.12}>
+                      <title>{`${p.bank ?? "Other bank"} · ${p.branch} — zoom in to see logos`}</title>
+                    </circle>
+                  );
                   return (
-                    <svg key={i} x={xy[0] - r} y={xy[1] - r} width={r * 2} height={r * 2} viewBox="0 0 40 40" opacity={!lit ? 0.12 : 1} className="pin">
+                    <svg key={m.id} x={x - logoSize / 2} y={y - logoSize / 2} width={logoSize} height={logoSize} viewBox="0 0 40 40" className="pin branch-logo">
                       <title>{`${p.bank ?? "Other bank"} · ${p.branch}`}</title>
                       <foreignObject width="40" height="40">
                         <BankLogo name={p.bank ?? "Other bank"} website={p.website} />

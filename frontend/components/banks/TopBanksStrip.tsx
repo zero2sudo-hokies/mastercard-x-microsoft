@@ -76,7 +76,7 @@ export default function TopBanksStrip({ fips, name, selected = null, onSelect }:
       )}
       {data && (
         <p className="mt-2 text-[11px] text-muted">
-          FDIC Summary of Deposits, {data.as_of}. Ranked by local deposits, the public proxy for customers. Map logos show bank branches.{onSelect ? " Click a bank to show only its branches." : ""}
+          FDIC Summary of Deposits, {data.as_of}. Ranked by local deposits, the public proxy for customers. Crowded branches appear as dots; zoom in for bank logos.{onSelect ? " Click a bank to show only its branches." : ""}
         </p>
       )}
     </div>
