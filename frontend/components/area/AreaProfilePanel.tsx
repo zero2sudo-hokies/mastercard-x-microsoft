@@ -44,6 +44,7 @@ export default function AreaProfilePanel({ fips, onSelect }: { fips: string | nu
   const ok = status === "ok";
   const isCounty = area.level === "county";
   const maxShare = Math.max(...TOPICS.map((t) => fr?.topic_shares?.[t] ?? 0), 0.01);
+  const topicGrid = "grid grid-cols-[1.25rem_minmax(0,7.5rem)_1fr_3rem_2.75rem] gap-x-2";
 
   return (
     <div className={`space-y-3 ${loading ? "opacity-60" : ""}`}>
@@ -81,20 +82,26 @@ export default function AreaProfilePanel({ fips, onSelect }: { fips: string | nu
         ) : (
           <>
             {!ok && <p className="mb-2 text-xs text-amber-800">Fewer than 30 complaints, so these numbers are not scored and may be noisy.</p>}
+            <div className={`mb-1 ${topicGrid} text-[10px] text-muted`}>
+              <span className="col-span-3" />
+              <span className="whitespace-nowrap text-right" title="Share of complaints">Share</span>
+              <span className="whitespace-nowrap text-right" title="Pain score: topic share versus national. 1.00 matches the national share">Pain</span>
+            </div>
             <ul className="space-y-1.5">
               {TOPICS.map((t) => {
                 const share = fr.topic_shares?.[t] ?? 0;
                 const pain = fr.pain_scores?.[t];
                 const top = fr.top_topic === t;
                 return (
-                  <li key={t} className="grid grid-cols-[1.25rem_8rem_1fr_3.5rem] items-center gap-2 text-xs">
+                  <li key={t} className={`${topicGrid} items-center text-xs`}>
                     <TopicIcon topic={t} className={top ? "text-accent" : "text-muted"} />
-                    <span className={top ? "font-semibold text-navy" : "text-navy"}>{TOPIC_LABEL[t]}</span>
-                    <span className="h-2 rounded bg-paper">
+                    <span className={`truncate ${top ? "font-semibold text-navy" : "text-navy"}`}>{TOPIC_LABEL[t]}</span>
+                    <span className="h-2 overflow-hidden rounded bg-paper">
                       <span className={`block h-2 rounded ${top ? "bg-accent" : "bg-navy-soft/60"}`} style={{ width: `${(share / maxShare) * 100}%` }} />
                     </span>
-                    <span className="text-right tabular-nums text-muted" title="Pain score: topic share vs national, weighted by intensity">
-                      {fmtPct(share, 0)} · {pain?.toFixed(2) ?? "—"}
+                    <span className="whitespace-nowrap text-right tabular-nums text-navy">{fmtPct(share, 0)}</span>
+                    <span className="whitespace-nowrap text-right tabular-nums text-muted" title="Pain score: topic share vs national, weighted by intensity">
+                      {pain?.toFixed(2) ?? "—"}
                     </span>
                   </li>
                 );
