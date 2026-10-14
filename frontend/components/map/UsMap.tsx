@@ -1,6 +1,6 @@
 "use client";
 
-import { geoBounds, geoCentroid } from "d3-geo";
+import { geoBounds } from "d3-geo";
 import type { Feature, FeatureCollection, Geometry } from "geojson";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { feature } from "topojson-client";
@@ -9,8 +9,9 @@ import us from "us-atlas/counties-10m.json";
 import { Map as RegionMap, MapControls, MapGeoJSON, MapMarker, MarkerContent, MarkerTooltip, useMap, type MapGeoJSONEvent } from "@/components/ui/map";
 import BankLogo from "@/components/ui/BankLogo";
 import { bankDotColor, crowdedMarkers } from "@/lib/marker-layout";
+import { mapBounds } from "@/lib/map-bounds";
 import { fmtInt, fmtScore } from "@/lib/format";
-import { TOPIC_ICON, TOPIC_LABEL } from "@/lib/topics";
+import { TOPIC_LABEL } from "@/lib/topics";
 import type { AreaSummary, BranchPin, Layer, TopicId } from "@/lib/types";
 
 const topology = us as unknown as Topology<{ states: GeometryCollection; counties: GeometryCollection }>;
@@ -101,7 +102,7 @@ export default function UsMap(props: Props) {
   return (
     <div className="relative w-full">
       <div className="relative h-[610px] max-h-[75vh] min-h-[360px] overflow-hidden rounded-lg border border-line bg-white" onMouseLeave={() => setHover(null)}>
-        <RegionMap theme="light" styles={{ light: `${process.env.NEXT_PUBLIC_BASE_PATH || ""}/map-style-light.json` }} center={[-98, 38]} zoom={3.3} minZoom={2} maxZoom={18} renderWorldCopies={false}>
+        <RegionMap theme="light" styles={{ light: `${process.env.NEXT_PUBLIC_BASE_PATH || ""}/map-style-light.json` }} center={[-98, 38]} zoom={3.3} minZoom={2} maxZoom={18} maxBounds={mapBounds(stateFips)} renderWorldCopies={false}>
           {stateFips && <MapGeoJSON<{ fips: string }> id="surrounding-states" beforeId="waterway_label" data={contextStates} promoteId="fips" interactive
             fillPaint={{ "fill-color": "#ebe9e3", "fill-opacity": ["interpolate", ["linear"], ["zoom"], 6, 0.55, 12, 0.08, 15, 0] }}
             linePaint={{ "line-color": "#ffffff", "line-width": 0.7 }}
@@ -119,14 +120,6 @@ export default function UsMap(props: Props) {
               else if (!focused) (stateFips ? props.onCountyClick : props.onStateClick)(e.feature.properties.fips);
             }} />
           <MapNavigation stateFips={stateFips} focused={focused} focusColor={selectedFips && counties.has(selectedFips) ? scale.color(counties.get(selectedFips)!) ?? "#f1f0ec" : "#f1f0ec"} onClearFocus={props.onClearFocus} />
-          {layer === "frustration" && stateFips && shapes.map((shape) => {
-            const row = counties.get(String(shape.id));
-            if (!row?.top_topic || row.frustration_status !== "ok" || !isClearLead(row) || (focused && String(shape.id) !== selectedFips)) return null;
-            const [longitude, latitude] = geoCentroid(shape);
-            return <MapMarker key={String(shape.id)} longitude={longitude} latitude={latitude}>
-              <MarkerContent className="pointer-events-none"><svg width="20" height="20" viewBox="0 0 24 24" className="pointer-events-none rounded-full bg-white p-0.5" aria-label={TOPIC_LABEL[row.top_topic]}><path d={TOPIC_ICON[row.top_topic]} fill="none" stroke="#0b1f3a" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" /></svg></MarkerContent>
-            </MapMarker>;
-          })}
           {focused && <BranchMarkers pins={props.pins ?? []} highlightCert={props.highlightCert ?? null} />}
           <MapControls position="bottom-right" showZoom showCompass />
         </RegionMap>
@@ -162,6 +155,7 @@ function MapNavigation({ stateFips, focused, focusColor, onClearFocus }: { state
     if (!map || !isLoaded) return;
     const duration = navigationStarted.current ? 650 : 0;
     navigationStarted.current = true;
+    map.setMaxBounds(mapBounds(stateFips));
     const shape = focused ?? stateShapes.find((s) => String(s.id) === stateFips);
     if (shape) map.fitBounds(regionBounds(shape), { padding: focused ? 100 : 40, maxZoom: focused ? 12 : 8, pitch: focused ? 35 : 0, duration });
     else map.fitBounds([[-125, 24], [-66, 50]], { padding: 30, pitch: 0, duration });
@@ -214,12 +208,6 @@ function BranchMarkers({ pins, highlightCert }: { pins: BranchPin[]; highlightCe
       <MarkerTooltip className="border border-line bg-white text-navy">{p.bank ?? "Other bank"} · {p.branch}</MarkerTooltip>
     </MapMarker>;
   });
-}
-
-// clear_lead lives on FrustrationArea; summaries carry pain scores, so recompute the same rule (lead >= 1.15)
-function isClearLead(s: AreaSummary) {
-  const p = Object.values(s.pain_scores ?? {}).sort((a, b) => b - a);
-  return p.length > 1 && p[1] > 0 && p[0] / p[1] >= 1.15;
 }
 
 function Tooltip({ s, x, y, width }: { s: AreaSummary; x: number; y: number; width: number }) {
